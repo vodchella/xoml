@@ -90,11 +90,10 @@ let board_draw () =
 
 (* Main functions *)
 
-let process_input str =
-    match str with
+let process_input = function
     | "q" | "e" | "quit" | "exit" -> Quit
-    | s when (move_is_valid_input_str s) -> Move str
-    | _   -> Invalid ("Invalid move: " ^ str)
+    | s when (move_is_valid_input_str s) -> Move s
+    | s -> Invalid ("Invalid move: " ^ s)
 
 let rec main_loop (g: game) =
     screen_clear ();
