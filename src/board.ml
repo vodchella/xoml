@@ -10,7 +10,7 @@ let make_column_headers columns_count =
     "   " ^ make_sparse_row columns_count (fun i -> Char.chr (chrc 'A' + i))
 
 let make_empty_row columns_count =
-    make_sparse_row columns_count (fun i -> '.')
+    make_sparse_row columns_count (fun _ -> '.')
 
 let make_body rows_count row  =
     let lines = List.init rows_count (fun i ->

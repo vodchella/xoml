@@ -3,10 +3,10 @@ set -e
 
 mkdir -p build
 
-ocamlopt -I build -c -o build/common.cmx src/common.ml
-ocamlopt -I build -c -o build/board.cmx src/board.ml
-ocamlopt -I build -c -o build/input.cmx src/input.ml
-ocamlfind ocamlopt -package unix -I build -c -o build/xo.cmx src/xo.ml
+ocamlopt -w +a-40-42-70 -I build -c -o build/common.cmx src/common.ml
+ocamlopt -w +a-40-42-70 -I build -c -o build/board.cmx src/board.ml
+ocamlopt -w +a-40-42-70 -I build -c -o build/input.cmx src/input.ml
+ocamlfind ocamlopt -w +a-40-42-70 -package unix -I build -c -o build/xo.cmx src/xo.ml
 
 ocamlfind ocamlopt -linkpkg -package unix \
   -I build \

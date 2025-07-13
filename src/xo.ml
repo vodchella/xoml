@@ -1,7 +1,7 @@
 open Common
 
 
-let calc_next_move str =
+let calc_next_move _str =
     Unix.sleep 2;
     "RND"
 
