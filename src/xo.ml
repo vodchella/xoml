@@ -1,43 +1,13 @@
-let printf = Printf.printf
-let chrc   = Char.code
+open Common
 
 type input_result =
     | Move of string
     | Invalid of string
+    | Help
     | Quit
-
-type game =
-    { last_tip : string
-    ; board    : int list
-    }
-
-let board_width   = 10
-let board_height  = 10
-let input_vmargin = board_height + 5
-let input_prompt  = "?> "
-let ascii_esc     = "\x1b"
-let inital_tip    = "Type your move (e.g. 'E4') or 'Q' to exit"
-let empty_row     = String.make (String.length inital_tip) ' '
-let inital_game   =
-    { last_tip = inital_tip
-    ; board    = []
-    }
 
 
 (* Utility functions *)
-
-let screen_clear () =
-    Sys.command "clear"
-    |> ignore
-
-let cursor_move row col =
-    printf "%s[%d;%dH%!" ascii_esc row col
-    |> ignore
-
-let print_at str row col =
-    cursor_move row col;
-    printf "%s" str
-    |> ignore
 
 let move_is_valid_input_str str =
     match String.length str with
@@ -56,58 +26,18 @@ let move_is_valid_input_str str =
         is_letter c1 && is_digit c2
     | _ -> false
 
-
-(* Board drawing functions *)
-
-let board_make_sparse_row count make_chars_fn =
-    String.init count make_chars_fn
-    |> String.to_seq
-    |> Seq.map (fun ch -> String.make 1 ch ^ " ")
-    |> Seq.fold_left ( ^ ) ""
-
-let board_make_column_headers columns_count =
-    "   " ^ board_make_sparse_row columns_count (fun i -> Char.chr (chrc 'A' + i))
-
-let board_make_empty_row columns_count =
-    board_make_sparse_row columns_count (fun i -> '.')
-
-let board_make_body rows_count row  =
-    let lines = List.init rows_count (fun i ->
-        let index = rows_count - 1 - i in
-        let index_str = string_of_int index in
-        index_str ^ "  " ^ row ^ " " ^ index_str ^ "\n")
-    in
-    String.concat "" lines
-
-let board_draw () =
-    let headers    =  board_make_column_headers  board_width      in
-    let row        =  board_make_empty_row       board_width      in
-    let board_body =  board_make_body            board_height row in
-    cursor_move 1 1;
-    printf "\n%s\n" headers;
-    printf "%s"     board_body;
-    printf "%s"     headers
-    |> ignore
-
-let board_print_prompt(g: game) =
-    print_at empty_row (input_vmargin - 1) 1;
-    print_at empty_row input_vmargin 1;
-    print_at empty_row (input_vmargin + 1) 1;
-    print_at (g.last_tip) input_vmargin 1;
-    print_at input_prompt (input_vmargin + 1) 1
-    |> ignore
+let process_input = function
+    | "q" | "e" | "quit" | "exit" -> Quit
+    | "h" | "help" -> Help
+    | s when (move_is_valid_input_str s) -> Move s
+    | s -> Invalid ("Invalid move: " ^ s)
 
 
 (* Main functions *)
 
-let process_input = function
-    | "q" | "e" | "quit" | "exit" -> Quit
-    | s when (move_is_valid_input_str s) -> Move s
-    | s -> Invalid ("Invalid move: " ^ s)
-
 let rec main_loop (g: game) =
-    board_draw ();
-    board_print_prompt g;
+    Board.draw ();
+    Board.print_prompt g;
     let input =
         read_line ()
         |> String.trim
@@ -120,6 +50,9 @@ let rec main_loop (g: game) =
         (main_loop[@tailcall]) g'
     | Move move ->
         let g' = { g with last_tip = "Your move: " ^ move } in
+        (main_loop[@tailcall]) g'
+    | Help ->
+        let g' = { g with last_tip = inital_tip } in
         (main_loop[@tailcall]) g'
     | Quit -> ()
 
