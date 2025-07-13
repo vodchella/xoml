@@ -17,6 +17,7 @@ let input_vmargin = board_height + 5
 let input_prompt  = "?> "
 let ascii_esc     = "\x1b"
 let inital_tip    = "Type your move (e.g. 'E4') or 'Q' to exit"
+let empty_row     = String.make (String.length inital_tip) ' '
 let inital_game   =
     { last_tip = inital_tip
     ; board    = []
@@ -82,9 +83,18 @@ let board_draw () =
     let headers    =  board_make_column_headers  board_width      in
     let row        =  board_make_empty_row       board_width      in
     let board_body =  board_make_body            board_height row in
+    cursor_move 1 1;
     printf "\n%s\n" headers;
     printf "%s"     board_body;
     printf "%s"     headers
+    |> ignore
+
+let board_print_prompt(g: game) =
+    print_at empty_row (input_vmargin - 1) 1;
+    print_at empty_row input_vmargin 1;
+    print_at empty_row (input_vmargin + 1) 1;
+    print_at (g.last_tip) input_vmargin 1;
+    print_at input_prompt (input_vmargin + 1) 1
     |> ignore
 
 
@@ -96,10 +106,8 @@ let process_input = function
     | s -> Invalid ("Invalid move: " ^ s)
 
 let rec main_loop (g: game) =
-    screen_clear ();
     board_draw ();
-    print_at (g.last_tip) input_vmargin 1;
-    print_at input_prompt (input_vmargin + 1) 1;
+    board_print_prompt g;
     let input =
         read_line ()
         |> String.trim
@@ -115,6 +123,8 @@ let rec main_loop (g: game) =
         (main_loop[@tailcall]) g'
     | Quit -> ()
 
-let main () = (main_loop[@tailcall]) inital_game
+let main () =
+    screen_clear ();
+    (main_loop[@tailcall]) inital_game
 let () = main ()
 
