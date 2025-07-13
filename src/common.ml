@@ -2,9 +2,12 @@ let printf = Printf.printf
 let chrc   = Char.code
 
 
+type game_state = Waiting | Thinking
 type game =
-    { last_tip : string
-    ; board    : int list
+    { last_tip      : string
+    ; last_move_str : string
+    ; state         : game_state
+    ; board         : int list
     }
 
 let board_width   = 10
@@ -15,8 +18,10 @@ let ascii_esc     = "\x1b"
 let inital_tip    = "Type your move (e.g. 'E4') or 'Q' to exit"
 let empty_row     = String.make (String.length inital_tip) ' '
 let initial_game  =
-    { last_tip = inital_tip
-    ; board    = []
+    { last_tip      = inital_tip
+    ; last_move_str = ""
+    ; state         = Waiting
+    ; board         = []
     }
 
 
