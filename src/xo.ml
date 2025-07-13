@@ -24,6 +24,6 @@ let rec main_loop (g: game) =
 
 let main () =
     screen_clear ();
-    (main_loop[@tailcall]) inital_game
+    (main_loop[@tailcall]) initial_game
 let () = main ()
 

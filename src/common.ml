@@ -14,7 +14,7 @@ let input_prompt  = "?> "
 let ascii_esc     = "\x1b"
 let inital_tip    = "Type your move (e.g. 'E4') or 'Q' to exit"
 let empty_row     = String.make (String.length inital_tip) ' '
-let inital_game   =
+let initial_game  =
     { last_tip = inital_tip
     ; board    = []
     }
