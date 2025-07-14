@@ -1,7 +1,19 @@
 open Common
 
 
-let calc_next_move _str =
+let apply_move (g: game) (p: player) move_str =
+    let point = point_of_move_str g move_str in
+    let i = index_of_point g point in
+    g.board.(i) <- p;
+    let g' = { g with
+               last_tip = "Your move: " ^ move_str ^ ". Thinking..."
+             ; last_move_str = move_str
+             ; state = Thinking
+             }
+    in
+    g'
+
+let calc_next_move (_g: game) (_p: player) =
     Unix.sleep 2;
     "RND"
 
@@ -10,7 +22,7 @@ let rec main_loop (g: game) =
     Board.print_prompt g;
     match g.state with
     | Thinking ->
-        let next_move = calc_next_move g.last_move_str in
+        let next_move = calc_next_move g O in
         let g' = { g with
                    last_tip = "Computer's move: " ^ next_move ^ ". Now your turn..."
                  ; last_move_str = next_move
@@ -22,7 +34,7 @@ let rec main_loop (g: game) =
         let input =
             read_line ()
             |> String.trim
-            |> String.lowercase_ascii
+            |> String.uppercase_ascii
             |> Input.of_string g
         in
         match input with
@@ -30,12 +42,7 @@ let rec main_loop (g: game) =
             let g' = { g with last_tip = invalid_input } in
             (main_loop[@tailcall]) g'
         | Move move ->
-            let g' = { g with
-                       last_tip = "Your move: " ^ move ^ ". Thinking..."
-                     ; last_move_str = move
-                     ; state = Thinking
-                     }
-            in
+            let g' = apply_move g X move in
             (main_loop[@tailcall]) g'
         | Help ->
             let g' = { g with last_tip = inital_tip } in

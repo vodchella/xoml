@@ -10,7 +10,7 @@ let make_column_headers columns_count =
     "   " ^ make_sparse_row columns_count (fun i -> Char.chr (chrc 'A' + i))
 
 let make_empty_row columns_count =
-    make_sparse_row columns_count (fun _ -> '.')
+    make_sparse_row columns_count (fun _ -> sym_none.[0])
 
 let make_body rows_count row  =
     let lines = List.init rows_count (fun i ->
@@ -27,7 +27,19 @@ let draw (g: game) =
     cursor_move 1 1;
     printf "\n%s\n" headers;
     printf "%s"     board_body;
-    printf "%s"     headers
+    printf "%s"     headers;
+    g.board
+    |> Array.iteri (fun i cell ->
+       match cell with
+       | N -> ()
+       | X | O as p ->
+           let pnt = point_of_index g i in
+           let symbol = match p with
+               | X -> sym_x
+               | O -> sym_o
+               | N -> sym_none (* <-- nonreachable, just for avoid warnings *)
+           in
+           print_at symbol (pnt.y + 2) (pnt.x * 2 + 2))
     |> ignore
 
 let print_prompt(g: game) =

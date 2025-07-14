@@ -13,20 +13,17 @@ let input_str_is_valid_move (g: game) str =
         let c2 = String.get str 1 in
         let is_letter c =
             let code = chrc c in
-            let boundU = chrc 'A' + g.board_width - 1 in
-            let boundL = chrc 'a' + g.board_width - 1 in
-                (code >= chrc 'A' && code <= boundU) ||
-                (code >= chrc 'a' && code <= boundL)
+            code >= chrc 'A' && code <= chrc 'A' + g.board_width - 1
         in
         let is_digit c =
             let code = chrc c in
-                code >= chrc '0' && code <= chrc '0' + g.board_height - 1
+            code >= chrc '0' && code <= chrc '0' + g.board_height - 1
         in
         is_letter c1 && is_digit c2
     | _ -> false
 
 let of_string (g: game) = function
-    | "q" | "e" | "quit" | "exit" -> Quit
-    | "h" | "help" -> Help
+    | "Q" | "E" | "QUIT" | "EXIT" -> Quit
+    | "H" | "HELP" -> Help
     | s when (input_str_is_valid_move g s) -> Move s
     | s -> Invalid ("Invalid move: " ^ s)
