@@ -12,7 +12,7 @@ let rec main_loop (g: game) =
     | Thinking ->
         let next_move = calc_next_move g O in
         let g' = { g with
-                   last_tip = "Computer's move: '" ^ next_move ^ "'. Now your turn..."
+                   last_tip = "Computer's move: '" ^ next_move ^ "'. Now it's your turn..."
                  ; last_move_str = next_move
                  ; state = Waiting
                  }
