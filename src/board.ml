@@ -63,7 +63,10 @@ let draw (g: game) =
     cursor_move 1 1;
     printf "\n%s\n" headers;
     printf "%s"     board_body;
-    printf "%s"     headers;
+    printf "%s"     headers
+    |> ignore
+
+let print_figures (g: game) =
     g.board
     |> Array.iteri (fun i cell ->
        match cell with

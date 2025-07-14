@@ -6,7 +6,7 @@ let calc_next_move (_g: game) (_p: player) =
     "RND"
 
 let rec main_loop (g: game) =
-    Board.draw g;
+    Board.print_figures g;
     Board.print_prompt g;
     match g.state with
     | Thinking ->
@@ -46,6 +46,7 @@ let main () =
     assert (g.board_height >= 5);
     assert (g.board_height <= 10);
     screen_clear ();
+    Board.draw g;
     (main_loop[@tailcall]) g
 let () = main ()
 
