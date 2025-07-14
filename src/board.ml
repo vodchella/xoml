@@ -38,6 +38,24 @@ let apply_move (g: game) (p: player) move_str =
       let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
       g'
 
+let size_from_args () =
+    let size = ref None in
+    let speclist = [
+        ("-s", Arg.Int (fun x ->
+            if x < 5 || x > 10 then
+              raise (Arg.Bad "Value for -s must be between 5 and 10")
+            else
+              size := Some x),
+         "Set size (must be between 5 and 10)")
+    ] in
+
+    let usage_msg = "Usage: program_name [-s X]" in
+    Arg.parse speclist print_endline usage_msg;
+
+    match !size with
+    | Some s -> s
+    | None   -> default_board_width
+
 let draw (g: game) =
     let headers    =  make_column_headers  g.board_width      in
     let row        =  make_empty_row       g.board_width      in

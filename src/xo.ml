@@ -38,7 +38,9 @@ let rec main_loop (g: game) =
         | Quit -> ()
 
 let main () =
+    let s = Board.size_from_args () in
     let g = initial_game in
+    let g = { g with board_width = s; board_height = s; input_vmargin = s + 5 } in
     assert (g.board_width  >= 5);
     assert (g.board_width  <= 10);
     assert (g.board_height >= 5);
