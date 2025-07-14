@@ -6,7 +6,7 @@ let calc_next_move _str =
     "RND"
 
 let rec main_loop (g: game) =
-    Board.draw ();
+    Board.draw g;
     Board.print_prompt g;
     match g.state with
     | Thinking ->
@@ -23,7 +23,7 @@ let rec main_loop (g: game) =
             read_line ()
             |> String.trim
             |> String.lowercase_ascii
-            |> Input.of_string
+            |> Input.of_string g
         in
         match input with
         | Invalid invalid_input ->
@@ -43,6 +43,11 @@ let rec main_loop (g: game) =
         | Quit -> ()
 
 let main () =
+    let g = initial_game in
+    assert (g.board_width  >= 5);
+    assert (g.board_width  <= 10);
+    assert (g.board_height >= 5);
+    assert (g.board_height <= 10);
     screen_clear ();
     (main_loop[@tailcall]) initial_game
 let () = main ()

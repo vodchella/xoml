@@ -20,10 +20,10 @@ let make_body rows_count row  =
     in
     String.concat "" lines
 
-let draw () =
-    let headers    =  make_column_headers  board_width      in
-    let row        =  make_empty_row       board_width      in
-    let board_body =  make_body            board_height row in
+let draw (g: game) =
+    let headers    =  make_column_headers  g.board_width      in
+    let row        =  make_empty_row       g.board_width      in
+    let board_body =  make_body            g.board_height row in
     cursor_move 1 1;
     printf "\n%s\n" headers;
     printf "%s"     board_body;
@@ -31,9 +31,9 @@ let draw () =
     |> ignore
 
 let print_prompt(g: game) =
-    print_at empty_row (input_vmargin - 1) 1;
-    print_at empty_row input_vmargin 1;
-    print_at empty_row (input_vmargin + 1) 1;
-    print_at (g.last_tip) input_vmargin 1;
-    print_at input_prompt (input_vmargin + 1) 1
+    print_at empty_row (g.input_vmargin - 1) 1;
+    print_at empty_row g.input_vmargin 1;
+    print_at empty_row (g.input_vmargin + 1) 1;
+    print_at (g.last_tip) g.input_vmargin 1;
+    print_at input_prompt (g.input_vmargin + 1) 1
     |> ignore
