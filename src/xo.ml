@@ -2,16 +2,22 @@ open Common
 
 
 let apply_move (g: game) (p: player) move_str =
-    let point = point_of_move_str g move_str in
-    let i = index_of_point g point in
-    g.board.(i) <- p;
-    let g' = { g with
-               last_tip = "Your move: " ^ move_str ^ ". Thinking..."
-             ; last_move_str = move_str
-             ; state = Thinking
-             }
-    in
-    g'
+  let point = point_of_move_str g move_str in
+  let i = index_of_point g point in
+  let cell = g.board.(i) in
+  match cell with
+  | N ->
+      g.board.(i) <- p;
+      let g' = { g with
+                 last_tip      = "Your move: " ^ move_str ^ ". Thinking..."
+               ; last_move_str = move_str
+               ; state         = Thinking
+               }
+      in
+      g'
+  | X | O ->
+      let g' = { g with last_tip = "Cell " ^ move_str ^ " is occupied" } in
+      g'
 
 let calc_next_move (_g: game) (_p: player) =
     Unix.sleep 2;
