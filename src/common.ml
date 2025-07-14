@@ -69,3 +69,4 @@ let point_of_move_str (g: game) (s : string) : point =
     let y' = digit_to_int c2 in
     let y  = g.board_height - y' in
     { x; y }
+

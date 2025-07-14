@@ -6,7 +6,7 @@ type input_result =
     | Help
     | Quit
 
-let input_str_is_valid_move (g: game) str =
+let str_is_valid_move (g: game) str =
     match String.length str with
     | 2 ->
         let c1 = String.get str 0 in
@@ -23,7 +23,8 @@ let input_str_is_valid_move (g: game) str =
     | _ -> false
 
 let of_string (g: game) = function
-    | "Q" | "E" | "QUIT" | "EXIT" -> Quit
+    | "Q" | "E" | "X" | "QUIT" | "EXIT" -> Quit
     | "H" | "HELP" -> Help
-    | s when (input_str_is_valid_move g s) -> Move s
+    | s when (str_is_valid_move g s) -> Move s
     | s -> Invalid ("Invalid move: '" ^ s ^ "'")
+

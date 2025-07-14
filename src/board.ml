@@ -85,3 +85,4 @@ let print_prompt(g: game) =
     print_at (g.last_tip) g.input_vmargin 1;
     print_at input_prompt (g.input_vmargin + 1) 1
     |> ignore
+
