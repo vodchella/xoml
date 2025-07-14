@@ -1,24 +1,6 @@
 open Common
 
 
-let apply_move (g: game) (p: player) move_str =
-  let point = point_of_move_str g move_str in
-  let i = index_of_point g point in
-  let cell = g.board.(i) in
-  match cell with
-  | N ->
-      g.board.(i) <- p;
-      let g' = { g with
-                 last_tip      = "Your move: " ^ move_str ^ ". Thinking..."
-               ; last_move_str = move_str
-               ; state         = Thinking
-               }
-      in
-      g'
-  | X | O ->
-      let g' = { g with last_tip = "Cell " ^ move_str ^ " is occupied" } in
-      g'
-
 let calc_next_move (_g: game) (_p: player) =
     Unix.sleep 2;
     "RND"
@@ -30,7 +12,7 @@ let rec main_loop (g: game) =
     | Thinking ->
         let next_move = calc_next_move g O in
         let g' = { g with
-                   last_tip = "Computer's move: " ^ next_move ^ ". Now your turn..."
+                   last_tip = "Computer's move: '" ^ next_move ^ "'. Now your turn..."
                  ; last_move_str = next_move
                  ; state = Waiting
                  }
@@ -48,7 +30,7 @@ let rec main_loop (g: game) =
             let g' = { g with last_tip = invalid_input } in
             (main_loop[@tailcall]) g'
         | Move move ->
-            let g' = apply_move g X move in
+            let g' = Board.apply_move g X move in
             (main_loop[@tailcall]) g'
         | Help ->
             let g' = { g with last_tip = inital_tip } in
@@ -62,6 +44,6 @@ let main () =
     assert (g.board_height >= 5);
     assert (g.board_height <= 10);
     screen_clear ();
-    (main_loop[@tailcall]) initial_game
+    (main_loop[@tailcall]) g
 let () = main ()
 

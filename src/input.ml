@@ -26,4 +26,4 @@ let of_string (g: game) = function
     | "Q" | "E" | "QUIT" | "EXIT" -> Quit
     | "H" | "HELP" -> Help
     | s when (input_str_is_valid_move g s) -> Move s
-    | s -> Invalid ("Invalid move: " ^ s)
+    | s -> Invalid ("Invalid move: '" ^ s ^ "'")

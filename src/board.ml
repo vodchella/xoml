@@ -20,6 +20,24 @@ let make_body rows_count row  =
     in
     String.concat "" lines
 
+let apply_move (g: game) (p: player) move_str =
+  let point = point_of_move_str g move_str in
+  let i = index_of_point g point in
+  let cell = g.board.(i) in
+  match cell with
+  | N ->
+      g.board.(i) <- p;
+      let g' = { g with
+                 last_tip      = "Your move: '" ^ move_str ^ "'. Thinking..."
+               ; last_move_str = move_str
+               ; state         = Thinking
+               }
+      in
+      g'
+  | X | O ->
+      let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
+      g'
+
 let draw (g: game) =
     let headers    =  make_column_headers  g.board_width      in
     let row        =  make_empty_row       g.board_width      in
@@ -37,7 +55,7 @@ let draw (g: game) =
            let symbol = match p with
                | X -> sym_x
                | O -> sym_o
-               | N -> sym_none (* <-- nonreachable, just for avoid warnings *)
+               | N -> sym_none (* unreachable, just for avoid warnings *)
            in
            print_at symbol (pnt.y + 2) (pnt.x * 2 + 2))
     |> ignore
