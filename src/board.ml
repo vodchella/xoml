@@ -1,5 +1,4 @@
 open Common
-open Input
 
 let make_sparse_row count make_chars_fn =
     String.init count make_chars_fn
@@ -26,11 +25,12 @@ let apply_move (g: game) (p: player) move_str =
   let i = index_of_point g point in
   let cell = g.board.(i) in
   match cell with
-  | N ->
+  | NP ->
       g.board.(i) <- p;
       let g' = { g with
                  last_tip      = "Your move: '" ^ move_str ^ "'. Thinking..."
                ; last_move_str = move_str
+               ; last_player   = p
                ; state         = Thinking
                }
       in
@@ -68,16 +68,16 @@ let draw (g: game) =
     |> ignore
 
 let symbol_of_cell = function
-   | X -> sym_x
-   | O -> sym_o
-   | N -> sym_none
+   | X  -> sym_x
+   | O  -> sym_o
+   | NP -> sym_none
 
 (* Unused for now *)
 let print_figures (g: game) =
     g.board
     |> Array.iteri (fun i cell ->
        match cell with
-       | N -> ()
+       | NP    -> ()
        | X | O ->
            let point = point_of_index g i in
            let symbol = symbol_of_cell cell in
@@ -85,7 +85,7 @@ let print_figures (g: game) =
     |> ignore
 
 let print_last_figure (g: game) =
-    match str_is_valid_move g g.last_move_str with
+    match Input.str_is_valid_move g g.last_move_str with
     | false -> ()
     | true  ->
         let point = point_of_move_str g g.last_move_str in
@@ -93,11 +93,19 @@ let print_last_figure (g: game) =
         let symbol = symbol_of_cell g.board.(index) in
         print_symbol_at_point symbol point
 
-let print_prompt(g: game) =
+let clear_space_for_prompt (g: game) =
     print_at empty_row (g.input_vmargin - 1) 1;
     print_at empty_row g.input_vmargin 1;
-    print_at empty_row (g.input_vmargin + 1) 1;
+    print_at empty_row (g.input_vmargin + 1) 1
+
+let print_prompt (g: game) =
+    clear_space_for_prompt g;
     print_at (g.last_tip) g.input_vmargin 1;
     print_at input_prompt (g.input_vmargin + 1) 1
+    |> ignore
+
+let print_congratulations (g: game) (p: player) =
+    clear_space_for_prompt g;
+    print_at ("Player " ^ (symbol_of_cell p) ^ " wins!") g.input_vmargin 1
     |> ignore
 
