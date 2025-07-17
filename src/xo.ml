@@ -6,7 +6,7 @@ let calc_next_move (_g: game) (_p: player) =
     "RND"
 
 let rec main_loop (g: game) =
-    Board.print_figures g;
+    Board.print_last_figure g;
     Board.print_prompt g;
     match g.state with
     | Thinking ->

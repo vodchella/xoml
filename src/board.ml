@@ -1,4 +1,5 @@
 open Common
+open Input
 
 let make_sparse_row count make_chars_fn =
     String.init count make_chars_fn
@@ -66,20 +67,31 @@ let draw (g: game) =
     printf "%s"     headers
     |> ignore
 
+let symbol_of_cell = function
+   | X -> sym_x
+   | O -> sym_o
+   | N -> sym_none
+
+(* Unused for now *)
 let print_figures (g: game) =
     g.board
     |> Array.iteri (fun i cell ->
        match cell with
        | N -> ()
-       | X | O as p ->
-           let pnt = point_of_index g i in
-           let symbol = match p with
-               | X -> sym_x
-               | O -> sym_o
-               | N -> sym_none (* unreachable, just for avoid warnings *)
-           in
-           print_at symbol (pnt.y + 2) (pnt.x * 2 + 2))
+       | X | O ->
+           let point = point_of_index g i in
+           let symbol = symbol_of_cell cell in
+           print_symbol_at_point symbol point)
     |> ignore
+
+let print_last_figure (g: game) =
+    match str_is_valid_move g g.last_move_str with
+    | false -> ()
+    | true  ->
+        let point = point_of_move_str g g.last_move_str in
+        let index = index_of_point g point in
+        let symbol = symbol_of_cell g.board.(index) in
+        print_symbol_at_point symbol point
 
 let print_prompt(g: game) =
     print_at empty_row (g.input_vmargin - 1) 1;

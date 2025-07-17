@@ -50,6 +50,9 @@ let print_at str row col =
     printf "%s" str
     |> ignore
 
+let print_symbol_at_point symbol point =
+    print_at symbol (point.y + 2) (point.x * 2 + 2)
+
 let index_of_point (g: game) (p : point) : int =
     (p.y - 1) * g.board_width + (p.x - 1)
 
