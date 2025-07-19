@@ -1,5 +1,6 @@
 open Common
 
+
 let make_sparse_row count make_chars_fn =
     String.init count make_chars_fn
     |> String.to_seq

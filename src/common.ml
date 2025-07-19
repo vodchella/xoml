@@ -84,16 +84,3 @@ let point_of_move_str (g: game) (s : string) : point =
     let y  = g.board_height - y' in
     { x; y }
 
-let relative_point_of_direction = function
-    | N  -> { x =  0; y = -1 }
-    | E  -> { x =  1; y =  0 }
-    | S  -> { x =  0; y =  1 }
-    | W  -> { x = -1; y =  0 }
-    | NE -> { x =  1; y = -1 }
-    | SE -> { x =  1; y =  1 }
-    | SW -> { x = -1; y =  1 }
-    | NW -> { x = -1; y = -1 }
-
-let count_in_direction (_g: game) (_pl: player) (_p: point) (_d: direction): int =
-    0
-
