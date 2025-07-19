@@ -11,8 +11,26 @@ let relative_point_of_direction = function
     | SW -> { x = -1; y =  1 }
     | NW -> { x = -1; y = -1 }
 
-let count_in_direction (_g: game) (_pl: player) (_p: point) (_d: direction): int =
-    0
+let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
+    let rel = relative_point_of_direction d in
+    let rec count_in_direction_aux counter accum =
+        match counter with
+        | c when c > g.win_length -> accum
+        | c ->
+            let pnt =
+                { x = p.x + (rel.x * c)
+                ; y = p.y + (rel.y * c)
+                }
+            in
+            let index_opt = index_of_point g pnt in
+            match index_opt with
+            | None -> accum
+            | Some index ->
+                match g.board.(index) with
+                | p_ when p_ == pl -> count_in_direction_aux (c + 1) (accum + 1)
+                | _ -> accum
+    in
+    count_in_direction_aux 0 0
 
 let check_winner (g: game) =
     match g.last_move_point with

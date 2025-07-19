@@ -64,13 +64,23 @@ let print_at str row col =
 let print_symbol_at_point symbol point =
     print_at symbol (point.y + 2) (point.x * 2 + 2)
 
-let index_of_point (g: game) (p : point) : int =
-    (p.y - 1) * g.board_width + (p.x - 1)
+let index_of_point (g: game) (pnt : point) : int option =
+    match pnt with
+    | { x; _ } when x < 1 -> None
+    | { y; _ } when y < 1 -> None
+    | { x; _ } when x > g.board_width  -> None
+    | { y; _ } when y > g.board_height -> None
+    | { x; y } ->
+        Some ((y - 1) * g.board_width + (x - 1))
 
-let point_of_index (g : game) (i : int) : point =
-  let x = (i mod g.board_width) + 1 in
-  let y = (i / g.board_width) + 1 in
-  { x; y }
+let point_of_index (g : game) (index : int) : point option =
+    match index with
+    | i when i > (g.board_width * g.board_height - 1) -> None
+    | i when i < 0 -> None
+    | i ->
+        let x = (i mod g.board_width) + 1 in
+        let y = (i / g.board_width) + 1 in
+        Some { x; y }
 
 let point_of_move_str (g: game) (s : string) : point =
     let letter_to_x c =

@@ -3,7 +3,8 @@ open Common
 
 let rec main_loop (g: game) =
     Board.print_last_figure g;
-    let winner = Engine.check_winner g in
+    let winner = NP in
+    (* let winner = Engine.check_winner g in *)
     match winner with
     | X | O ->
             Board.print_congratulations g winner;
@@ -44,6 +45,7 @@ let rec main_loop (g: game) =
             | Quit -> ()
 
 let main () =
+    Printexc.record_backtrace true;
     let s = Board.size_from_args () in
     let g = initial_game in
     let g = { g with board_width = s; board_height = s; input_vmargin = s + 5 } in

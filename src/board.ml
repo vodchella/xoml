@@ -23,7 +23,7 @@ let make_body rows_count row  =
 
 let apply_move (g: game) (p: player) move_str =
   let point = point_of_move_str g move_str in
-  let index = index_of_point g point in
+  let index = index_of_point g point |> Option.get in
   let cell = g.board.(index) in
   match cell with
   | NP ->
@@ -82,7 +82,7 @@ let print_figures (g: game) =
        match cell with
        | NP    -> ()
        | X | O ->
-           let point = point_of_index g i in
+           let point = point_of_index g i |> Option.get in
            let symbol = symbol_of_cell cell in
            print_symbol_at_point symbol point)
     |> ignore
