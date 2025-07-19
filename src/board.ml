@@ -22,16 +22,18 @@ let make_body rows_count row  =
 
 let apply_move (g: game) (p: player) move_str =
   let point = point_of_move_str g move_str in
-  let i = index_of_point g point in
-  let cell = g.board.(i) in
+  let index = index_of_point g point in
+  let cell = g.board.(index) in
   match cell with
   | NP ->
-      g.board.(i) <- p;
+      g.board.(index) <- p;
       let g' = { g with
-                 last_tip      = "Your move: '" ^ move_str ^ "'. Thinking..."
-               ; last_move_str = move_str
-               ; last_player   = p
-               ; state         = Thinking
+                 last_tip        = "Your move: '" ^ move_str ^ "'. Thinking..."
+               ; last_move_str   = Some move_str
+               ; last_move_point = Some point
+               ; last_move_index = Some index
+               ; last_player     = p
+               ; state           = Thinking
                }
       in
       g'
@@ -85,13 +87,11 @@ let print_figures (g: game) =
     |> ignore
 
 let print_last_figure (g: game) =
-    match Input.str_is_valid_move g g.last_move_str with
-    | false -> ()
-    | true  ->
-        let point = point_of_move_str g g.last_move_str in
-        let index = index_of_point g point in
+    match g.last_move_point, g.last_move_index with
+    | Some point, Some index ->
         let symbol = symbol_of_cell g.board.(index) in
         print_symbol_at_point symbol point
+    | _ -> ()
 
 let clear_space_for_prompt (g: game) =
     print_at empty_row (g.input_vmargin - 1) 1;

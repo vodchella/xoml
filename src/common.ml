@@ -9,15 +9,17 @@ type point = { x : int
              ; y : int
              }
 type game =
-    { board_width   : int
-    ; board_height  : int
-    ; win_length    : int
-    ; input_vmargin : int
-    ; last_tip      : string
-    ; last_move_str : string
-    ; last_player   : player
-    ; state         : game_state
-    ; board         : player array
+    { board_width     : int
+    ; board_height    : int
+    ; win_length      : int
+    ; input_vmargin   : int
+    ; last_tip        : string
+    ; last_move_str   : string option
+    ; last_move_point : point option
+    ; last_move_index : int option
+    ; last_player     : player
+    ; state           : game_state
+    ; board           : player array
     }
 
 let default_board_width  = 10
@@ -32,15 +34,17 @@ let sym_none             = "."
 let inital_tip           = "Type your move (e.g. 'E4') or 'Q' to exit"
 let empty_row            = String.make (5 + (String.length inital_tip)) ' '
 let initial_game         =
-    { board_width   = default_board_width
-    ; board_height  = default_board_height
-    ; win_length    = default_win_length
-    ; input_vmargin = 0  (* Will be set up on startup *)
-    ; last_tip      = inital_tip
-    ; last_move_str = ""
-    ; last_player   = NP
-    ; state         = Waiting
-    ; board         = Array.make (default_board_width * default_board_height) NP
+    { board_width     = default_board_width
+    ; board_height    = default_board_height
+    ; win_length      = default_win_length
+    ; input_vmargin   = 0  (* Will be set up on startup *)
+    ; last_tip        = inital_tip
+    ; last_move_str   = None
+    ; last_move_point = None
+    ; last_move_index = None
+    ; last_player     = NP
+    ; state           = Waiting
+    ; board           = Array.make (default_board_width * default_board_height) NP
     }
 
 

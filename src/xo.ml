@@ -3,13 +3,12 @@ open Common
 
 let calc_next_move (_g: game) (_p: player) =
     Unix.sleep 2;
-    "RND"
+    None
 
 let check_winner_on_last_move (g: game) =
-    match Input.str_is_valid_move g g.last_move_str with
-    | false -> NP
-    | true  ->
-        let point = point_of_move_str g g.last_move_str in
+    match g.last_move_point with
+    | None -> NP
+    | Some point  ->
         let finished_lines_count = all_directions
             |> List.map (fun dir -> count_in_direction g g.last_player point dir)  (* TODO: break on success *)
             |> List.filter (fun cnt -> cnt == g.win_length)
@@ -31,9 +30,12 @@ let rec main_loop (g: game) =
         match g.state with
         | Thinking ->
             let next_move = calc_next_move g O in
+            let next_move_str = next_move |> Option.value ~default:"RND" in
             let g' = { g with
-                       last_tip = "Computer's move: '" ^ next_move ^ "'. Now it's your turn..."
-                     ; last_move_str = next_move
+                       last_tip = "Computer's move: '" ^ next_move_str ^ "'. Now it's your turn..."
+                     ; last_move_str   = None
+                     ; last_move_point = None
+                     ; last_move_index = None
                      ; last_player = O
                      ; state = Waiting
                      }
