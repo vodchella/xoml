@@ -32,18 +32,31 @@ let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
     in
     count_in_direction_aux 0 0
 
-let check_winner (g: game) =
-    match g.last_move_point with
-    | None -> NP
-    | Some point  ->
-        let finished_lines_count = all_directions
-            |> List.map (fun dir -> count_in_direction g g.last_player point dir)  (* TODO: break on success *)
-            |> List.filter (fun cnt -> cnt == g.win_length)
-            |> List.length
+let find_winner (g: game) : player =
+    let check_player_at_index index pl =
+        let point = point_of_index g index |> Option.get in
+        let rec check_player_at_index_aux dirs =
+            match dirs with
+            | [] -> false
+            | dir :: rest ->
+                match count_in_direction g pl point dir with
+                | c when c == g.win_length -> true
+                | _ -> check_player_at_index_aux rest
         in
-        match finished_lines_count with
-        | 0 -> NP
-        | _ -> g.last_player
+        check_player_at_index_aux [ SW; S; SE; E ]
+    in
+    let rec find_winner_aux index =
+        match index with
+        | i when i > (g.board_size - 1) -> NP
+        | i ->
+            match check_player_at_index i X with
+            | true  -> X
+            | false ->
+                match check_player_at_index i O with
+                | true  -> O
+                | false -> find_winner_aux (i + 1)
+    in
+    find_winner_aux 0
 
 let calc_next_move (_g: game) (_p: player) =
     Unix.sleep 2;

@@ -3,12 +3,11 @@ open Common
 
 let rec main_loop (g: game) =
     Board.print_last_figure g;
-    let winner = NP in
-    (* let winner = Engine.check_winner g in *)
+    let winner = Engine.find_winner g in
     match winner with
     | X | O ->
-            Board.print_congratulations g winner;
-            ()
+        Board.print_congratulations g winner;
+        ()
     | NP ->
         Board.print_prompt g;
         match g.state with
@@ -48,7 +47,13 @@ let main () =
     Printexc.record_backtrace true;
     let s = Board.size_from_args () in
     let g = initial_game in
-    let g = { g with board_width = s; board_height = s; input_vmargin = s + 5 } in
+    let g = { g with
+              board_width = s
+            ; board_height = s
+            ; board_size = s * s
+            ; input_vmargin = s + 5
+            }
+    in
     assert (g.board_width  >= 5);
     assert (g.board_width  <= 10);
     assert (g.board_height >= 5);

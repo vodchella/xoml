@@ -11,6 +11,8 @@ type point = { x : int
 type game =
     { board_width     : int
     ; board_height    : int
+    ; board_size      : int
+    ; board           : player array
     ; win_length      : int
     ; input_vmargin   : int
     ; last_tip        : string
@@ -19,13 +21,11 @@ type game =
     ; last_move_index : int option
     ; last_player     : player
     ; state           : game_state
-    ; board           : player array
     }
 
 let default_board_width  = 10
 let default_board_height = 10
 let default_win_length   = 5
-let all_directions       = [ N ; E ; S ; W ; NE ; SE ; SW ; NW ]
 let input_prompt         = "?> "
 let ascii_esc            = "\x1b"
 let sym_x                = "X"
@@ -36,15 +36,16 @@ let empty_row            = String.make (5 + (String.length inital_tip)) ' '
 let initial_game         =
     { board_width     = default_board_width
     ; board_height    = default_board_height
+    ; board_size      = default_board_width * default_board_height  (* Will be set up on startup *)
+    ; board           = Array.make (default_board_width * default_board_height) NP
     ; win_length      = default_win_length
-    ; input_vmargin   = 0  (* Will be set up on startup *)
+    ; input_vmargin   = default_board_height + 5                    (* Will be set up on startup *)
     ; last_tip        = inital_tip
     ; last_move_str   = None
     ; last_move_point = None
     ; last_move_index = None
     ; last_player     = NP
     ; state           = Waiting
-    ; board           = Array.make (default_board_width * default_board_height) NP
     }
 
 
@@ -75,7 +76,7 @@ let index_of_point (g: game) (pnt : point) : int option =
 
 let point_of_index (g : game) (index : int) : point option =
     match index with
-    | i when i > (g.board_width * g.board_height - 1) -> None
+    | i when i > (g.board_size - 1) -> None
     | i when i < 0 -> None
     | i ->
         let x = (i mod g.board_width) + 1 in
