@@ -3,7 +3,7 @@ let chrc   = Char.code
 
 
 type direction  = N | E | S | W | NE | SE | SW | NW
-type player     = X | O | NP
+type player     = X | O
 type game_state = Waiting | Thinking
 type point = { x : int
              ; y : int
@@ -12,14 +12,14 @@ type game =
     { board_width     : int
     ; board_height    : int
     ; board_size      : int
-    ; board           : player array
+    ; board           : player option array
     ; win_length      : int
     ; input_vmargin   : int
     ; last_tip        : string
     ; last_move_str   : string option
     ; last_move_point : point option
     ; last_move_index : int option
-    ; last_player     : player
+    ; last_player     : player option
     ; state           : game_state
     }
 
@@ -37,14 +37,14 @@ let initial_game         =
     { board_width     = default_board_width
     ; board_height    = default_board_height
     ; board_size      = default_board_width * default_board_height  (* Will be set up on startup *)
-    ; board           = Array.make (default_board_width * default_board_height) NP
+    ; board           = Array.make (default_board_width * default_board_height) None
     ; win_length      = default_win_length
     ; input_vmargin   = default_board_height + 5                    (* Will be set up on startup *)
     ; last_tip        = inital_tip
     ; last_move_str   = None
     ; last_move_point = None
     ; last_move_index = None
-    ; last_player     = NP
+    ; last_player     = None
     ; state           = Waiting
     }
 

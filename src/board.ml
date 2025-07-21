@@ -26,19 +26,19 @@ let apply_move (g: game) (p: player) move_str =
   let index = index_of_point g point |> Option.get in
   let cell = g.board.(index) in
   match cell with
-  | NP ->
-      g.board.(index) <- p;
+  | None ->
+      g.board.(index) <- Some p;
       let g' = { g with
                  last_tip        = "Your move: '" ^ move_str ^ "'. Thinking..."
                ; last_move_str   = Some move_str
                ; last_move_point = Some point
                ; last_move_index = Some index
-               ; last_player     = p
+               ; last_player     = Some p
                ; state           = Thinking
                }
       in
       g'
-  | X | O ->
+  | Some _ ->
       let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
       g'
 
@@ -71,17 +71,17 @@ let draw (g: game) =
     |> ignore
 
 let symbol_of_cell = function
-   | X  -> sym_x
-   | O  -> sym_o
-   | NP -> sym_none
+   | Some X  -> sym_x
+   | Some O  -> sym_o
+   | None    -> sym_none
 
 (* Unused for now *)
 let print_figures (g: game) =
     g.board
     |> Array.iteri (fun i cell ->
        match cell with
-       | NP    -> ()
-       | X | O ->
+       | None   -> ()
+       | Some _ ->
            let point = point_of_index g i |> Option.get in
            let symbol = symbol_of_cell cell in
            print_symbol_at_point symbol point)
@@ -107,6 +107,6 @@ let print_prompt (g: game) =
 
 let print_congratulations (g: game) (p: player) =
     clear_space_for_prompt g;
-    print_at ("Player " ^ (symbol_of_cell p) ^ " wins!") g.input_vmargin 1
+    print_at ("Player " ^ (symbol_of_cell (Some p)) ^ " wins!") g.input_vmargin 1
     |> ignore
 

@@ -5,10 +5,10 @@ let rec main_loop (g: game) =
     Board.print_last_figure g;
     let winner = Engine.find_winner g in
     match winner with
-    | X | O ->
-        Board.print_congratulations g winner;
+    | Some winner' ->
+        Board.print_congratulations g winner';
         ()
-    | NP ->
+    | None ->
         Board.print_prompt g;
         match g.state with
         | Thinking ->
@@ -19,7 +19,7 @@ let rec main_loop (g: game) =
                      ; last_move_str   = None
                      ; last_move_point = None
                      ; last_move_index = None
-                     ; last_player = O
+                     ; last_player = Some O
                      ; state = Waiting
                      }
             in
