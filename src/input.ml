@@ -1,5 +1,6 @@
 open Common
 
+
 type input_result =
     | Move of string
     | Invalid of string

@@ -1,6 +1,22 @@
 open Common
 
 
+let screen_clear () =
+    Sys.command "clear"
+    |> ignore
+
+let cursor_move row col =
+    printf "%s[%d;%dH%!" ascii_esc row col
+    |> ignore
+
+let print_at str row col =
+    cursor_move row col;
+    printf "%s" str
+    |> ignore
+
+let print_symbol_at_point symbol point =
+    print_at symbol (point.y + 2) (point.x * 2 + 2)
+
 let make_sparse_row count make_chars_fn =
     String.init count make_chars_fn
     |> String.to_seq
@@ -87,18 +103,6 @@ let symbol_of_cell = function
    | Some X  -> sym_x
    | Some O  -> sym_o
    | None    -> sym_none
-
-(* Unused for now *)
-let print_figures (g: game) =
-    g.board
-    |> Array.iteri (fun i cell ->
-       match cell with
-       | None   -> ()
-       | Some _ ->
-           let point = point_of_index g i |> Option.get in
-           let symbol = symbol_of_cell cell in
-           print_symbol_at_point symbol point)
-    |> ignore
 
 let print_last_figure (g: game) =
     match g.last_move_point, g.last_move_index with

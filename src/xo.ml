@@ -3,10 +3,9 @@ open Common
 
 let rec main_loop (g: game) =
     Board.print_last_figure g;
-    let winner = Engine.find_winner g in
-    match winner with
-    | Some winner' ->
-        Board.print_congratulations g winner';
+    match Engine.find_winner g with
+    | Some winner ->
+        Board.print_congratulations g winner;
         ()
     | None ->
         Board.print_prompt g;
@@ -35,8 +34,6 @@ let rec main_loop (g: game) =
             | Quit -> ()
 
 let main () =
-    Printexc.record_backtrace true;
-    Random.self_init ();
     let s = Board.size_from_args () in
     let g = initial_game in
     let g = { g with
@@ -52,7 +49,9 @@ let main () =
     assert (g.board_height <= 10);
     assert (g.win_length   >= 3);
     assert (g.win_length   <= 5);
-    screen_clear ();
+    Printexc.record_backtrace true;
+    Random.self_init ();
+    Board.screen_clear ();
     Board.draw g;
     (main_loop[@tailcall]) g
 let () = main ()

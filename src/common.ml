@@ -54,22 +54,6 @@ let ( >>! ) opt fn =
     | Some v -> Some v
     | None   -> fn ()
 
-let screen_clear () =
-    Sys.command "clear"
-    |> ignore
-
-let cursor_move row col =
-    printf "%s[%d;%dH%!" ascii_esc row col
-    |> ignore
-
-let print_at str row col =
-    cursor_move row col;
-    printf "%s" str
-    |> ignore
-
-let print_symbol_at_point symbol point =
-    print_at symbol (point.y + 2) (point.x * 2 + 2)
-
 let index_of_point (g: game) (pnt : point) : int option =
     match pnt with
     | { x; _ } when x < 1 -> None
