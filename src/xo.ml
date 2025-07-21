@@ -12,7 +12,7 @@ let rec main_loop (g: game) =
         match g.state with
         | Thinking ->
             let next_move_index = Engine.find_best_move g O in
-            let g' = Board.apply_move_by_index g O next_move_index in
+            let g' = Engine.apply_move_by_index g O next_move_index in
             (main_loop[@tailcall]) g'
         | Waiting ->
             let input =
@@ -26,7 +26,7 @@ let rec main_loop (g: game) =
                 let g' = { g with last_tip = invalid_input } in
                 (main_loop[@tailcall]) g'
             | Move move ->
-                let g' = Board.apply_move g X move in
+                let g' = Engine.apply_move g X move in
                 (main_loop[@tailcall]) g'
             | Help ->
                 let g' = { g with last_tip = inital_tip } in

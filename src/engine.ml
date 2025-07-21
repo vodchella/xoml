@@ -1,6 +1,40 @@
 open Common
 
 
+let apply_move_by_index (g: game) (p: player) index =
+    let point = point_of_index g index |> Option.get in
+    let move_str = move_str_of_point g point in
+    let cell = g.board.(index) in
+    let new_state = match p with
+        | O -> Waiting
+        | X -> Thinking
+    in
+    let new_tip = match p with
+        | X -> "Your move: '" ^ move_str ^ "'. Thinking..."
+        | O -> "Computer's move: '" ^ move_str ^ "'. Now it's your turn..."
+    in
+    match cell with
+    | None ->
+        g.board.(index) <- Some p;
+        let g' = { g with
+                   last_tip        = new_tip
+                 ; last_move_str   = Some move_str
+                 ; last_move_point = Some point
+                 ; last_move_index = Some index
+                 ; last_player     = Some p
+                 ; state           = new_state
+                 }
+        in
+        g'
+    | Some _ ->
+        let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
+        g'
+
+let apply_move (g: game) (p: player) move_str =
+  let point = point_of_move_str g move_str in
+  let index = index_of_point g point |> Option.get in
+  apply_move_by_index g p index
+
 let relative_point_of_direction = function
     | N  -> { x =  0; y = -1 }
     | E  -> { x =  1; y =  0 }
