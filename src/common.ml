@@ -66,28 +66,26 @@ let index_of_point (g: game) (pnt : point) : int option =
 let point_of_index (g : game) (index : int) : point option =
     match index with
     | i when i > (g.board_size - 1) -> None
-    | i when i < 0 -> None
+    | i when i < 0                  -> None
     | i ->
         let x = (i mod g.board_width) + 1 in
         let y = (i  /  g.board_width) + 1 in
         Some { x; y }
 
 let point_of_move_str (g: game) (s : string) : point =
-    let letter_to_x c =
-        chrc c - chrc 'A' + 1 in
-    let digit_to_int c =
-        chrc c - chrc '0' in
+    let letter_to_x  c = chrc c - chrc 'A' + 1 in
+    let digit_to_int c = chrc c - chrc '0'     in
     let c1 = s.[0] in
     let c2 = s.[1] in
-    let x  = letter_to_x c1 in
+    let x  = letter_to_x  c1 in
     let y' = digit_to_int c2 in
     let y  = g.board_height - y' in
     { x; y }
 
 let move_str_of_point (g : game) (p : point) : string =
     let x_to_letter x = Char.chr (Char.code 'A' + x - 1) in
-    let y_to_digit y = Char.chr (Char.code '0' + (g.board_height - y)) in
+    let y_to_digit  y = Char.chr (Char.code '0' + (g.board_height - y)) in
     let c1 = x_to_letter p.x in
-    let c2 = y_to_digit p.y in
+    let c2 = y_to_digit  p.y in
     String.make 1 c1 ^ String.make 1 c2
 

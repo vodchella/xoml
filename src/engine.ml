@@ -57,7 +57,7 @@ let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
                 }
             in
             match index_of_point g point with
-            | None -> c
+            | None       -> c
             | Some index ->
                 match g.board.(index) with
                 | Some p' when p' == pl -> count_in_direction_aux (c + 1)
@@ -98,7 +98,7 @@ let find_winner (g: game) : player option =
 let find_best_move (g: game) (_p: player) =
     let possible_moves = get_possible_moves g in
     match possible_moves with
-    | [] -> failwith "OOOPS: board is full!"
+    | []    -> failwith "OOOPS: board is full!"
     | moves ->
         let len   = List.length moves      in
         let rndi  = Random.int  len        in
