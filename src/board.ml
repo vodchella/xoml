@@ -2,7 +2,8 @@ open Common
 
 
 let screen_clear () =
-    Sys.command "clear"
+    (* Sys.command "clear" *)
+    printf "%s[2J%s[H" ascii_esc ascii_esc
     |> ignore
 
 let cursor_move row col =
