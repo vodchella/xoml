@@ -17,12 +17,12 @@ let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
         match counter with
         | c when c > g.win_length -> g.win_length
         | c ->
-            let pnt =
+            let point =
                 { x = p.x + (rel.x * c)
                 ; y = p.y + (rel.y * c)
                 }
             in
-            match index_of_point g pnt with
+            match index_of_point g point with
             | None -> c
             | Some index ->
                 match g.board.(index) with
@@ -36,10 +36,10 @@ let find_winner (g: game) : player option =
         let point = point_of_index g index |> Option.get in
         let rec check_player_at_index_aux dirs =
             match dirs with
-            | [] -> false
+            | [] -> None
             | dir :: rest ->
                 match count_in_direction g pl point dir with
-                | c when c == g.win_length -> true
+                | c when c == g.win_length -> Some pl
                 | _ -> check_player_at_index_aux rest
         in
         check_player_at_index_aux [ SW; S; SE; E ]
@@ -47,13 +47,10 @@ let find_winner (g: game) : player option =
     let rec find_winner_aux index =
         match index with
         | i when i > (g.board_size - 1) -> None
-        | i ->
-            match check_player_at_index i X with
-            | true  -> Some X
-            | false ->
-                match check_player_at_index i O with
-                | true  -> Some O
-                | false -> find_winner_aux (i + 1)
+        | _ ->
+            check_player_at_index index X
+            >>! (fun () -> check_player_at_index index O)
+            >>! (fun () -> find_winner_aux (index + 1))
     in
     find_winner_aux 0
 

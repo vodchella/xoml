@@ -49,6 +49,11 @@ let initial_game         =
     }
 
 
+let ( >>! ) opt fn =
+    match opt with
+    | Some v -> Some v
+    | None   -> fn ()
+
 let screen_clear () =
     Sys.command "clear"
     |> ignore
@@ -80,7 +85,7 @@ let point_of_index (g : game) (index : int) : point option =
     | i when i < 0 -> None
     | i ->
         let x = (i mod g.board_width) + 1 in
-        let y = (i / g.board_width) + 1 in
+        let y = (i  /  g.board_width) + 1 in
         Some { x; y }
 
 let point_of_move_str (g: game) (s : string) : point =
