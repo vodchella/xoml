@@ -100,3 +100,10 @@ let point_of_move_str (g: game) (s : string) : point =
     let y  = g.board_height - y' in
     { x; y }
 
+let move_str_of_point (g : game) (p : point) : string =
+    let x_to_letter x = Char.chr (Char.code 'A' + x - 1) in
+    let y_to_digit y = Char.chr (Char.code '0' + (g.board_height - y)) in
+    let c1 = x_to_letter p.x in
+    let c2 = y_to_digit p.y in
+    String.make 1 c1 ^ String.make 1 c2
+

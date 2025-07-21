@@ -31,6 +31,13 @@ let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
     in
     count_in_direction_aux 0
 
+let get_possible_moves (g: game) : int list =
+    g.board
+    |> Array.to_list
+    |> List.mapi   (fun i v -> (i, v))
+    |> List.filter (fun (_, v) -> v == None)
+    |> List.map    fst
+
 let find_winner (g: game) : player option =
     let check_player_at_index index pl =
         let point = point_of_index g index |> Option.get in
@@ -54,7 +61,14 @@ let find_winner (g: game) : player option =
     in
     find_winner_aux 0
 
-let calc_next_move (_g: game) (_p: player) =
-    Unix.sleep 2;
-    None
+let find_best_move (g: game) (_p: player) =
+    let possible_moves = get_possible_moves g in
+    match possible_moves with
+    | [] -> failwith "OOOPS: board is full!"
+    | moves ->
+        let len   = List.length moves in
+        let rndi  = Random.int len in
+        let index = List.nth moves rndi in
+        Unix.sleep 1;
+        index
 

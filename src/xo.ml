@@ -12,17 +12,8 @@ let rec main_loop (g: game) =
         Board.print_prompt g;
         match g.state with
         | Thinking ->
-            let next_move = Engine.calc_next_move g O in
-            let next_move_str = next_move |> Option.value ~default:"RND" in
-            let g' = { g with
-                       last_tip = "Computer's move: '" ^ next_move_str ^ "'. Now it's your turn..."
-                     ; last_move_str   = None
-                     ; last_move_point = None
-                     ; last_move_index = None
-                     ; last_player = Some O
-                     ; state = Waiting
-                     }
-            in
+            let next_move_index = Engine.find_best_move g O in
+            let g' = Board.apply_move_by_index g O next_move_index in
             (main_loop[@tailcall]) g'
         | Waiting ->
             let input =
@@ -45,6 +36,7 @@ let rec main_loop (g: game) =
 
 let main () =
     Printexc.record_backtrace true;
+    Random.self_init ();
     let s = Board.size_from_args () in
     let g = initial_game in
     let g = { g with
