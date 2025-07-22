@@ -41,6 +41,7 @@ let main () =
             ; board_height = s
             ; board_size = s * s
             ; input_vmargin = s + 5
+            ; board = Array.make (s * s) None
             }
     in
     assert (g.board_width  >= 5);
