@@ -40,17 +40,31 @@ let relative_point_of_direction = function
     | SW -> { x = -1; y =  1 }
     | NW -> { x = -1; y = -1 }
 
-let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
+let opposite_direction_of = function
+    | N  ->  S
+    | E  ->  W
+    | S  ->  N
+    | W  ->  E
+    | NE ->  SW
+    | SE ->  NW
+    | SW ->  NE
+    | NW ->  SE
+
+let shift_point_according_to_direction (p: point) (d: direction) (times: int) =
     let rel = relative_point_of_direction d in
+    let point =
+        { x = p.x + (rel.x * times)
+        ; y = p.y + (rel.y * times)
+        }
+    in
+    point
+
+let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
     let rec count_in_direction_aux counter =
         match counter with
         | c when c > g.win_length -> g.win_length
         | c ->
-            let point =
-                { x = p.x + (rel.x * c)
-                ; y = p.y + (rel.y * c)
-                }
-            in
+            let point = shift_point_according_to_direction p d c in
             match index_of_point g point with
             | None       -> c
             | Some index ->
@@ -60,20 +74,14 @@ let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
     in
     count_in_direction_aux 0
 
-let have_open_end_in_direction (g: game) (pl: player) (p: point) (d: direction) : bool =
-    let rel = relative_point_of_direction d in
-    let cnt_in_dir = count_in_direction g pl p d in
-    let point =
-        { x = p.x + (rel.x * (cnt_in_dir + 1))
-        ; y = p.y + (rel.y * (cnt_in_dir + 1))
-        }
-    in
+let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: int) : int =
+    let point = shift_point_according_to_direction p d cnt_in_dir in
     match index_of_point g point with
-    | None       -> false
+    | None       -> 0
     | Some index ->
         match g.board.(index) with
-        | None -> true
-        | _    -> false
+        | None -> 1
+        | _    -> 0
 
 let get_possible_moves (g: game) : int list =
     g.board
@@ -105,10 +113,38 @@ let find_winner (g: game) : player option =
     in
     find_winner_aux 0
 
-let apply_move (g: game) (p: player) move_str =
-  let point = point_of_move_str g move_str in
-  let index = index_of_point g point |> Option.get in
-  apply_move_by_index g p index
+let score_line (g: game) (pl: player) (p: point) (d: direction): int =
+    let index = index_of_point g p|> Option.get in
+    match g.board.(index) with
+    | None ->
+        let shifted_point_1 = shift_point_according_to_direction p d 1 in
+        let cnt_in_dir_1    = count_in_direction g pl shifted_point_1 d in
+        let opened_1        = have_open_end_in_direction g shifted_point_1 d cnt_in_dir_1 in
+        let opposite_dir    = opposite_direction_of d in
+        let shifted_point_2 = shift_point_according_to_direction p opposite_dir 1 in
+        let cnt_in_dir_2    = count_in_direction g pl shifted_point_2 opposite_dir in
+        let opened_2        = have_open_end_in_direction g shifted_point_2 opposite_dir cnt_in_dir_2 in
+        let count           = cnt_in_dir_1 + cnt_in_dir_2 in
+        let open_ends       = opened_1 + opened_2 in
+        let score = match count, open_ends with
+            | count', _ when count' >= 4 -> 10000
+            | 3, 2 -> 1000
+            | 2, 2 -> 100
+            | 1, 2 -> 10
+            | _ -> 0
+        in
+        (* printf "b1 = %d; cnt1 = %d                          !!!\n" opened_1 cnt_in_dir_1; *)
+        (* printf "b2 = %d; cnt2 = %d                          !!!\n" opened_2 cnt_in_dir_2; *)
+        score
+    | _ -> failwith "Cell must be empty"
+
+
+let apply_move (g: game) (pl: player) move_str =
+    let point = point_of_move_str g move_str in
+    let index = index_of_point g point |> Option.get in
+    (* let score = score_line g pl point NE in *)
+    (* printf "score = %d" score; *)
+    apply_move_by_index g pl index
 
 let find_best_move (g: game) (_p: player) =
     let possible_moves = get_possible_moves g in
