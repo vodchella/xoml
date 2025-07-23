@@ -54,6 +54,20 @@ let ( >>! ) opt fn =
     | Some v -> Some v
     | None   -> fn ()
 
+(* https://en.wikipedia.org/wiki/Box–Muller_transform *)
+let random_index_biased_toward_center len =
+    let center = float_of_int len /. 2.0 in
+    let stddev = float_of_int len /. 4.0 in
+    let rec sample () =
+        let x = Random.float 1.0 in
+        let y = Random.float 1.0 in
+        let z = sqrt (-2.0 *. log x) *. cos (2.0 *. Float.pi *. y) in
+        match int_of_float (center +. z *. stddev) with
+        | i when i >= 0 && i < len -> i
+        | _ -> sample ()
+    in
+    sample ()
+
 let index_of_point (g: game) (pnt : point) : int option =
     match pnt with
     | { x; _ } when x < 1 -> None

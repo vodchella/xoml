@@ -167,7 +167,7 @@ let find_best_move_score (g: game) (pl: player) (possible_moves: int list) : int
     let initial_score = -1 lsl (Sys.int_size - 1) in
     let rec evaluate_board_aux moves best_score_accum best_index_accum =
         match moves with
-        | []        -> best_index_accum
+        | []        -> best_score_accum, best_index_accum
         | i :: rest ->
            let score = evaluate_position g pl i in
            match score with
@@ -176,7 +176,14 @@ let find_best_move_score (g: game) (pl: player) (possible_moves: int list) : int
            | _ ->
                evaluate_board_aux rest best_score_accum best_index_accum
     in
-    evaluate_board_aux possible_moves initial_score (-1)
+    let score, index = evaluate_board_aux possible_moves initial_score (-1) in
+    match score, index with
+    |  0, _ ->
+        possible_moves
+        |> List.length
+        |> random_index_biased_toward_center
+        |> List.nth possible_moves
+    | _s, i -> i
 
 let find_best_move (g: game) (pl: player) : int option =
     match get_possible_moves g with
