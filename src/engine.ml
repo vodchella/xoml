@@ -67,6 +67,42 @@ let get_possible_moves (g: game) : int list =
     |> List.filter (fun (_, v) -> v == None)
     |> List.map    fst
 
+let apply_move_by_index (g: game) (p: player) index : game =
+    let point = point_of_index g index |> Option.get in
+    let move_str = move_str_of_point g point in
+    let cell = g.board.(index) in
+    let new_state = match p with
+        | O -> Waiting
+        | X -> Thinking
+    in
+    let new_tip = match p with
+        | X -> "Your move: '" ^ move_str ^ "'. Thinking..."
+        | O -> "Computer's move: '" ^ move_str ^ "'. Now it's your turn..."
+    in
+    match cell with
+    | None ->
+        g.board.(index) <- Some p;
+        let g' = { g with
+                   last_tip        = new_tip
+                 ; last_move_str   = Some move_str
+                 ; last_move_point = Some point
+                 ; last_move_index = Some index
+                 ; last_player     = Some p
+                 ; state           = new_state
+                 }
+        in
+        g'
+    | Some _ ->
+        let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
+        g'
+
+let apply_move (g: game) (pl: player) move_str : game =
+    let point = point_of_move_str g move_str in
+    let index = index_of_point g point |> Option.get in
+    (* let score = evaluate_position g pl index in *)
+    (* printf "score = %d" score; *)
+    apply_move_by_index g pl index
+
 let find_winner (g: game) : player option =
     let check_player_at_index index pl =
         let point = point_of_index g index |> Option.get in
@@ -140,51 +176,17 @@ let evaluate_board (g: game) (pl: player) : int =
     in
     evaluate_board_aux 0 initial_score (-1)
 
-
-let apply_move_by_index (g: game) (p: player) index : game =
-    let point = point_of_index g index |> Option.get in
-    let move_str = move_str_of_point g point in
-    let cell = g.board.(index) in
-    let new_state = match p with
-        | O -> Waiting
-        | X -> Thinking
-    in
-    let new_tip = match p with
-        | X -> "Your move: '" ^ move_str ^ "'. Thinking..."
-        | O -> "Computer's move: '" ^ move_str ^ "'. Now it's your turn..."
-    in
-    match cell with
-    | None ->
-        g.board.(index) <- Some p;
-        let g' = { g with
-                   last_tip        = new_tip
-                 ; last_move_str   = Some move_str
-                 ; last_move_point = Some point
-                 ; last_move_index = Some index
-                 ; last_player     = Some p
-                 ; state           = new_state
-                 }
-        in
-        g'
-    | Some _ ->
-        let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
-        g'
-
-let apply_move (g: game) (pl: player) move_str : game =
-    let point = point_of_move_str g move_str in
-    let index = index_of_point g point |> Option.get in
-    (* let score = evaluate_position g pl index in *)
-    (* printf "score = %d" score; *)
-    apply_move_by_index g pl index
+let find_best_move_random (possible_moves: int list) : int =
+    let len   = List.length possible_moves      in
+    let rndi  = Random.int  len                 in
+    let index = List.nth    possible_moves rndi in
+    index
 
 let find_best_move (g: game) (_p: player) : int =
-    let possible_moves = get_possible_moves g in
-    match possible_moves with
+    match get_possible_moves g with
     | []    -> failwith "OOOPS: board is full!"
     | moves ->
-        let len   = List.length moves      in
-        let rndi  = Random.int  len        in
-        let index = List.nth    moves rndi in
+        let index = find_best_move_random moves in
         Unix.sleep 1;
         index
 
