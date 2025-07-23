@@ -30,11 +30,6 @@ let apply_move_by_index (g: game) (p: player) index =
         let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
         g'
 
-let apply_move (g: game) (p: player) move_str =
-  let point = point_of_move_str g move_str in
-  let index = index_of_point g point |> Option.get in
-  apply_move_by_index g p index
-
 let relative_point_of_direction = function
     | N  -> { x =  0; y = -1 }
     | E  -> { x =  1; y =  0 }
@@ -65,6 +60,21 @@ let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
     in
     count_in_direction_aux 0
 
+let have_open_end_in_direction (g: game) (pl: player) (p: point) (d: direction) : bool =
+    let rel = relative_point_of_direction d in
+    let cnt_in_dir = count_in_direction g pl p d in
+    let point =
+        { x = p.x + (rel.x * (cnt_in_dir + 1))
+        ; y = p.y + (rel.y * (cnt_in_dir + 1))
+        }
+    in
+    match index_of_point g point with
+    | None       -> false
+    | Some index ->
+        match g.board.(index) with
+        | None -> true
+        | _    -> false
+
 let get_possible_moves (g: game) : int list =
     g.board
     |> Array.to_list
@@ -94,6 +104,11 @@ let find_winner (g: game) : player option =
             >>! (fun () -> find_winner_aux       (index + 1))
     in
     find_winner_aux 0
+
+let apply_move (g: game) (p: player) move_str =
+  let point = point_of_move_str g move_str in
+  let index = index_of_point g point |> Option.get in
+  apply_move_by_index g p index
 
 let find_best_move (g: game) (_p: player) =
     let possible_moves = get_possible_moves g in
