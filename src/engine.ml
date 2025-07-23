@@ -110,8 +110,6 @@ let score_line (g: game) (pl: player) (p: point) (d: direction): int =
             | 1, 2 -> 10
             | _ -> 0
         in
-        (* printf "b1 = %d; cnt1 = %d                          !!!\n" opened_1 cnt_in_dir_1; *)
-        (* printf "b2 = %d; cnt2 = %d                          !!!\n" opened_2 cnt_in_dir_2; *)
         score
     | _ -> failwith "Cell must be empty"
 
@@ -124,7 +122,8 @@ let evaluate_position (g: game) (pl: player) (index: int) =
         | d :: rest ->
             let score_pl = score_line g pl point d in
             let score_op = score_line g opponent point d in
-            evaluate_position_aux rest (score_pl + score_op)
+            let score'   = (score_pl + score_op) in
+            evaluate_position_aux rest (score' + accum)
     in
     evaluate_position_aux working_dirs 0
 
@@ -161,7 +160,7 @@ let apply_move_by_index (g: game) (p: player) index =
 let apply_move (g: game) (pl: player) move_str =
     let point = point_of_move_str g move_str in
     let index = index_of_point g point |> Option.get in
-    (* let score = score_line g pl point NE in *)
+    (* let score = evaluate_position g pl index in *)
     (* printf "score = %d" score; *)
     apply_move_by_index g pl index
 
