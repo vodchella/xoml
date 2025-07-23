@@ -1,34 +1,7 @@
 open Common
 
 
-let apply_move_by_index (g: game) (p: player) index =
-    let point = point_of_index g index |> Option.get in
-    let move_str = move_str_of_point g point in
-    let cell = g.board.(index) in
-    let new_state = match p with
-        | O -> Waiting
-        | X -> Thinking
-    in
-    let new_tip = match p with
-        | X -> "Your move: '" ^ move_str ^ "'. Thinking..."
-        | O -> "Computer's move: '" ^ move_str ^ "'. Now it's your turn..."
-    in
-    match cell with
-    | None ->
-        g.board.(index) <- Some p;
-        let g' = { g with
-                   last_tip        = new_tip
-                 ; last_move_str   = Some move_str
-                 ; last_move_point = Some point
-                 ; last_move_index = Some index
-                 ; last_player     = Some p
-                 ; state           = new_state
-                 }
-        in
-        g'
-    | Some _ ->
-        let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
-        g'
+let working_dirs = [ SW; S; SE; E ]
 
 let relative_point_of_direction = function
     | N  -> { x =  0; y = -1 }
@@ -49,6 +22,10 @@ let opposite_direction_of = function
     | SE ->  NW
     | SW ->  NE
     | NW ->  SE
+
+let opponent_of = function
+    | X -> O
+    | O -> X
 
 let shift_point_according_to_direction (p: point) (d: direction) (times: int) =
     let rel = relative_point_of_direction d in
@@ -101,7 +78,7 @@ let find_winner (g: game) : player option =
                 | c when c == g.win_length -> Some pl
                 | _ -> check_player_at_index_aux rest
         in
-        check_player_at_index_aux [ SW; S; SE; E ]
+        check_player_at_index_aux working_dirs
     in
     let rec find_winner_aux index =
         match index with
@@ -138,6 +115,48 @@ let score_line (g: game) (pl: player) (p: point) (d: direction): int =
         score
     | _ -> failwith "Cell must be empty"
 
+let evaluate_position (g: game) (pl: player) (index: int) =
+    let point = point_of_index g index |> Option.get in
+    let opponent = opponent_of pl in
+    let rec evaluate_position_aux dirs accum =
+        match dirs with
+        | [] -> accum
+        | d :: rest ->
+            let score_pl = score_line g pl point d in
+            let score_op = score_line g opponent point d in
+            evaluate_position_aux rest (score_pl + score_op)
+    in
+    evaluate_position_aux working_dirs 0
+
+
+let apply_move_by_index (g: game) (p: player) index =
+    let point = point_of_index g index |> Option.get in
+    let move_str = move_str_of_point g point in
+    let cell = g.board.(index) in
+    let new_state = match p with
+        | O -> Waiting
+        | X -> Thinking
+    in
+    let new_tip = match p with
+        | X -> "Your move: '" ^ move_str ^ "'. Thinking..."
+        | O -> "Computer's move: '" ^ move_str ^ "'. Now it's your turn..."
+    in
+    match cell with
+    | None ->
+        g.board.(index) <- Some p;
+        let g' = { g with
+                   last_tip        = new_tip
+                 ; last_move_str   = Some move_str
+                 ; last_move_point = Some point
+                 ; last_move_index = Some index
+                 ; last_player     = Some p
+                 ; state           = new_state
+                 }
+        in
+        g'
+    | Some _ ->
+        let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
+        g'
 
 let apply_move (g: game) (pl: player) move_str =
     let point = point_of_move_str g move_str in
