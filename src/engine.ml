@@ -113,7 +113,7 @@ let score_line (g: game) (pl: player) (p: point) (d: direction): int =
         score
     | _ -> failwith "Cell must be empty"
 
-let evaluate_position (g: game) (pl: player) (index: int) =
+let evaluate_position (g: game) (pl: player) (index: int) : int =
     let point = point_of_index g index |> Option.get in
     let opponent = opponent_of pl in
     let rec evaluate_position_aux dirs accum =
@@ -122,10 +122,24 @@ let evaluate_position (g: game) (pl: player) (index: int) =
         | d :: rest ->
             let score_pl = score_line g pl point d in
             let score_op = score_line g opponent point d in
-            let score'   = (score_pl + score_op) in
-            evaluate_position_aux rest (score' + accum)
+            let score   = (score_pl + score_op) in
+            evaluate_position_aux rest (score + accum)
     in
     evaluate_position_aux working_dirs 0
+
+let evaluate_board (g: game) (pl: player) =
+    let best_score = -1 lsl (Sys.int_size - 1) in
+    let best_index = -1 in
+    let rec evaluate_board_aux index score_accum best_index_accum =
+        match index with
+        | i when i > (g.board_size - 1) -> best_index_accum
+        | i ->
+            let score = evaluate_position g pl i in
+            match score with
+            | score' when score' > best_score -> evaluate_board_aux (index + 1) score' i
+            | _ -> evaluate_board_aux (index + 1) score_accum best_index_accum
+    in
+    evaluate_board_aux 0 best_score best_index
 
 
 let apply_move_by_index (g: game) (p: player) index =
