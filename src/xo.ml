@@ -29,7 +29,7 @@ let rec main_loop (g: game) =
                 let g' = Engine.apply_move g X move in
                 (main_loop[@tailcall]) g'
             | Help ->
-                let g' = { g with last_tip = inital_tip } in
+                let g' = { g with last_tip = initial_tip } in
                 (main_loop[@tailcall]) g'
             | Quit -> ()
 
