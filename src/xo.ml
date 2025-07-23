@@ -10,10 +10,13 @@ let rec main_loop (g: game) =
     | None ->
         Board.print_prompt g;
         match g.state with
-        | Thinking ->
-            let next_move_index = Engine.find_best_move g O in
-            let g' = Engine.apply_move_by_index g O next_move_index in
-            (main_loop[@tailcall]) g'
+        | Thinking -> (
+            match Engine.find_best_move g O with
+            | Some i ->
+                let g' = Engine.apply_move_by_index g O i in
+                (main_loop[@tailcall]) g'
+            | _ ->
+                Board.print_draw g)
         | Waiting ->
             let input =
                 read_line ()

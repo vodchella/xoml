@@ -94,3 +94,8 @@ let print_congratulations (g: game) (p: player) =
     print_at ("Player " ^ (symbol_of_cell (Some p)) ^ " wins!") g.input_vmargin 1
     |> ignore
 
+let print_draw (g: game) =
+    clear_space_for_prompt g;
+    print_at "Ohh, this is draw!" g.input_vmargin 1
+    |> ignore
+
