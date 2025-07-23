@@ -27,7 +27,7 @@ let opponent_of = function
     | X -> O
     | O -> X
 
-let shift_point_according_to_direction (p: point) (d: direction) (times: int) =
+let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
     let rel = relative_point_of_direction d in
     let point =
         { x = p.x + (rel.x * times)
@@ -36,7 +36,7 @@ let shift_point_according_to_direction (p: point) (d: direction) (times: int) =
     in
     point
 
-let count_in_direction (g: game) (pl: player) (p: point) (d: direction): int =
+let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
     let rec count_in_direction_aux counter =
         match counter with
         | c when c > g.win_length -> g.win_length
@@ -90,17 +90,17 @@ let find_winner (g: game) : player option =
     in
     find_winner_aux 0
 
-let score_line (g: game) (pl: player) (p: point) (d: direction): int =
+let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
     let index = index_of_point g p|> Option.get in
     match g.board.(index) with
     | None ->
-        let shifted_point_1 = shift_point_according_to_direction p d 1 in
-        let cnt_in_dir_1    = count_in_direction g pl shifted_point_1 d in
-        let opened_1        = have_open_end_in_direction g shifted_point_1 d cnt_in_dir_1 in
-        let opposite_dir    = opposite_direction_of d in
-        let shifted_point_2 = shift_point_according_to_direction p opposite_dir 1 in
-        let cnt_in_dir_2    = count_in_direction g pl shifted_point_2 opposite_dir in
-        let opened_2        = have_open_end_in_direction g shifted_point_2 opposite_dir cnt_in_dir_2 in
+        let opp_dir         = opposite_direction_of dir in
+        let shifted_point_1 = shift_point_according_to_direction p dir     1  in
+        let shifted_point_2 = shift_point_according_to_direction p opp_dir 1  in
+        let cnt_in_dir_1    = count_in_direction g pl shifted_point_1 dir     in
+        let cnt_in_dir_2    = count_in_direction g pl shifted_point_2 opp_dir in
+        let opened_1        = have_open_end_in_direction g shifted_point_1 dir     cnt_in_dir_1 in
+        let opened_2        = have_open_end_in_direction g shifted_point_2 opp_dir cnt_in_dir_2 in
         let count           = cnt_in_dir_1 + cnt_in_dir_2 in
         let open_ends       = opened_1 + opened_2 in
         let score = match count, open_ends with
@@ -115,34 +115,33 @@ let score_line (g: game) (pl: player) (p: point) (d: direction): int =
 
 let evaluate_position (g: game) (pl: player) (index: int) : int =
     let point = point_of_index g index |> Option.get in
-    let opponent = opponent_of pl in
+    let pl_opp = opponent_of pl in
     let rec evaluate_position_aux dirs accum =
         match dirs with
         | [] -> accum
         | d :: rest ->
-            let score_pl = score_line g pl point d in
-            let score_op = score_line g opponent point d in
-            let score   = (score_pl + score_op) in
+            let score_pl = score_line g pl     point d in
+            let score_op = score_line g pl_opp point d in
+            let score    = (score_pl + score_op) in
             evaluate_position_aux rest (score + accum)
     in
     evaluate_position_aux working_dirs 0
 
-let evaluate_board (g: game) (pl: player) =
-    let best_score = -1 lsl (Sys.int_size - 1) in
-    let best_index = -1 in
-    let rec evaluate_board_aux index score_accum best_index_accum =
+let evaluate_board (g: game) (pl: player) : int =
+    let initial_score = -1 lsl (Sys.int_size - 1) in
+    let rec evaluate_board_aux index best_score_accum best_index_accum =
         match index with
         | i when i > (g.board_size - 1) -> best_index_accum
         | i ->
             let score = evaluate_position g pl i in
             match score with
-            | score' when score' > best_score -> evaluate_board_aux (index + 1) score' i
-            | _ -> evaluate_board_aux (index + 1) score_accum best_index_accum
+            | score' when score' > best_score_accum -> evaluate_board_aux (i + 1) score' i
+            | _ -> evaluate_board_aux (i + 1) best_score_accum best_index_accum
     in
-    evaluate_board_aux 0 best_score best_index
+    evaluate_board_aux 0 initial_score (-1)
 
 
-let apply_move_by_index (g: game) (p: player) index =
+let apply_move_by_index (g: game) (p: player) index : game =
     let point = point_of_index g index |> Option.get in
     let move_str = move_str_of_point g point in
     let cell = g.board.(index) in
@@ -171,14 +170,14 @@ let apply_move_by_index (g: game) (p: player) index =
         let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
         g'
 
-let apply_move (g: game) (pl: player) move_str =
+let apply_move (g: game) (pl: player) move_str : game =
     let point = point_of_move_str g move_str in
     let index = index_of_point g point |> Option.get in
     (* let score = evaluate_position g pl index in *)
     (* printf "score = %d" score; *)
     apply_move_by_index g pl index
 
-let find_best_move (g: game) (_p: player) =
+let find_best_move (g: game) (_p: player) : int =
     let possible_moves = get_possible_moves g in
     match possible_moves with
     | []    -> failwith "OOOPS: board is full!"
