@@ -153,7 +153,7 @@ let score_position (g: game) (pl: player) (index: int) : int =
         | d :: rest ->
             let score_pl = score_line g pl     point d in
             let score_op = score_line g pl_opp point d in
-            let score    = (score_pl + score_op) in
+            let score    = (score_pl + (score_op / 2)) in
             score_position_aux rest (score + accum)
     in
     score_position_aux working_dirs 0
