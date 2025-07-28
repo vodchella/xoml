@@ -27,17 +27,16 @@ let opponent_of = function
     | X -> O
     | O -> X
 
-let score_of count open_ends =
-    match count, open_ends with
-    | c, _ when c >= 5 -> 100000
-    | 4, 2 -> 10000
-    | 4, 1 -> 1000
-    | 3, 2 -> 500
-    | 3, 1 -> 250
-    | 2, 2 -> 100
-    | 2, 1 -> 50
-    | 1, 2 -> 10
-    | 1, 1 -> 5
+let score_of = function
+    | (c, _) when c >= 5 -> 100000
+    | (4, 2) -> 10000
+    | (4, 1) -> 1000
+    | (3, 2) -> 500
+    | (3, 1) -> 250
+    | (2, 2) -> 100
+    | (2, 1) -> 50
+    | (1, 2) -> 10
+    | (1, 1) -> 5
     | _ -> 0
 
 let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
@@ -150,8 +149,8 @@ let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
     let count           = cnt_in_dir_1 + cnt_in_dir_2 in
     let open_ends       = opened_1 + opened_2 in
     match g.board.(index) with
-    | Some pl' when pl' = pl -> score_of (count + 1) open_ends
-    | None                   -> score_of  count      open_ends
+    | Some pl' when pl' = pl -> score_of ((count + 1), open_ends)
+    | None                   -> score_of ( count     , open_ends)
     | _                      -> 0
 
 let score_position (g: game) (pl: player) (index: int) : int =
