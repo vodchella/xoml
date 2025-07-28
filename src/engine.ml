@@ -82,25 +82,20 @@ let apply_move_by_index (g: game) (p: player) index : game =
     match cell with
     | None ->
         g.board.(index) <- Some p;
-        let g' = { g with
-                   last_tip        = new_tip
-                 ; last_move_str   = Some move_str
-                 ; last_move_point = Some point
-                 ; last_move_index = Some index
-                 ; last_player     = Some p
-                 ; state           = new_state
-                 }
-        in
-        g'
+        { g with
+          last_tip        = new_tip
+        ; last_move_str   = Some move_str
+        ; last_move_point = Some point
+        ; last_move_index = Some index
+        ; last_player     = Some p
+        ; state           = new_state
+        }
     | Some _ ->
-        let g' = { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" } in
-        g'
+        { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" }
 
 let apply_move (g: game) (pl: player) move_str : game =
     let point = point_of_move_str g move_str in
     let index = index_of_point g point |> Option.get in
-    (* let score = evaluate_position g pl index in *)
-    (* printf "score = %d" score; *)
     apply_move_by_index g pl index
 
 let find_winner (g: game) : player option =
@@ -127,7 +122,7 @@ let find_winner (g: game) : player option =
     find_winner_aux 0
 
 let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
-    let index = index_of_point g p|> Option.get in
+    let index = index_of_point g p |> Option.get in
     match g.board.(index) with
     | None ->
         let opp_dir         = opposite_direction_of dir in
@@ -149,34 +144,32 @@ let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
         score
     | _ -> failwith "Cell must be empty"
 
-let evaluate_position (g: game) (pl: player) (index: int) : int =
+let score_position (g: game) (pl: player) (index: int) : int =
     let point = point_of_index g index |> Option.get in
     let pl_opp = opponent_of pl in
-    let rec evaluate_position_aux dirs accum =
+    let rec score_position_aux dirs accum =
         match dirs with
         | [] -> accum
         | d :: rest ->
             let score_pl = score_line g pl     point d in
             let score_op = score_line g pl_opp point d in
             let score    = (score_pl + score_op) in
-            evaluate_position_aux rest (score + accum)
+            score_position_aux rest (score + accum)
     in
-    evaluate_position_aux working_dirs 0
+    score_position_aux working_dirs 0
 
 let find_best_move_score (g: game) (pl: player) (possible_moves: int list) : int option =
-    let initial_score = Common.min_int in
-    let rec evaluate_board_aux moves best_score_accum best_index_accum =
+    let rec find_best_move_score_aux moves best_score_accum best_index_accum =
         match moves with
         | []        -> best_score_accum, best_index_accum
         | i :: rest ->
-           let score = evaluate_position g pl i in
-           match score with
-           | score' when score' > best_score_accum ->
-               evaluate_board_aux rest score' (Some i)
+           match score_position g pl i with
+           | score when score > best_score_accum ->
+               find_best_move_score_aux rest score (Some i)
            | _ ->
-               evaluate_board_aux rest best_score_accum best_index_accum
+               find_best_move_score_aux rest best_score_accum best_index_accum
     in
-    let score, index = evaluate_board_aux possible_moves initial_score None in
+    let score, index = find_best_move_score_aux possible_moves Common.min_int None in
     match score with
     |  0 ->
         possible_moves
@@ -188,6 +181,5 @@ let find_best_move_score (g: game) (pl: player) (possible_moves: int list) : int
 let find_best_move (g: game) (pl: player) : int option =
     match get_possible_moves g with
     | []    -> None
-    | moves ->
-        find_best_move_score g pl moves
+    | moves -> find_best_move_score g pl moves
 
