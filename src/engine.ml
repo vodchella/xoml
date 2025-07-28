@@ -170,9 +170,9 @@ let score_position (g: game) (pl: player) (index: int) : int =
 
 let score_board (g: game) (pl: player) : int =
     let indices = get_occupied_indices g in
-    let rec score_board_aux indexes accum_b =
+    let rec score_board_aux indexes accum =
         match indexes with
-        | [] -> accum_b
+        | [] -> accum
         | i :: rest ->
             let score_at_index = score_position g pl i in
             let pl' = g.board.(i) |> Option.get in
@@ -180,7 +180,7 @@ let score_board (g: game) (pl: player) : int =
                     | p' when p' == pl' -> 1
                     | _ -> 0
             in
-            score_board_aux rest (accum_b + (v * score_at_index))
+            score_board_aux rest (accum + (v * score_at_index))
     in
     score_board_aux indices 0
 
@@ -188,15 +188,15 @@ let find_best_move_score (g: game) (pl: player) : int option =
     match get_possible_moves g with
     | []    -> None
     | moves ->
-        let rec find_best_move_score_aux moves best_score_accum best_index_accum =
+        let rec find_best_move_score_aux moves score_accum index_accum =
             match moves with
-            | []        -> best_score_accum, best_index_accum
+            | []        -> score_accum, index_accum
             | i :: rest ->
                match score_position g pl i with
-               | score when score > best_score_accum ->
+               | score when score > score_accum ->
                    find_best_move_score_aux rest score (Some i)
                | _ ->
-                   find_best_move_score_aux rest best_score_accum best_index_accum
+                   find_best_move_score_aux rest score_accum index_accum
         in
         let score, index = find_best_move_score_aux moves Common.min_int None in
         match score with
