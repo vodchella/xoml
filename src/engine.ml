@@ -27,14 +27,24 @@ let opponent_of = function
     | X -> O
     | O -> X
 
+let score_of count open_ends =
+    match count, open_ends with
+    | c, _ when c >= 5 -> 100000
+    | 4, 2 -> 10000
+    | 4, 1 -> 1000
+    | 3, 2 -> 500
+    | 3, 1 -> 250
+    | 2, 2 -> 100
+    | 2, 1 -> 50
+    | 1, 2 -> 10
+    | 1, 1 -> 5
+    | _ -> 0
+
 let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
     let rel = relative_point_of_direction d in
-    let point =
-        { x = p.x + (rel.x * times)
-        ; y = p.y + (rel.y * times)
-        }
-    in
-    point
+    { x = p.x + (rel.x * times)
+    ; y = p.y + (rel.y * times)
+    }
 
 let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
     let rec count_in_direction_aux counter =
@@ -60,12 +70,19 @@ let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: 
         | None -> 1
         | _    -> 0
 
-let get_possible_moves (g: game) : int list =
+let filter_board_indices (g: game) fn : int list =
     g.board
     |> Array.to_list
-    |> List.mapi   (fun  i  v  -> (i, v))
-    |> List.filter (fun (_, v) -> v == None)
+    |> List.mapi   (fun i v  -> (i, v))
+    |> List.filter fn
     |> List.map    fst
+
+let get_possible_moves (g: game) : int list =
+    (* TODO: improve algo *)
+    filter_board_indices g (fun (_, v) -> v == None)
+
+let get_occupied_indices (g: game) : int list =
+    filter_board_indices g (fun (_, v) -> v <> None)
 
 let apply_move_by_index (g: game) (p: player) index : game =
     let point = point_of_index g index |> Option.get in
@@ -120,19 +137,6 @@ let find_winner (g: game) : player option =
             >>! (fun () -> find_winner_aux       (index + 1))
     in
     find_winner_aux 0
-
-let score_of count open_ends =
-    match count, open_ends with
-    | c, _ when c >= 5 -> 100000
-    | 4, 2 -> 10000
-    | 4, 1 -> 1000
-    | 3, 2 -> 500
-    | 3, 1 -> 250
-    | 2, 2 -> 100
-    | 2, 1 -> 50
-    | 1, 2 -> 10
-    | 1, 1 -> 5
-    | _ -> 0
 
 let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
     let index           = index_of_point g p |> Option.get in
