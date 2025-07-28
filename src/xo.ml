@@ -31,6 +31,9 @@ let rec main_loop (g: game) =
                 (main_loop[@tailcall]) g'
             | Move move ->
                 let g' = Engine.apply_move g X move in
+                (* let score_x = Engine.score_board g' X in *)
+                (* let score_o = Engine.score_board g' O in *)
+                (* printf "score_x = %d; score_o = %d\n" score_x score_o; *)
                 (main_loop[@tailcall]) g'
             | Help ->
                 let g' = { g with last_tip = initial_tip } in
