@@ -37,7 +37,7 @@ let score_of = function
     | (2, 1) -> 50
     | (1, 2) -> 10
     | (1, 1) -> 5
-    | _ -> 0
+    | _      -> 0
 
 let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
     let rel = relative_point_of_direction d in
@@ -84,15 +84,15 @@ let get_occupied_indices (g: game) : int list =
     filter_board_indices g (fun (_, v) -> v <> None)
 
 let apply_move_by_index (g: game) (pl: player) index : game =
-    let point = point_of_index g index |> Option.get in
-    let move_str = move_str_of_point g point in
-    let cell = g.board.(index) in
+    let point     = point_of_index g index |> Option.get in
+    let move_str  = move_str_of_point g point in
+    let cell      = g.board.(index) in
     let new_state = match pl with
         | O -> Waiting
         | X -> Thinking
     in
     let new_tip = match pl with
-        | X -> "Your move: '" ^ move_str ^ "'. Thinking..."
+        | X -> "Your move: '"       ^ move_str ^ "'. Thinking..."
         | O -> "Computer's move: '" ^ move_str ^ "'. Now it's your turn..."
     in
     match cell with
@@ -111,7 +111,7 @@ let apply_move_by_index (g: game) (pl: player) index : game =
 
 let apply_move (g: game) (pl: player) move_str : game =
     let point = point_of_move_str g move_str in
-    let index = index_of_point g point |> Option.get in
+    let index = index_of_point    g point |> Option.get in
     apply_move_by_index g pl index
 
 let find_winner (g: game) : player option =
