@@ -163,8 +163,8 @@ let evaluate_position (g: game) (pl: player) (index: int) : int =
     in
     evaluate_position_aux working_dirs 0
 
-let find_best_move_score (g: game) (pl: player) (possible_moves: int list) : int =
-    let initial_score = -1 lsl (Sys.int_size - 1) in
+let find_best_move_score (g: game) (pl: player) (possible_moves: int list) : int option =
+    let initial_score = Common.min_int in
     let rec evaluate_board_aux moves best_score_accum best_index_accum =
         match moves with
         | []        -> best_score_accum, best_index_accum
@@ -172,25 +172,22 @@ let find_best_move_score (g: game) (pl: player) (possible_moves: int list) : int
            let score = evaluate_position g pl i in
            match score with
            | score' when score' > best_score_accum ->
-               evaluate_board_aux rest score' i
+               evaluate_board_aux rest score' (Some i)
            | _ ->
                evaluate_board_aux rest best_score_accum best_index_accum
     in
-    let score, index = evaluate_board_aux possible_moves initial_score (-1) in
-    match score, index with
-    |  0, _ ->
+    let score, index = evaluate_board_aux possible_moves initial_score None in
+    match score with
+    |  0 ->
         possible_moves
         |> List.length
         |> random_index_biased_toward_center
-        |> List.nth possible_moves
-    | _s, i -> i
+        |> List.nth_opt possible_moves
+    | _ -> index
 
 let find_best_move (g: game) (pl: player) : int option =
     match get_possible_moves g with
     | []    -> None
     | moves ->
-        Unix.sleep 1;
-        match find_best_move_score g pl moves with
-        | -1 -> None
-        |  i -> Some i
+        find_best_move_score g pl moves
 

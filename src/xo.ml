@@ -11,6 +11,7 @@ let rec main_loop (g: game) =
         Board.print_prompt g;
         match g.state with
         | Thinking -> (
+            Unix.sleep 1;
             match Engine.find_best_move g O with
             | Some i ->
                 let g' = Engine.apply_move_by_index g O i in
