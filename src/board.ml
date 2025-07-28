@@ -16,7 +16,7 @@ let print_at str row col =
     |> ignore
 
 let print_symbol_at_point symbol point =
-    print_at symbol (point.y + 2) (point.x * 2 + 2)
+    print_at symbol (point.y + 2) (point.x * 2 + 4)
 
 let make_sparse_row count make_chars_fn =
     String.init count make_chars_fn
@@ -25,7 +25,7 @@ let make_sparse_row count make_chars_fn =
     |> Seq.fold_left ( ^ ) ""
 
 let make_column_headers columns_count =
-    "   " ^ make_sparse_row columns_count (fun i -> Char.chr (chrc 'A' + i))
+    "     " ^ make_sparse_row columns_count (fun i -> Char.chr (chrc 'A' + i))
 
 let make_empty_row columns_count =
     make_sparse_row columns_count (fun _ -> sym_none.[0])
@@ -34,7 +34,7 @@ let make_body rows_count row  =
     let lines = List.init rows_count (fun i ->
         let index = rows_count - 1 - i in
         let index_str = string_of_int index in
-        index_str ^ "  " ^ row ^ " " ^ index_str ^ "\n")
+        "  " ^ index_str ^ "  " ^ row ^ " " ^ index_str ^ "\n")
     in
     String.concat "" lines
 
