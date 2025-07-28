@@ -121,6 +121,17 @@ let find_winner (g: game) : player option =
     in
     find_winner_aux 0
 
+let score_of count open_ends =
+    match count, open_ends with
+    | c, _ when c >= 5 -> 100000
+    | 4, 2 -> 10000
+    | 4, 1 -> 1000
+    | 3, 2 -> 500
+    | 3, 1 -> 250
+    | 2, 2 -> 100
+    | 1, 2 -> 10
+    | _ -> 0
+
 let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
     let index = index_of_point g p |> Option.get in
     match g.board.(index) with
@@ -134,14 +145,7 @@ let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
         let opened_2        = have_open_end_in_direction g shifted_point_2 opp_dir cnt_in_dir_2 in
         let count           = cnt_in_dir_1 + cnt_in_dir_2 in
         let open_ends       = opened_1 + opened_2 in
-        let score = match count, open_ends with
-            | count', _ when count' >= 4 -> 10000
-            | 3, 2 -> 1000
-            | 2, 2 -> 100
-            | 1, 2 -> 10
-            | _ -> 0
-        in
-        score
+        score_of count open_ends
     | _ -> failwith "Cell must be empty"
 
 let score_position (g: game) (pl: player) (index: int) : int =
