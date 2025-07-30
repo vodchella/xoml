@@ -3,6 +3,9 @@ open Common
 
 let rec main_loop (g: game) =
     Board.print_last_figure g;
+    (* let score_x = Engine.score_board g X |> string_of_int in *)
+    (* let score_o = Engine.score_board g O |> string_of_int in *)
+    (* Board.print_at ("score_x = " ^ score_x ^ "; score_o = " ^ score_o ^ " !!!\n") (g.input_vmargin + 3) 1; *)
     match Engine.find_winner g with
     | Some winner ->
         Board.print_congratulations g winner;
@@ -31,9 +34,6 @@ let rec main_loop (g: game) =
                 (main_loop[@tailcall]) g'
             | Move move ->
                 let g' = Engine.apply_move g X move in
-                (* let score_x = Engine.score_board g' X in *)
-                (* let score_o = Engine.score_board g' O in *)
-                (* printf "score_x = %d; score_o = %d\n" score_x score_o; *)
                 (main_loop[@tailcall]) g'
             | Help ->
                 let g' = { g with last_tip = initial_tip } in
