@@ -14,6 +14,8 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/%.cmx: src/%.ml | $(BUILD_DIR)
+	# $< : Путь к исходному файлу. Здесь .ml
+	# $@ : Имя цели. Здесь .cmx
 	$(OCAMLFIND) $(OCAMLC) $(FLAGS) -package $(PKGS) -I $(BUILD_DIR) -c $< -o $@
 
 $(TARGET): $(CMX)
