@@ -1,0 +1,16 @@
+opam-version: "2.0"
+name: "xoml"
+version: "0.1"
+synopsis: "Simple (easy-to-win) tic-tac-toe game in OCaml"
+maintainer: "vodchella"
+authors: "vodchella"
+license: "MIT"
+
+depends: [
+  "ocaml"
+  "dune" {>= "3.0"}
+]
+
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+]
