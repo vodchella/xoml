@@ -4,3 +4,4 @@ build/
 *.cmx
 *.o
 *.out
+*.log

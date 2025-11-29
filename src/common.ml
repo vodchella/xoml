@@ -21,6 +21,7 @@ type game =
     ; last_move_index : int option
     ; last_player     : player option
     ; state           : game_state
+    ; log_file        : out_channel option
     }
 
 let default_board_width  = 10
@@ -47,6 +48,7 @@ let initial_game         =
     ; last_move_index = None
     ; last_player     = None
     ; state           = Waiting
+    ; log_file        = None
     }
 
 

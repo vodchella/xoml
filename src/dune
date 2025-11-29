@@ -1,5 +1,5 @@
 (executable
  (name xo)
  (public_name xoml)
- (modules common input board engine xo)
+ (modules common logger input board engine xo)
  (libraries unix))

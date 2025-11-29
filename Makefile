@@ -5,7 +5,7 @@ FLAGS       = -g -w +a-40-42-70
 BUILD_DIR   = build
 TARGET      = $(BUILD_DIR)/xoml
 
-SOURCES     = src/common.ml src/input.ml src/board.ml src/engine.ml src/xo.ml
+SOURCES     = src/common.ml src/logger.ml src/input.ml src/board.ml src/engine.ml src/xo.ml
 CMX         = $(patsubst src/%.ml,$(BUILD_DIR)/%.cmx,$(SOURCES))
 
 all: $(TARGET)
@@ -13,9 +13,9 @@ all: $(TARGET)
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
+# $< : Путь к исходному файлу. Здесь .ml
+# $@ : Имя цели. Здесь .cmx
 $(BUILD_DIR)/%.cmx: src/%.ml | $(BUILD_DIR)
-	# $< : Путь к исходному файлу. Здесь .ml
-	# $@ : Имя цели. Здесь .cmx
 	$(OCAMLFIND) $(OCAMLC) $(FLAGS) -package $(PKGS) -I $(BUILD_DIR) -c $< -o $@
 
 $(TARGET): $(CMX)

@@ -3,9 +3,6 @@ open Common
 
 let rec main_loop (g: game) =
     Board.print_last_figure g;
-    (* let score_x = Engine.score_board g X |> string_of_int in *)
-    (* let score_o = Engine.score_board g O |> string_of_int in *)
-    (* Board.print_at ("score_x = " ^ score_x ^ "; score_o = " ^ score_o ^ " !!!\n") (g.input_vmargin + 3) 1; *)
     match Engine.find_winner g with
     | Some winner ->
         Board.print_congratulations g winner;
@@ -43,6 +40,7 @@ let rec main_loop (g: game) =
 let main () =
     let s = Board.size_from_args () in
     let g = initial_game in
+    let g = Logger.create g in
     let g = { g with
               board_width = s
             ; board_height = s
@@ -57,10 +55,13 @@ let main () =
     assert (g.board_height <= 10);
     assert (g.win_length   >= 3);
     assert (g.win_length   <= 5);
+
     Printexc.record_backtrace true;
     Random.self_init ();
+    Logger.write g "Started!";
     Board.screen_clear ();
     Board.draw g;
     (main_loop[@tailcall]) g
+
 let () = main ()
 
