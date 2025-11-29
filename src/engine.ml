@@ -69,7 +69,7 @@ let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: 
         | None -> 1
         | _    -> 0
 
-(* Old unoptimized (but beauty) version: *)
+(* NOTE: old unoptimized (but beauty) version: *)
 (* 1000000 runs: 0.732028 sec *)
 (* let filter_board_indices (g: game) fn : int list = *)
 (*     g.board *)
@@ -78,7 +78,7 @@ let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: 
 (*     |> List.filter fn *)
 (*     |> List.map    fst *)
 
-(* New optimized version: *)
+(* PERF: new optimized version: *)
 (* 1000000 runs: 0.247501 sec *)
 let filter_board_indices (g : game) (fn : int * 'a option -> bool) : int list =
     let acc = ref [] in
