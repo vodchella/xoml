@@ -50,7 +50,7 @@ jobs:
           TAG="${{ github.ref_name }}"
           FILENAME="xoml-${TAG}-${{ matrix.target }}.tar.gz"
           tar -C dist -czf "$FILENAME" xoml
-          ls -l xoml-${{ matrix.target }}.tar.gz
+          ls -l "$FILENAME"
 
       - name: Upload assets to GitHub release
         uses: softprops/action-gh-release@v2
