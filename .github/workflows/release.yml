@@ -47,14 +47,16 @@ jobs:
           ls -l "$BIN"
           strip "$BIN"
           cp "$BIN" dist/xoml
-          tar -C dist -czf "xoml-${{ matrix.target }}.tar.gz" xoml
+          TAG="${{ github.ref_name }}"
+          FILENAME="xoml-${TAG}-${{ matrix.target }}.tar.gz"
+          tar -C dist -czf "$FILENAME" xoml
           ls -l xoml-${{ matrix.target }}.tar.gz
 
       - name: Upload assets to GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            xoml-${{ matrix.target }}.tar.gz
+            xoml-${{ github.ref_name }}-${{ matrix.target }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
