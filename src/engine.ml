@@ -89,11 +89,15 @@ let filter_board_indices (g : game) (fn : int * 'a option -> bool) : int list =
     done;
     !acc
 
+let get_occupied_indices (g: game) : int list =
+    filter_board_indices g (fun (_, v) -> v <> None)
+
 let get_possible_moves (g: game) : int list =
     (* TODO: improve algo *)
     filter_board_indices g (fun (_, v) -> v == None)
 
-let get_active_bounds_rect (g: game) : point * point =
+let get_active_bounds_rect (g: game) : point * point * int =
+    let cnt = ref 0 in
     let p1 = ref {x = max_int; y = max_int} in
     let p2 = ref {x = min_int; y = min_int} in
     for i = 0 to g.board_size - 1 do
@@ -107,26 +111,37 @@ let get_active_bounds_rect (g: game) : point * point =
             let ny1 = if p.y < !p1.y then p.y else !p1.y in
             let nx2 = if p.x > !p2.x then p.x else !p2.x in
             let ny2 = if p.y > !p2.y then p.y else !p2.y in
+            cnt := !cnt + 1;
             p1 := {x = nx1; y = ny1};
             p2 := {x = nx2; y = ny2};
         | None -> ()
     done;
     match !p1 with
     | {x; y} when x = max_int && y = max_int ->
-            ({x = 0; y = 0}
-            ,{x = (g.board_width - 1); y = (g.board_height - 1)}
-            )
-    | _ -> (!p1, !p2)
+        ( {x = 0; y = 0}
+        , {x = (g.board_width - 1); y = (g.board_height - 1)}
+        , !cnt
+        )
+    | _ -> (!p1, !p2, !cnt)
+
+let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * point) =
+    let nx1 = p1.x - factor in
+    let ny1 = p1.y - factor in
+    let nx2 = p2.x + factor in
+    let ny2 = p2.y + factor in
+    let nx1 = if nx1 < 0 then 0 else nx1 in
+    let ny1 = if ny1 < 0 then 0 else ny1 in
+    let nx2 = if nx2 > (g.board_width  - 1) then (g.board_width  - 1) else nx2 in
+    let ny2 = if ny2 > (g.board_height - 1) then (g.board_height - 1) else ny2 in
+    ({x = nx1; y = ny1}, {x = nx2; y = ny2})
 
 let get_possible_moves_2 (g: game) : int list =
-    let (p1, p2) = get_active_bounds_rect g in
+    let (p1, p2, _) = get_active_bounds_rect g in
+    let (p1, p2) = expand_bounds g p1 p2 2 in
     let ps1 = move_str_of_point g p1 in
     let ps2 = move_str_of_point g p2 in
     Logger.write g ("Bounds: " ^ ps1 ^ " - " ^ ps2);
     []
-
-let get_occupied_indices (g: game) : int list =
-    filter_board_indices g (fun (_, v) -> v <> None)
 
 let apply_move_by_index (g: game) (pl: player) index : game =
     let point     = point_of_index g index |> Option.get in
