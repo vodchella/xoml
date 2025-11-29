@@ -1,0 +1,60 @@
+name: Build release tarballs
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      matrix:
+        include:
+          - runs-on: ubuntu-latest
+            target: x86_64-linux
+          - runs-on: ubuntu-24.04-arm
+            target: arm64-linux
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5.4
+          opam-disable-sandboxing: true
+
+      - name: Install dependencies
+        run: opam install . --deps-only -y
+
+      - name: Build and install into local prefix
+        run: |
+          opam exec -- dune build @install
+          opam exec -- dune install \
+            --prefix "$PWD/_install" \
+            --relocatable \
+            --force
+
+      - name: Create tarball
+        run: |
+          mkdir -p dist
+          BIN="_install/bin/xoml"
+          ls -l "$BIN"
+          strip "$BIN"
+          cp "$BIN" dist/xoml
+          tar -C dist -czf "xoml-${{ matrix.target }}.tar.gz" xoml
+          ls -l xoml-${{ matrix.target }}.tar.gz
+
+      - name: Upload assets to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            xoml-${{ matrix.target }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
