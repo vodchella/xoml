@@ -5,7 +5,13 @@ FLAGS       = -g -w +a-40-42-70
 BUILD_DIR   = build
 TARGET      = $(BUILD_DIR)/xoml
 
-SOURCES     = src/common.ml src/logger.ml src/input.ml src/board.ml src/engine.ml src/xo.ml
+SOURCES     = src/logger.ml    \
+			  src/common.ml    \
+			  src/benchmark.ml \
+			  src/input.ml     \
+			  src/board.ml     \
+			  src/engine.ml    \
+			  src/xo.ml
 CMX         = $(patsubst src/%.ml,$(BUILD_DIR)/%.cmx,$(SOURCES))
 
 all: $(TARGET)

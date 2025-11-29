@@ -58,7 +58,10 @@ let main () =
 
     Printexc.record_backtrace true;
     Random.self_init ();
-    Logger.write g "Started!";
+
+    (* Benchmark.bench_game_fn g "get_possible_moves" Engine.get_possible_moves; *)
+    (* Benchmark.bench_game_fn g "get_occupied_indices" Engine.get_occupied_indices; *)
+
     Board.screen_clear ();
     Board.draw g;
     (main_loop[@tailcall]) g

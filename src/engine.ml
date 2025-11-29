@@ -69,12 +69,25 @@ let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: 
         | None -> 1
         | _    -> 0
 
-let filter_board_indices (g: game) fn : int list =
-    g.board
-    |> Array.to_list
-    |> List.mapi   (fun i v  -> (i, v))
-    |> List.filter fn
-    |> List.map    fst
+(* Old unoptimized (but beauty) version: *)
+(* 1000000 runs: 0.732028 sec *)
+(* let filter_board_indices (g: game) fn : int list = *)
+(*     g.board *)
+(*     |> Array.to_list *)
+(*     |> List.mapi   (fun i v  -> (i, v)) *)
+(*     |> List.filter fn *)
+(*     |> List.map    fst *)
+
+(* New optimized version: *)
+(* 1000000 runs: 0.247501 sec *)
+let filter_board_indices (g : game) (fn : int * 'a option -> bool) : int list =
+    let acc = ref [] in
+    let b = g.board in
+    for i = Array.length b - 1 downto 0 do
+        if fn (i, b.(i)) then
+            acc := i :: !acc
+    done;
+    !acc
 
 let get_possible_moves (g: game) : int list =
     (* TODO: improve algo *)
