@@ -92,10 +92,6 @@ let filter_board_indices (g : game) (fn : int * 'a option -> bool) : int list =
 let get_occupied_indices (g: game) : int list =
     filter_board_indices g (fun (_, v) -> v <> None)
 
-let get_possible_moves (g: game) : int list =
-    (* TODO: improve algo *)
-    filter_board_indices g (fun (_, v) -> v == None)
-
 let get_active_bounds_rect (g: game) : point * point * int =
     let cnt = ref 0 in
     let p1 = ref {x = max_int; y = max_int} in
@@ -135,13 +131,23 @@ let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * poi
     let ny2 = if ny2 > (g.board_height - 1) then (g.board_height - 1) else ny2 in
     ({x = nx1; y = ny1}, {x = nx2; y = ny2})
 
-let get_possible_moves_2 (g: game) : int list =
-    let (p1, p2, _) = get_active_bounds_rect g in
-    let (p1, p2) = expand_bounds g p1 p2 2 in
-    let ps1 = move_str_of_point g p1 in
-    let ps2 = move_str_of_point g p2 in
-    Logger.write g ("Bounds: " ^ ps1 ^ " - " ^ ps2);
-    []
+let get_possible_moves (g: game) : int list =
+    let (p1, p2, cnt) = get_active_bounds_rect g in
+    match cnt with
+    | 0 -> (random_index_biased_toward_center g.board_size) :: []
+    | _ ->
+        let (p1, p2) = expand_bounds g p1 p2 2 in
+        let result = ref [] in
+        for x = p1.x to p2.x do
+            for y = p1.y to p2.y do
+                let i = index_of_point g {x; y} |> Option.get in
+                let pl = g.board.(i) in
+                match pl with
+                | Some _ -> ()
+                | None -> result := i :: !result
+            done;
+        done;
+        !result
 
 let apply_move_by_index (g: game) (pl: player) index : game =
     let point     = point_of_index g index |> Option.get in
@@ -243,9 +249,8 @@ let score_board (g: game) (pl: player) : int =
     in
     score_board' indices 0
 
-let find_best_move_score (g: game) (pl: player) : int option =
-    let _ = get_possible_moves_2 g in
-    match get_possible_moves g with
+let find_best_move_score (g: game) (pl: player) (m: int list) : int option =
+    match m with
     | []    -> None
     | moves ->
         let rec find_best_move_score' moves score_accum index_accum =
@@ -268,5 +273,6 @@ let find_best_move_score (g: game) (pl: player) : int option =
         | _ -> index
 
 let find_best_move (g: game) (pl: player) : int option =
-    find_best_move_score g pl
+    let moves = get_possible_moves g in
+    find_best_move_score g pl moves
 

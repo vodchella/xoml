@@ -24,7 +24,7 @@ let write (g : game) (s : string) : unit =
     | Some ch ->
         let ts = timestamp () in
         output_string ch ts;
-        output_char ch ' ';
+        output_string ch "   ";
         output_string ch s;
         output_char ch '\n';
         flush ch

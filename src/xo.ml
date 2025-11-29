@@ -40,7 +40,7 @@ let rec main_loop (g: game) =
 let main () =
     let s = Board.size_from_args () in
     let g = initial_game in
-    let g = Logger.create g in
+    (* let g = Logger.create g in *)
     let g = { g with
               board_width = s
             ; board_height = s
@@ -59,8 +59,9 @@ let main () =
     Printexc.record_backtrace true;
     Random.self_init ();
 
-    (* Benchmark.bench_game_fn g "get_possible_moves" Engine.get_possible_moves; *)
-    (* Benchmark.bench_game_fn g "get_occupied_indices" Engine.get_occupied_indices; *)
+    (* let g = Engine.apply_move g X "E5" in *)
+    (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_1" Engine.find_best_move_1; *)
+    (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_2" Engine.find_best_move_2; *)
 
     Board.screen_clear ();
     Board.draw g;

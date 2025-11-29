@@ -56,6 +56,7 @@ let ( >>! ) opt fn =
     | Some v -> Some v
     | None   -> fn ()
 
+(* FIX: needs to be rewritten to work with a two-dimensional array *)
 (* https://en.wikipedia.org/wiki/Box–Muller_transform *)
 let random_index_biased_toward_center len =
     let center = float_of_int len /. 2.0 in
