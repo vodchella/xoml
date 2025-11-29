@@ -93,6 +93,38 @@ let get_possible_moves (g: game) : int list =
     (* TODO: improve algo *)
     filter_board_indices g (fun (_, v) -> v == None)
 
+let get_active_bounds_rect (g: game) : point * point =
+    let p1 = ref {x = max_int; y = max_int} in
+    let p2 = ref {x = min_int; y = min_int} in
+    for i = 0 to g.board_size - 1 do
+        let pl = g.board.(i) in
+        match pl with
+        | Some _ ->
+            (* PERF: This can be optimized to avoid
+                     rewriting points that haven’t changed *)
+            let p = point_of_index g i |> Option.get in
+            let nx1 = if p.x < !p1.x then p.x else !p1.x in
+            let ny1 = if p.y < !p1.y then p.y else !p1.y in
+            let nx2 = if p.x > !p2.x then p.x else !p2.x in
+            let ny2 = if p.y > !p2.y then p.y else !p2.y in
+            p1 := {x = nx1; y = ny1};
+            p2 := {x = nx2; y = ny2};
+        | None -> ()
+    done;
+    match !p1 with
+    | {x; y} when x = max_int && y = max_int ->
+            ({x = 0; y = 0}
+            ,{x = (g.board_width - 1); y = (g.board_height - 1)}
+            )
+    | _ -> (!p1, !p2)
+
+let get_possible_moves_2 (g: game) : int list =
+    let (p1, p2) = get_active_bounds_rect g in
+    let ps1 = move_str_of_point g p1 in
+    let ps2 = move_str_of_point g p2 in
+    Logger.write g ("Bounds: " ^ ps1 ^ " - " ^ ps2);
+    []
+
 let get_occupied_indices (g: game) : int list =
     filter_board_indices g (fun (_, v) -> v <> None)
 
@@ -197,6 +229,7 @@ let score_board (g: game) (pl: player) : int =
     score_board' indices 0
 
 let find_best_move_score (g: game) (pl: player) : int option =
+    let _ = get_possible_moves_2 g in
     match get_possible_moves g with
     | []    -> None
     | moves ->
@@ -210,7 +243,7 @@ let find_best_move_score (g: game) (pl: player) : int option =
                | _ ->
                    find_best_move_score' rest score_accum index_accum
         in
-        let score, index = find_best_move_score' moves Common.min_int None in
+        let score, index = find_best_move_score' moves min_int None in
         match score with
         |  0 ->
             moves
