@@ -46,7 +46,7 @@ let shift_point_according_to_direction (p: point) (d: direction) (times: int) : 
     }
 
 let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
-    let rec count_in_direction_aux counter =
+    let rec count_in_direction' counter =
         match counter with
         | c when c > g.win_length -> g.win_length
         | c ->
@@ -55,10 +55,10 @@ let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
             | None       -> c
             | Some index ->
                 match g.board.(index) with
-                | Some p' when p' == pl -> count_in_direction_aux (c + 1)
+                | Some p' when p' == pl -> count_in_direction' (c + 1)
                 | _ -> c
     in
-    count_in_direction_aux 0
+    count_in_direction' 0
 
 let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: int) : int =
     let point = shift_point_according_to_direction p d cnt_in_dir in
@@ -130,25 +130,25 @@ let apply_move (g: game) (pl: player) move_str : game =
 let find_winner (g: game) : player option =
     let check_player_at_index index pl =
         let point = point_of_index g index |> Option.get in
-        let rec check_player_at_index_aux dirs =
+        let rec check_player_at_index' dirs =
             match dirs with
             | []          -> None
             | dir :: rest ->
                 match count_in_direction g pl point dir with
                 | c when c == g.win_length -> Some pl
-                | _ -> check_player_at_index_aux rest
+                | _ -> check_player_at_index' rest
         in
-        check_player_at_index_aux working_dirs
+        check_player_at_index' working_dirs
     in
-    let rec find_winner_aux index =
+    let rec find_winner' index =
         match index with
         | i when i > (g.board_size - 1) -> None
         | _ ->
             check_player_at_index index X
             >>! (fun () -> check_player_at_index index O)
-            >>! (fun () -> find_winner_aux       (index + 1))
+            >>! (fun () -> find_winner'          (index + 1))
     in
-    find_winner_aux 0
+    find_winner' 0
 
 let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
     let index           = index_of_point g p |> Option.get in
@@ -169,20 +169,20 @@ let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
 let score_position (g: game) (pl: player) (index: int) : int =
     let point = point_of_index g index |> Option.get in
     let pl_opp = opponent_of pl in
-    let rec score_position_aux dirs accum =
+    let rec score_position' dirs accum =
         match dirs with
         | [] -> accum
         | d :: rest ->
             let score_pl = score_line g pl     point d in
             let score_op = score_line g pl_opp point d in
             let score    = (score_pl + (score_op / 2)) in
-            score_position_aux rest (score + accum)
+            score_position' rest (score + accum)
     in
-    score_position_aux working_dirs 0
+    score_position' working_dirs 0
 
 let score_board (g: game) (pl: player) : int =
     let indices = get_occupied_indices g in
-    let rec score_board_aux indexes accum =
+    let rec score_board' indexes accum =
         match indexes with
         | [] -> accum
         | i :: rest ->
@@ -192,25 +192,25 @@ let score_board (g: game) (pl: player) : int =
                     | p' when p' == pl' -> 1
                     | _ -> 0
             in
-            score_board_aux rest (accum + (v * score_at_index))
+            score_board' rest (accum + (v * score_at_index))
     in
-    score_board_aux indices 0
+    score_board' indices 0
 
 let find_best_move_score (g: game) (pl: player) : int option =
     match get_possible_moves g with
     | []    -> None
     | moves ->
-        let rec find_best_move_score_aux moves score_accum index_accum =
+        let rec find_best_move_score' moves score_accum index_accum =
             match moves with
             | []        -> score_accum, index_accum
             | i :: rest ->
                match score_position g pl i with
                | score when score > score_accum ->
-                   find_best_move_score_aux rest score (Some i)
+                   find_best_move_score' rest score (Some i)
                | _ ->
-                   find_best_move_score_aux rest score_accum index_accum
+                   find_best_move_score' rest score_accum index_accum
         in
-        let score, index = find_best_move_score_aux moves Common.min_int None in
+        let score, index = find_best_move_score' moves Common.min_int None in
         match score with
         |  0 ->
             moves

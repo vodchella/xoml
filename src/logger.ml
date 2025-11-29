@@ -29,5 +29,5 @@ let write (g : game) (s : string) : unit =
         output_char ch '\n';
         flush ch
     | None ->
-        failwith "log_write: log file not open"
+        ()
 
