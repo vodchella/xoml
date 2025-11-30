@@ -69,18 +69,7 @@ let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: 
         | None -> 1
         | _    -> 0
 
-(* NOTE: old unoptimized (but beauty) version: *)
-(* 1000000 runs: 0.732028 sec *)
-(* let filter_board_indices (g: game) fn : int list = *)
-(*     g.board *)
-(*     |> Array.to_list *)
-(*     |> List.mapi   (fun i v  -> (i, v)) *)
-(*     |> List.filter fn *)
-(*     |> List.map    fst *)
-
-(* PERF: new optimized version: *)
-(* 1000000 runs: 0.247501 sec *)
-let filter_board_indices (g : game) (fn : int * 'a option -> bool) : int list =
+let filter_board_indices (g : game) (fn: int * 'a option -> bool) : int list =
     let acc = ref [] in
     let b = g.board in
     for i = Array.length b - 1 downto 0 do
@@ -94,31 +83,25 @@ let get_occupied_indices (g: game) : int list =
 
 let get_active_bounds_rect (g: game) : point * point * int =
     let cnt = ref 0 in
-    let p1 = ref {x = max_int; y = max_int} in
-    let p2 = ref {x = min_int; y = min_int} in
+    let p1  = ref {x = max_int; y = max_int} in
+    let p2  = ref {x = min_int; y = min_int} in
     for i = 0 to g.board_size - 1 do
         let pl = g.board.(i) in
         match pl with
         | Some _ ->
             (* PERF: This can be optimized to avoid
                      rewriting points that haven’t changed *)
-            let p = point_of_index g i |> Option.get in
+            let p   = point_of_index g i |> Option.get   in
             let nx1 = if p.x < !p1.x then p.x else !p1.x in
             let ny1 = if p.y < !p1.y then p.y else !p1.y in
             let nx2 = if p.x > !p2.x then p.x else !p2.x in
             let ny2 = if p.y > !p2.y then p.y else !p2.y in
             cnt := !cnt + 1;
-            p1 := {x = nx1; y = ny1};
-            p2 := {x = nx2; y = ny2};
+            p1  := {x = nx1; y = ny1};
+            p2  := {x = nx2; y = ny2};
         | None -> ()
     done;
-    match !p1 with
-    | {x; y} when x = max_int && y = max_int ->
-        ( {x = 0; y = 0}
-        , {x = (g.board_width - 1); y = (g.board_height - 1)}
-        , !cnt
-        )
-    | _ -> (!p1, !p2, !cnt)
+    (!p1, !p2, !cnt)
 
 let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * point) =
     let nx1 = p1.x - factor in
