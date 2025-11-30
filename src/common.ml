@@ -5,6 +5,8 @@ let chrc   = Char.code
 type direction  = N | E | S | W | NE | SE | SW | NW
 type player     = X | O
 type game_state = Waiting | Thinking
+
+(* INFO: point is 1-based !!! *)
 type point = { x : int
              ; y : int
              }

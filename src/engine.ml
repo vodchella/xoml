@@ -101,18 +101,18 @@ let get_active_bounds_rect (g: game) : point * point * int =
             p2  := {x = nx2; y = ny2};
         | None -> ()
     done;
-    (!p1, !p2, !cnt)
+    ( !p1, !p2, !cnt )
 
 let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * point) =
     let nx1 = p1.x - factor in
     let ny1 = p1.y - factor in
     let nx2 = p2.x + factor in
     let ny2 = p2.y + factor in
-    let nx1 = if nx1 < 0 then 0 else nx1 in
-    let ny1 = if ny1 < 0 then 0 else ny1 in
-    let nx2 = if nx2 > (g.board_width  - 1) then (g.board_width  - 1) else nx2 in
-    let ny2 = if ny2 > (g.board_height - 1) then (g.board_height - 1) else ny2 in
-    ({x = nx1; y = ny1}, {x = nx2; y = ny2})
+    let nx1 = if nx1 < 1 then 1 else nx1 in
+    let ny1 = if ny1 < 1 then 1 else ny1 in
+    let nx2 = if nx2 > g.board_width  then g.board_width  else nx2 in
+    let ny2 = if ny2 > g.board_height then g.board_height else ny2 in
+    ( {x = nx1; y = ny1}, {x = nx2; y = ny2} )
 
 let get_possible_moves (g: game) : int list =
     let (p1, p2, cnt) = get_active_bounds_rect g in
@@ -165,17 +165,22 @@ let apply_move (g: game) (pl: player) move_str : game =
 
 let find_winner (g: game) : player option =
     let check_player_at_index index pl =
-        let point = point_of_index g index |> Option.get in
-        let rec check_player_at_index' dirs =
-            match dirs with
-            | []          -> None
-            | dir :: rest ->
-                match count_in_direction g pl point dir with
-                | c when c == g.win_length -> Some pl
-                | _ -> check_player_at_index' rest
-        in
-        check_player_at_index' working_dirs
+        let pl' = g.board.(index) in
+        match pl' with
+        | Some pl'' when pl'' = pl ->
+            let point = point_of_index g index |> Option.get in
+            let rec check_player_at_index' dirs =
+                match dirs with
+                | []          -> None
+                | dir :: rest ->
+                    match count_in_direction g pl point dir with
+                    | c when c == g.win_length -> Some pl
+                    | _ -> check_player_at_index' rest
+            in
+            check_player_at_index' working_dirs
+        | _ -> None
     in
+    (* PERF: need to be improved with get_active_bounds_rect usage *)
     let rec find_winner' index =
         match index with
         | i when i > (g.board_size - 1) -> None
