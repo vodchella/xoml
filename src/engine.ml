@@ -117,7 +117,7 @@ let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * poi
 let get_possible_moves (g: game) : int list =
     let (p1, p2, cnt) = get_active_bounds_rect g in
     match cnt with
-    | 0 -> (random_index_biased_toward_center g.board_size) :: []
+    | 0 -> (random_index_near_center g) :: []
     | _ ->
         let (p1, p2) = expand_bounds g p1 p2 2 in
         let result = ref [] in
@@ -157,6 +157,11 @@ let apply_move_by_index (g: game) (pl: player) index : game =
         }
     | Some _ ->
         { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" }
+
+let apply_move_by_index_opt (g: game) (pl: player) (index_opt: int option) : game =
+    match index_opt with
+    | Some index -> apply_move_by_index g pl index
+    | None       -> g
 
 let apply_move (g: game) (pl: player) move_str : game =
     let point = point_of_move_str g move_str in
@@ -221,6 +226,7 @@ let score_position (g: game) (pl: player) (index: int) : int =
     in
     score_position' working_dirs 0
 
+(* Unused *)
 let score_board (g: game) (pl: player) : int =
     let indices = get_occupied_indices g in
     let rec score_board' indexes accum =
@@ -237,30 +243,26 @@ let score_board (g: game) (pl: player) : int =
     in
     score_board' indices 0
 
-let find_best_move_score (g: game) (pl: player) (m: int list) : int option =
-    match m with
+let find_best_move_by_score (g: game) (pl: player) (moves: int list) : int option =
+    match moves with
     | []    -> None
-    | moves ->
-        let rec find_best_move_score' moves score_accum index_accum =
-            match moves with
+    | moves' ->
+        let rec find_best_move_by_score' moves' score_accum index_accum =
+            match moves' with
             | []        -> score_accum, index_accum
             | i :: rest ->
                match score_position g pl i with
                | score when score > score_accum ->
-                   find_best_move_score' rest score (Some i)
+                   find_best_move_by_score' rest score (Some i)
                | _ ->
-                   find_best_move_score' rest score_accum index_accum
+                   find_best_move_by_score' rest score_accum index_accum
         in
-        let score, index = find_best_move_score' moves min_int None in
+        let score, index = find_best_move_by_score' moves' min_int None in
         match score with
-        |  0 ->
-            moves
-            |> List.length
-            |> random_index_biased_toward_center
-            |> List.nth_opt moves
+        | 0 -> random_index_near_center_opt g
         | _ -> index
 
 let find_best_move (g: game) (pl: player) : int option =
     let moves = get_possible_moves g in
-    find_best_move_score g pl moves
+    find_best_move_by_score g pl moves
 

@@ -39,22 +39,8 @@ let make_body rows_count row  =
     String.concat "" lines
 
 let size_from_args () =
-    let size = ref None in
-    let speclist = [
-        ("-s", Arg.Int (fun x ->
-            if x < 5 || x > 10 then
-              raise (Arg.Bad "Value for -s must be between 5 and 10")
-            else
-              size := Some x),
-         "Set size (must be between 5 and 10)")
-    ] in
-
-    let usage_msg = "Usage: program_name [-s X]" in
-    Arg.parse speclist print_endline usage_msg;
-
-    match !size with
-    | Some s -> s
-    | None   -> default_board_width
+    let { board_side; _ } = Args.parse_args in
+    board_side
 
 let draw (g: game) =
     let headers    =  make_column_headers  g.board_width      in

@@ -5,8 +5,9 @@ FLAGS       = -g -w +a-40-42-70
 BUILD_DIR   = build
 TARGET      = $(BUILD_DIR)/xoml
 
-SOURCES     = src/logger.ml    \
-			  src/common.ml    \
+SOURCES     = src/common.ml    \
+			  src/logger.ml    \
+			  src/args.ml      \
 			  src/benchmark.ml \
 			  src/input.ml     \
 			  src/board.ml     \

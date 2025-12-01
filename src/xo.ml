@@ -63,6 +63,9 @@ let main () =
     (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_1" Engine.find_best_move_1; *)
     (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_2" Engine.find_best_move_2; *)
 
+    let playerO_starts = Array.exists (fun a -> a = "-O") Sys.argv in
+    let first_move = some_if playerO_starts (Engine.find_best_move g O) in
+    let g = Engine.apply_move_by_index_opt g O first_move in
     Board.screen_clear ();
     Board.draw g;
     (main_loop[@tailcall]) g

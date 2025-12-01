@@ -1,5 +1,5 @@
 (executable
  (name xo)
  (public_name xoml)
- (modules logger common benchmark input board engine xo)
+ (modules common logger args benchmark input board engine xo)
  (libraries unix))
