@@ -6,8 +6,8 @@
 
 ## How to play
 
-- Unpack the archive downloaded from the [Releases](https://github.com/vodchella/xoml/releases) section (or build it yourself from the source), and run `./xoml` in the terminal. The game supports several command-line parameters:
-  - `-s X` or `-s=X` is used to specify the board side length. `X` here is an integer from 5 to 10. For example, with `-s=7` the game will start with a 7x7 board.
+- Unpack the archive downloaded from the [Releases](https://github.com/vodchella/xoml/releases) section (or build it yourself from the source), and run `./xoml` in the terminal. The game supports several optional command-line parameters:
+  - `-s X` or `-s=X` is used to specify the board side length. `X` here is an integer from 5 to 10. For example, with `-s=7` the game will start with a 7x7 board. By default, the board size is 10×10.
   - `-O` is used to make the computer perform the first move; by default, the human goes first. The computer’s moves are marked with the symbol `O`, hence the name of the flag.
 - To make a move, you need to enter the coordinates of a free cell and press Enter. For example, `e5` or `f4`. The case of all commands does not matter.
 - To display help, enter `h` or `help`.
