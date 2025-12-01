@@ -2,7 +2,7 @@
 
 [![OCaml](https://img.shields.io/badge/OCaml-%23EC6813.svg?logo=ocaml&logoColor=white)](https://ocaml.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**XOml** is a very simple (easy-to-win) **Tic Tac Toe** game _(5 in a row, 10x10 board)_ for fans of the terminal and Linux implemented in [OCaml](https://ocaml.org/)
+**XOml** is a very simple (easy-to-win) **Tic-Tac-Toe** game — _a 5-in-a-row variant on a 10×10 board_ — for fans of the terminal and Linux, implemented in [OCaml](https://ocaml.org/).
 
 ## How to play
 
