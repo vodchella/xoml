@@ -38,15 +38,15 @@ let rec main_loop (g: game) =
             | Quit -> ()
 
 let main () =
-    let s = Board.size_from_args () in
+    let { board_side; playerO_starts } = Args.parse_args in
     let g = initial_game in
     (* let g = Logger.create g in *)
     let g = { g with
-              board_width = s
-            ; board_height = s
-            ; board_size = s * s
-            ; input_vmargin = s + 5
-            ; board = Array.make (s * s) None
+              board_width   = board_side
+            ; board_height  = board_side
+            ; board_size    = board_side * board_side
+            ; input_vmargin = board_side + 5
+            ; board = Array.make (board_side * board_side) None
             }
     in
     assert (g.board_width  >= 5);
@@ -63,7 +63,6 @@ let main () =
     (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_1" Engine.find_best_move_1; *)
     (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_2" Engine.find_best_move_2; *)
 
-    let playerO_starts = Array.exists (fun a -> a = "-O") Sys.argv in
     let first_move = some_if playerO_starts (Engine.find_best_move g O) in
     let g = Engine.apply_move_by_index_opt g O first_move in
     Board.screen_clear ();

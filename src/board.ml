@@ -38,10 +38,6 @@ let make_body rows_count row  =
     in
     String.concat "" lines
 
-let size_from_args () =
-    let { board_side; _ } = Args.parse_args in
-    board_side
-
 let draw (g: game) =
     let headers    =  make_column_headers  g.board_width      in
     let row        =  make_empty_row       g.board_width      in
