@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "xoml"
-version: "0.1"
+version: "0.1.1"
 synopsis: "Simple (easy-to-win) tic-tac-toe game in OCaml"
 maintainer: "vodchella"
 authors: "vodchella"
