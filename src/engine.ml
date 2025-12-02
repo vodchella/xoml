@@ -228,6 +228,7 @@ let score_position (g: game) (pl: player) (index: int) : int =
 
 (* Unused *)
 let score_board (g: game) (pl: player) : int =
+    (* BUG?: Why for all players? *)
     let indices = get_occupied_indices g in
     let rec score_board' indexes accum =
         match indexes with
