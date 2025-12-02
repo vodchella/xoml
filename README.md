@@ -1,6 +1,6 @@
 # XOml
 
-[![OCaml](https://img.shields.io/badge/OCaml-%23EC6813.svg?logo=ocaml&logoColor=white)](https://ocaml.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Nix flakes](https://img.shields.io/badge/Flakes-enabled-blue?logo=nixos&logoColor=white)](https://wiki.nixos.org/wiki/Flakes)
+[![OCaml](https://img.shields.io/badge/OCaml-%23EC6813.svg?logo=ocaml&logoColor=white)](https://ocaml.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Nix flakes](https://img.shields.io/badge/Flakes-enabled-blue?logo=nixos&logoColor=white)](https://wiki.nixos.org/wiki/Flakes) [![CI](https://github.com/vodchella/xoml/actions/workflows/release.yml/badge.svg)](https://github.com/vodchella/xoml/actions/workflows/release.yml)
 
 **XOml** is a very simple (easy-to-win) **Tic-Tac-Toe** game — _a 5-in-a-row variant on a 10×10 board_ — for fans of the terminal and Linux, implemented in [OCaml](https://ocaml.org/).
 
