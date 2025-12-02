@@ -1,6 +1,6 @@
 # XOml
 
-[![OCaml](https://img.shields.io/badge/OCaml-%23EC6813.svg?logo=ocaml&logoColor=white)](https://ocaml.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![OCaml](https://img.shields.io/badge/OCaml-%23EC6813.svg?logo=ocaml&logoColor=white)](https://ocaml.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Nix flakes](https://img.shields.io/badge/Flakes-enabled-blue?logo=nixos&logoColor=white)](https://wiki.nixos.org/wiki/Flakes)
 
 **XOml** is a very simple (easy-to-win) **Tic-Tac-Toe** game — _a 5-in-a-row variant on a 10×10 board_ — for fans of the terminal and Linux, implemented in [OCaml](https://ocaml.org/).
 
@@ -15,12 +15,13 @@
 
 ## How to build
 
-With `dune`:
-- `dune build` to build
-- `dune exec xoml` to build and run
-- `dune clean` to clean up build artifacts
-
-With `make`:
-- `make` to build
-- `make run` to build and run
-- `make clean` to clean up build artifacts
+- [Install](https://nix.dev/install-nix.html) [Nix](https://github.com/NixOS/nix) with `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
+- Enter to the development shell with `nix develop`. You may need to provide additional `--extra-experimental-features nix-command --extra-experimental-features flakes` flags for this command.
+- Build it with `dune`:
+  - `dune build` to build.
+  - `dune exec xoml` to build and run.
+  - `dune clean` to clean up build artifacts.
+- Or with `make`:
+  - `make` to build.
+  - `make run` to build and run.
+  - `make clean` to clean up build artifacts.
