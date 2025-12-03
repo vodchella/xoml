@@ -16,12 +16,16 @@
 ## How to build
 
 - [Install](https://nix.dev/install-nix.html) [Nix](https://github.com/NixOS/nix) with `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
-- Enter to the development shell with `nix develop`. You may need to provide additional `--extra-experimental-features nix-command --extra-experimental-features flakes` flags for this command.
-- Build it with `dune`:
-  - `dune build` to build.
-  - `dune exec xoml` to build and run.
-  - `dune clean` to clean up build artifacts.
-- Or with `make`:
-  - `make` to build.
-  - `make run` to build and run.
-  - `make clean` to clean up build artifacts.
+- Build it with `nix`:
+  - `nix build` to build.
+  - `nix run` to build and run.
+- **Or**:
+  - Enter to the development shell with `nix develop`. You may need to provide additional `--extra-experimental-features nix-command --extra-experimental-features flakes` flags for this command.
+  - Build it with `dune`:
+    - `dune build` to build.
+    - `dune exec xoml` to build and run.
+    - `dune clean` to clean up build artifacts.
+  - Or with `make`:
+    - `make` to build.
+    - `make run` to build and run.
+    - `make clean` to clean up build artifacts.

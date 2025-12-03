@@ -25,5 +25,26 @@
           };
         }
       );
+
+      packages = forAllSystems (system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+          ocamlPackages = pkgs.ocamlPackages;
+        in {
+          default = ocamlPackages.buildDunePackage {
+            pname = "xoml";
+            version = "0.1.1";
+            src = ./.;
+          };
+        }
+      );
+
+      apps = forAllSystems (system: {
+        default = {
+          type = "app";
+          program = "${self.packages.${system}.default}/bin/xoml";
+        };
+      });
+
     };
 }
