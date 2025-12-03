@@ -59,9 +59,11 @@ let main () =
     Printexc.record_backtrace true;
     Random.self_init ();
 
-    (* let g = Engine.apply_move g X "E5" in *)
     (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_1" Engine.find_best_move_1; *)
     (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_2" Engine.find_best_move_2; *)
+
+    (* let g = Engine.apply_move g X "E5" in *)
+    (* ignore @@ Engine.score_board g X; *)
 
     let first_move = some_if playerO_starts (Engine.find_best_move g O) in
     let g = Engine.apply_move_by_index_opt g O first_move in

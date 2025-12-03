@@ -69,7 +69,7 @@ let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: 
         | None -> 1
         | _    -> 0
 
-let filter_board_indices (g : game) (fn: int * 'a option -> bool) : int list =
+let filter_board_indices (g : game) (fn: int * player option -> bool) : int list =
     let acc = ref [] in
     let b = g.board in
     for i = Array.length b - 1 downto 0 do
@@ -78,8 +78,9 @@ let filter_board_indices (g : game) (fn: int * 'a option -> bool) : int list =
     done;
     !acc
 
-let get_occupied_indices (g: game) : int list =
-    filter_board_indices g (fun (_, v) -> v <> None)
+let get_occupied_indices (g: game) (pl: player) : int list =
+    let pl_opt = Some pl in
+    filter_board_indices g (fun (_, v) -> v = pl_opt)
 
 let get_active_bounds_rect (g: game) : point * point * int =
     let cnt = ref 0 in
@@ -228,8 +229,7 @@ let score_position (g: game) (pl: player) (index: int) : int =
 
 (* Unused *)
 let score_board (g: game) (pl: player) : int =
-    (* BUG?: Why for all players? *)
-    let indices = get_occupied_indices g in
+    let indices = get_occupied_indices g pl in
     let rec score_board' indexes accum =
         match indexes with
         | [] -> accum
