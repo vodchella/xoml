@@ -235,12 +235,7 @@ let score_board (g: game) (pl: player) : int =
         | [] -> accum
         | i :: rest ->
             let score_at_index = score_position g pl i in
-            let pl' = g.board.(i) |> Option.get in
-            let v = match pl' with
-                    | p' when p' == pl' -> 1
-                    | _ -> 0
-            in
-            score_board' rest (accum + (v * score_at_index))
+            score_board' rest (accum + score_at_index)
     in
     score_board' indices 0
 
