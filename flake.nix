@@ -1,5 +1,5 @@
 {
-  description = "OCaml dev shell";
+  description = "OCaml dev and build environment";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 

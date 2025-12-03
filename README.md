@@ -16,11 +16,12 @@
 ## How to build
 
 - [Install](https://nix.dev/install-nix.html) [Nix](https://github.com/NixOS/nix) with `curl -L https://nixos.org/nix/install | sh -s -- --daemon`
+- For all the `nix` commands listed below, additional `--extra-experimental-features nix-command --extra-experimental-features flakes` flags may be required. Alternatively, you can add `extra-experimental-features = nix-command flakes` to `nix.conf`.
 - Build it with `nix`:
   - `nix build` to build.
   - `nix run` to build and run.
 - **Or**:
-  - Enter to the development shell with `nix develop`. You may need to provide additional `--extra-experimental-features nix-command --extra-experimental-features flakes` flags for this command.
+  - Enter to the development shell with `nix develop`.
   - Build it with `dune`:
     - `dune build` to build.
     - `dune exec xoml` to build and run.
