@@ -213,16 +213,14 @@ let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
     | None                   -> score_of ( count     , open_ends)
     | _                      -> 0
 
+(* TODO: Rewrite. A single line must be checked only once *)
 let score_position (g: game) (pl: player) (index: int) : int =
     let point = point_of_index g index |> Option.get in
-    let pl_opp = opponent_of pl in
     let rec score_position' dirs accum =
         match dirs with
         | [] -> accum
         | d :: rest ->
-            let score_pl = score_line g pl     point d in
-            let score_op = score_line g pl_opp point d in
-            let score    = (score_pl + (score_op / 2)) in
+            let score = score_line g pl point d in
             score_position' rest (score + accum)
     in
     score_position' working_dirs 0

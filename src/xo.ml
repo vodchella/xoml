@@ -2,7 +2,7 @@ open Common
 
 
 let rec main_loop (g: game) =
-    Board.print_last_figure g;
+    Board.print_all_figures g;
     match Engine.find_winner g with
     | Some winner ->
         Board.print_congratulations g winner;
@@ -59,11 +59,11 @@ let main () =
     Printexc.record_backtrace true;
     Random.self_init ();
 
-    (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_1" Engine.find_best_move_1; *)
-    (* Benchmark.bench_game_fn ~count:100000 g "find_best_move_2" Engine.find_best_move_2; *)
-
-    (* let g = Engine.apply_move g X "E5" in *)
-    (* ignore @@ Engine.score_board g X; *)
+    (* let g = Engine.apply_move g O "E5" in *)
+    (* let g = Engine.apply_move g O "F4" in *)
+    (* let g = Engine.apply_move g O "G3" in *)
+    (* Board.print_all_figures g; *)
+    (* Benchmark.bench_game_fn ~count:1000000 g "score_board" Engine.score_board_test; *)
 
     let first_move = some_if playerO_starts (Engine.find_best_move g O) in
     let g = Engine.apply_move_by_index_opt g O first_move in

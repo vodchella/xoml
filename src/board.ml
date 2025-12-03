@@ -60,6 +60,22 @@ let print_last_figure (g: game) =
         print_symbol_at_point symbol point
     | _ -> ()
 
+let print_all_figures (g: game) =
+    let rec print_figure index =
+        match index with
+        | i when i > (g.board_size - 1) -> ()
+        | _ ->
+            let pl = g.board.(index) in
+            match pl with
+            | Some _ ->
+                let point = point_of_index g index |> Option.get in
+                let symbol = symbol_of_cell g.board.(index) in
+                print_symbol_at_point symbol point;
+                print_figure (index + 1) |> ignore
+            | _ -> print_figure (index + 1) |> ignore
+    in
+    print_figure 0
+
 let clear_space_for_prompt (g: game) =
     print_at empty_row (g.input_vmargin - 1) 1;
     print_at empty_row g.input_vmargin 1;

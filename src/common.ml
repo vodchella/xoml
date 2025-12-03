@@ -73,7 +73,7 @@ let index_of_point (g: game) (pnt : point) : int option =
     | { x; y } ->
         Some ((y - 1) * g.board_width + (x - 1))
 
-let point_of_index (g : game) (index : int) : point option =
+let point_of_index (g: game) (index : int) : point option =
     match index with
     | i when i > (g.board_size - 1) -> None
     | i when i < 0                  -> None
