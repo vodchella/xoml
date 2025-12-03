@@ -17,6 +17,7 @@
               dune_3
               ocaml
               ocamlPackages.findlib
+              ocamlPackages.ocaml-lsp
               pre-commit
             ];
             shellHook = ''
