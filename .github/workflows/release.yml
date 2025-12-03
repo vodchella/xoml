@@ -23,27 +23,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up OCaml
-        uses: ocaml/setup-ocaml@v3
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
         with:
-          ocaml-compiler: 5.4
-          opam-disable-sandboxing: true
+          extra_nix_config: |
+            experimental-features = nix-command flakes
 
-      - name: Install dependencies
-        run: opam install . --deps-only -y
-
-      - name: Build and install into local prefix
-        run: |
-          opam exec -- dune build @install
-          opam exec -- dune install \
-            --prefix "$PWD/_install" \
-            --relocatable \
-            --force
+      - name: Build with Nix
+        run: nix build .#default
 
       - name: Create tarball
         run: |
           mkdir -p dist
-          BIN="_install/bin/xoml"
+          BIN="result/bin/xoml"
           ls -l "$BIN"
           strip "$BIN"
           cp "$BIN" dist/xoml
@@ -59,4 +51,3 @@ jobs:
             xoml-${{ github.ref_name }}-${{ matrix.target }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
