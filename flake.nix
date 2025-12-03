@@ -18,6 +18,9 @@
               dune_3
               ocamlPackages.findlib
             ];
+            shellHook = ''
+              echo "OCaml dev shell"
+            '';
           };
         }
       );
