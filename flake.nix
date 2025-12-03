@@ -14,9 +14,10 @@
         in {
           default = pkgs.mkShell {
             buildInputs = with pkgs; [
-              ocaml
               dune_3
+              ocaml
               ocamlPackages.findlib
+              pre-commit
             ];
             shellHook = ''
               echo "OCaml dev shell"
