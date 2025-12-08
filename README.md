@@ -22,11 +22,8 @@
   - `nix run` to build and run.
 - **Or**:
   - Enter to the development shell with `nix develop`.
-  - Build it with `dune`:
-    - `dune build` to build.
-    - `dune exec xoml` to build and run.
-    - `dune clean` to clean up build artifacts.
-  - Or with `make`:
+  - Build it with `make`:
     - `make` to build.
     - `make run` to build and run.
     - `make clean` to clean up build artifacts.
+    - `make test` to run tests
