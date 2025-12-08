@@ -18,6 +18,7 @@
               ocaml
               ocamlPackages.findlib
               ocamlPackages.ocaml-lsp
+              ocamlPackages.alcotest
               pre-commit
             ];
             shellHook = ''

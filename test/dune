@@ -1,0 +1,3 @@
+(test
+ (name xoml_tests)
+ (libraries alcotest xoml))

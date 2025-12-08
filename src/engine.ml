@@ -197,21 +197,23 @@ let find_winner (g: game) : player option =
     in
     find_winner' 0
 
-let score_line (g: game) (pl: player) (p: point) (dir: direction) : int =
-    let index           = index_of_point g p |> Option.get in
-    let opp_dir         = opposite_direction_of dir in
-    let shifted_point_1 = shift_point_according_to_direction p dir     1  in
-    let shifted_point_2 = shift_point_according_to_direction p opp_dir 1  in
-    let cnt_in_dir_1    = count_in_direction g pl shifted_point_1 dir     in
-    let cnt_in_dir_2    = count_in_direction g pl shifted_point_2 opp_dir in
-    let opened_1        = have_open_end_in_direction g shifted_point_1 dir     cnt_in_dir_1 in
-    let opened_2        = have_open_end_in_direction g shifted_point_2 opp_dir cnt_in_dir_2 in
-    let count           = cnt_in_dir_1 + cnt_in_dir_2 in
-    let open_ends       = opened_1 + opened_2 in
+let score_line (g: game) (pl: player) (p: point) (dir: direction) : int * point * point =
+    let index = index_of_point g p |> Option.get in
     match g.board.(index) with
-    | Some pl' when pl' = pl -> score_of ((count + 1), open_ends)
-    | None                   -> score_of ( count     , open_ends)
-    | _                      -> 0
+    | None -> ( 0, p, p )
+    | _ ->
+        let opp_dir         = opposite_direction_of dir in
+        let shifted_point_1 = shift_point_according_to_direction p dir     1  in
+        let shifted_point_2 = shift_point_according_to_direction p opp_dir 1  in
+        let cnt_in_dir_1    = count_in_direction g pl shifted_point_1 dir     in
+        let cnt_in_dir_2    = count_in_direction g pl shifted_point_2 opp_dir in
+        let opened_1        = have_open_end_in_direction g shifted_point_1 dir     cnt_in_dir_1 in
+        let opened_2        = have_open_end_in_direction g shifted_point_2 opp_dir cnt_in_dir_2 in
+        let count           = cnt_in_dir_1 + cnt_in_dir_2 + 1 in
+        let open_ends       = opened_1 + opened_2 in
+        let edge_point_1    = shift_point_according_to_direction p dir     cnt_in_dir_1 in
+        let edge_point_2    = shift_point_according_to_direction p opp_dir cnt_in_dir_2 in
+        ( score_of (count, open_ends), edge_point_1, edge_point_2 )
 
 (* TODO: Rewrite. A single line must be checked only once *)
 let score_position (g: game) (pl: player) (index: int) : int =
@@ -220,7 +222,7 @@ let score_position (g: game) (pl: player) (index: int) : int =
         match dirs with
         | [] -> accum
         | d :: rest ->
-            let score = score_line g pl point d in
+            let score, _, _ = score_line g pl point d in
             score_position' rest (score + accum)
     in
     score_position' working_dirs 0

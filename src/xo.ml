@@ -2,7 +2,7 @@ open Common
 
 
 let rec main_loop (g: game) =
-    Board.print_all_figures g;
+    Board.print_last_figure g;
     match Engine.find_winner g with
     | Some winner ->
         Board.print_congratulations g winner;
@@ -59,9 +59,6 @@ let main () =
     Printexc.record_backtrace true;
     Random.self_init ();
 
-    (* let g = Engine.apply_move g O "E5" in *)
-    (* let g = Engine.apply_move g O "F4" in *)
-    (* let g = Engine.apply_move g O "G3" in *)
     (* Board.print_all_figures g; *)
     (* Benchmark.bench_game_fn ~count:1000000 g "score_board" Engine.score_board_test; *)
 

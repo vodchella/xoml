@@ -1,5 +1,12 @@
+(library
+ (name xoml)
+ (public_name xoml)
+ (wrapped false)
+ (modules common logger args benchmark input board engine)
+ (libraries unix))
+
 (executable
  (name xo)
  (public_name xoml)
- (modules common logger args benchmark input board engine xo)
- (libraries unix))
+ (modules xo)
+ (libraries xoml unix))
