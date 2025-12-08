@@ -116,3 +116,13 @@ let random_index_near_center_opt (g: game) =
 let random_index_near_center (g: game) =
     random_index_near_center_opt g |> Option.get
 
+let string_of_direction = function
+    | N  -> "N"
+    | E  -> "E"
+    | S  -> "S"
+    | W  -> "W"
+    | NE -> "NE"
+    | SE -> "SE"
+    | SW -> "SW"
+    | NW -> "NW"
+

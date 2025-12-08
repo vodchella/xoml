@@ -39,6 +39,35 @@ let score_of = function
     | (1, 1) -> 1
     | _      -> 0
 
+let get_direction_between_points (p1: point) (p2: point) : direction option =
+    if p1 = p2 then
+        None
+    else
+        let {x = x1; y = y1} = p1 in
+        let {x = x2; y = y2} = p2 in
+        match x1 with
+        | x1' when x1' > x2 -> (
+            match y1 with
+            | y1' when y1' > y2 -> Some NW
+            | y1' when y1' < y2 -> Some SW
+            | y1' when y1' = y2 -> Some W
+            | _ -> None
+        )
+        | x1' when x1' < x2 -> (
+            match y1 with
+            | y1' when y1' > y2 -> Some NE
+            | y1' when y1' < y2 -> Some SE
+            | y1' when y1' = y2 -> Some E
+            | _ -> None
+        )
+        | x1' when x1' = x2 -> (
+            match y1 with
+            | y1' when y1' > y2 -> Some N
+            | y1' when y1' < y2 -> Some S
+            | _ -> None
+        )
+        | _ -> None
+
 let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
     let rel = relative_point_of_direction d in
     { x = p.x + (rel.x * times)
