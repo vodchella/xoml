@@ -23,6 +23,7 @@ let direction_testable =
     in
     Alcotest.testable pp ( = )
 
+
 (*
  * Score line
  *)
@@ -104,7 +105,11 @@ let test_direction_between_points () =
     let d1  = Engine.get_direction_between_points p1 p2 in
     let d2  = Engine.get_direction_between_points p2 p1 in
     Alcotest.(check direction_testable) "F1 -> F4 dir must be N" N (d1 |> Option.get);
-    Alcotest.(check direction_testable) "F4 -> F1 dir must be S" S (d2 |> Option.get)
+    Alcotest.(check direction_testable) "F4 -> F1 dir must be S" S (d2 |> Option.get);
+    let p1 = Common.point_of_move_str g "F1" in
+    let p2 = Common.point_of_move_str g "F1" in
+    let d  = Engine.get_direction_between_points p1 p2 in
+    Alcotest.(check (option direction_testable)) "F1 -> F1 dir must be None" None d
 
 let () =
     Alcotest.run "all_tests" [
