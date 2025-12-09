@@ -38,6 +38,7 @@ jobs:
           BIN="result/bin/xoml"
           ls -l "$BIN"
           cp "$BIN" dist/xoml
+          chmod u+w dist/xoml
           strip dist/xoml
           TAG="${{ github.ref_name }}"
           FILENAME="xoml-${TAG}-${{ matrix.target }}.tar.gz"
