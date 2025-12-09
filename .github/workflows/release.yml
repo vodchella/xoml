@@ -37,8 +37,8 @@ jobs:
           mkdir -p dist
           BIN="result/bin/xoml"
           ls -l "$BIN"
-          strip "$BIN"
           cp "$BIN" dist/xoml
+          strip dist/xoml
           TAG="${{ github.ref_name }}"
           FILENAME="xoml-${TAG}-${{ matrix.target }}.tar.gz"
           tar -C dist -czf "$FILENAME" xoml
