@@ -218,7 +218,7 @@ let find_winner (g: game) : player option =
             check_player_at_index' working_dirs
         | _ -> None
     in
-    (* PERF: need to be improved with get_active_bounds_rect usage *)
+    (* PERF: maybe need to be improved with get_active_bounds_rect usage? *)
     let rec find_winner' index =
         match index with
         | i when i > (g.board_size - 1) -> None
@@ -247,38 +247,71 @@ let score_line (g: game) (pl: player) (p: point) (dir: direction) : int * point 
         let edge_point_2    = shift_point_according_to_direction p opp_dir cnt_in_dir_2 in
         ( score_of (count, open_ends), edge_point_1, edge_point_2 )
 
-let score_position (g: game) (pl: player) (index: int) (dirs: direction list) : int =
+let score_position (g: game) (pl: player) (index: int) (dirs: direction list) : int * ((int * direction) list) =
     let point = point_of_index g index |> Option.get in
-    let rec score_position' dirs accum =
+    let rec score_position' dirs score_accum indicies_accum =
         match dirs with
-        | [] -> accum
+        | [] -> (score_accum, indicies_accum)
         | d :: rest ->
-            let score, _, _ = score_line g pl point d in
-            score_position' rest (score + accum)
+            let score, p1, p2 = score_line g pl point d in
+            let points = get_line_points p1 p2 in
+            let processed_indicies = points |> List.map (fun p ->
+                let i = index_of_point g p |> Option.get in
+                (i, d)
+            )
+            in
+            score_position' rest (score + score_accum) (indicies_accum @ processed_indicies)
     in
-    score_position' dirs 0
+    score_position' dirs 0 []
 
 let init_dirs_array (g: game) (indicies: int list) : direction list option array =
     let dir_arr = Array.make g.board_size None in
-    List.iter (fun i ->
-        dir_arr.(i) <- Some working_dirs;
-        ()
-    ) indicies;
+    indicies |> List.iter (fun i ->
+        dir_arr.(i) <- Some working_dirs
+    );
     dir_arr
+
+let remove_dir_opt (d: direction) (lst: direction list) : direction list option =
+    let rec aux acc = function
+        | [] ->
+            let result = List.rev acc in
+            if result = [] then None else Some result
+        | x :: xs when x = d ->
+            let result = List.rev_append acc xs in
+            if result = [] then None else Some result
+        | x :: xs ->
+            aux (x :: acc) xs
+    in
+    aux [] lst
 
 let score_board (g: game) (pl: player) : int =
     let indicies = get_occupied_indices g pl  in
-    let dir_arr  = init_dirs_array g indicies in
+    let dir_arr  = ref (init_dirs_array g indicies) in
+    let actualize_dir_array indicies_and_dirs_to_remove =
+        indicies_and_dirs_to_remove
+        |> List.iter (fun ind_dir ->
+            let ind, dir = ind_dir in
+            match !dir_arr.(ind) with
+            | Some arr ->
+                let new_arr = remove_dir_opt dir arr in
+                !dir_arr.(ind) <- new_arr
+            | None -> ()
+        )
+    in
     let rec score_board' indexes accum =
         match indexes with
         | [] -> accum
         | i :: rest ->
-            match dir_arr.(i) with
+            match !dir_arr.(i) with
             | None ->
                 score_board' rest accum
             | Some dirs ->
-                let score_at_index = score_position g pl i dirs in
-                score_board' rest (accum + score_at_index)
+                let score, processed_indicies = score_position g pl i dirs in
+                (* NOTE: use string_of_int_direction_list to view processed_indicies: *)
+                (*       print_endline ((string_of_int i) ^ "i: " ^
+                                       (Common.string_of_int_direction_list processed_indicies)); *)
+                actualize_dir_array processed_indicies;
+                score_board' rest (accum + score)
     in
     score_board' indicies 0
 
@@ -291,7 +324,7 @@ let find_best_move_by_score (g: game) (pl: player) (moves: int list) : int optio
             | []        -> score_accum, index_accum
             | i :: rest ->
                match score_position g pl i working_dirs with
-               | score when score > score_accum ->
+               | score, _ when score > score_accum ->
                    find_best_move_by_score' rest score (Some i)
                | _ ->
                    find_best_move_by_score' rest score_accum index_accum

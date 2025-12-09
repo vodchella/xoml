@@ -109,6 +109,15 @@ let string_of_direction = function
     | SW -> "SW"
     | NW -> "NW"
 
+(* NOTE: just for debugging *)
+let string_of_int_direction_list (lst : (int * direction) list) : string =
+    let items =
+        List.map (fun (i, dir) ->
+            Printf.sprintf "(%d, %s)" i (string_of_direction dir)
+        ) lst
+    in
+    "[" ^ String.concat "; " items ^ "]"
+
 let random_index_near_center_opt (g: game) =
     let (offset, side) = match g.board_width with
     | 10 -> (3, 4)
