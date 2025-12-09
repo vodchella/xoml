@@ -20,7 +20,7 @@
 - Build it with `nix`:
   - `nix build` to build.
   - `nix run` to build and run.
-- **Or**:
+- Or:
   - Enter to the development shell with `nix develop`.
   - Build it with `make`:
     - `make` to build.
