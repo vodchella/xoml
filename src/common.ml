@@ -99,6 +99,16 @@ let move_str_of_point (g : game) (p : point) : string =
     let c2 = y_to_digit  p.y in
     String.make 1 c1 ^ String.make 1 c2
 
+let string_of_direction = function
+    | N  -> "N"
+    | E  -> "E"
+    | S  -> "S"
+    | W  -> "W"
+    | NE -> "NE"
+    | SE -> "SE"
+    | SW -> "SW"
+    | NW -> "NW"
+
 let random_index_near_center_opt (g: game) =
     let (offset, side) = match g.board_width with
     | 10 -> (3, 4)
@@ -115,14 +125,4 @@ let random_index_near_center_opt (g: game) =
 
 let random_index_near_center (g: game) =
     random_index_near_center_opt g |> Option.get
-
-let string_of_direction = function
-    | N  -> "N"
-    | E  -> "E"
-    | S  -> "S"
-    | W  -> "W"
-    | NE -> "NE"
-    | SE -> "SE"
-    | SW -> "SW"
-    | NW -> "NW"
 

@@ -11,9 +11,19 @@ let init_test_board () =
     in
     g
 
+let move_str_of_point (p: Common.point) : string =
+    let x_to_letter x = Char.chr (Char.code 'A' + x - 1) in
+    let y_to_digit  y = Char.chr (Char.code '0' + (10 - y)) in
+    let c1 = x_to_letter p.x in
+    let c2 = y_to_digit  p.y in
+    String.make 1 c1 ^ String.make 1 c2
+
 let point_testable =
-    let pp fmt { Common.x; y } =
-        Format.fprintf fmt "{ x = %d; y = %d }" x y
+    let pp fmt p =
+        Format.fprintf fmt "%s { x = %d; y = %d }"
+            (move_str_of_point p)
+            p.x
+            p.y
     in
     Alcotest.testable pp ( = )
 
@@ -77,7 +87,7 @@ let test_two_open_ends () =
 
 
 (*
- * Directions
+ * Directions and points
  *)
 
 let test_direction_between_points () =
@@ -111,6 +121,23 @@ let test_direction_between_points () =
     let d  = Engine.get_direction_between_points p1 p2 in
     Alcotest.(check (option direction_testable)) "F1 -> F1 dir must be None" None d
 
+let test_line_points () =
+    let g  = init_test_board () in
+    let p1 = Common.point_of_move_str g "D7" in
+    let p2 = Common.point_of_move_str g "E6" in
+    let p3 = Common.point_of_move_str g "F5" in
+    let p4 = Common.point_of_move_str g "G4" in
+    let points = Engine.get_line_points p1 p4 in
+    Alcotest.(check int) "points count between D7 and G4 must be 4" 4 (List.length points);
+    match points with
+    | [tp1; tp2; tp3; tp4] ->
+            Alcotest.(check point_testable) "first  point must be D7" p1 tp1;
+            Alcotest.(check point_testable) "second point must be E6" p2 tp2;
+            Alcotest.(check point_testable) "third  point must be F5" p3 tp3;
+            Alcotest.(check point_testable) "fourth point must be G4" p4 tp4;
+    | _ ->
+        Alcotest.fail "Expected exactly 4 points"
+
 let () =
     Alcotest.run "all_tests" [
         ( "Score line"
@@ -124,6 +151,7 @@ let () =
         ( "Directions and points"
         , [
             Alcotest.test_case "Directions between different points" `Quick test_direction_between_points;
+            Alcotest.test_case "Line points" `Quick test_line_points;
           ]
         );
     ]

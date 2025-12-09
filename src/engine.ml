@@ -56,6 +56,21 @@ let get_direction_between_points (p1 : point) (p2 : point) : direction option =
     |  1,  1  -> Some SE
     | _       -> None
 
+let get_line_points (p1: point) (p2: point) : point list =
+    match get_direction_between_points p1 p2 with
+    | None ->
+        [p1]
+    | Some dir ->
+        let step = relative_point_of_direction dir in
+        let rec build acc p =
+            if p = p2 then
+                List.rev (p :: acc)
+            else
+                let next = { x = p.x + step.x; y = p.y + step.y } in
+                build (p :: acc) next
+        in
+        build [] p1
+
 let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
     let rel = relative_point_of_direction d in
     { x = p.x + (rel.x * times)
