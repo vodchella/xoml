@@ -101,13 +101,12 @@ let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: 
         | None -> 1
         | _    -> 0
 
-let filter_board_indices (g : game) (fn: int * player option -> bool) : int list =
+let filter_board_indices (g : game) (fn : int * player option -> bool) : int list =
     let acc = ref [] in
-    let b = g.board in
-    for i = Array.length b - 1 downto 0 do
-        if fn (i, b.(i)) then
-            acc := i :: !acc
-    done;
+    g.board |>
+    Array.iteri (fun i cell ->
+        if fn (i, cell) then acc := i :: !acc
+    );
     !acc
 
 let get_occupied_indices (g: game) (pl: player) : int list =
