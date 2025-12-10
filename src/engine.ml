@@ -149,10 +149,13 @@ let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * poi
 
 let get_possible_moves (g: game) : int list =
     let (p1, p2, cnt) = get_active_bounds_rect g in
+    (* TODO: If the player places a piece near the wall, the computer should take the center *)
+    (* Now computer makes its first move next to the piece placed by the player *)
+    let expand_factor = if cnt = 1 then 1 else 2 in
     match cnt with
     | 0 -> (random_index_near_center g) :: []
     | _ ->
-        let (p1, p2) = expand_bounds g p1 p2 2 in
+        let (p1, p2) = expand_bounds g p1 p2 expand_factor in
         let result = ref [] in
         for x = p1.x to p2.x do
             for y = p1.y to p2.y do
