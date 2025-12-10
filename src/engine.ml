@@ -115,24 +115,24 @@ let get_occupied_indices (g: game) (pl: player) : int list =
 
 let get_active_bounds_rect (g: game) : point * point * int =
     let cnt = ref 0 in
-    let p1  = ref {x = max_int; y = max_int} in
-    let p2  = ref {x = min_int; y = min_int} in
-    for i = 0 to g.board_size - 1 do
-        let pl = g.board.(i) in
-        match pl with
+    let p1  = ref { x = max_int; y = max_int } in
+    let p2  = ref { x = min_int; y = min_int } in
+    g.board |>
+    Array.iteri (fun i cell ->
+        match cell with
         | Some _ ->
             (* PERF: This can be optimized to avoid
                      rewriting points that haven’t changed *)
-            let p   = point_of_index g i |> Option.get   in
-            let nx1 = if p.x < !p1.x then p.x else !p1.x in
-            let ny1 = if p.y < !p1.y then p.y else !p1.y in
-            let nx2 = if p.x > !p2.x then p.x else !p2.x in
-            let ny2 = if p.y > !p2.y then p.y else !p2.y in
+            let p   = Option.get (point_of_index g i) in
+            let nx1 = min p.x (!p1).x in
+            let ny1 = min p.y (!p1).y in
+            let nx2 = max p.x (!p2).x in
+            let ny2 = max p.y (!p2).y in
             cnt := !cnt + 1;
-            p1  := {x = nx1; y = ny1};
-            p2  := {x = nx2; y = ny2};
+            p1  := { x = nx1; y = ny1 };
+            p2  := { x = nx2; y = ny2 };
         | None -> ()
-    done;
+    );
     ( !p1, !p2, !cnt )
 
 let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * point) =
