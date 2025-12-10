@@ -203,6 +203,7 @@ let apply_move (g: game) (pl: player) move_str : game =
     let index = index_of_point    g point |> Option.get in
     apply_move_by_index g pl index
 
+(* TODO: optimize like score_board, so that visited cells are not checked again *)
 let find_winner (g: game) : player option =
     let check_player_at_index index pl =
         let pl' = g.board.(index) in
@@ -220,7 +221,7 @@ let find_winner (g: game) : player option =
             check_player_at_index' working_dirs
         | _ -> None
     in
-    (* PERF: maybe need to be improved with get_active_bounds_rect usage? *)
+    (* TODO: need to be improved with get_active_bounds_rect usage *)
     let rec find_winner' index =
         match index with
         | i when i > (g.board_size - 1) -> None

@@ -35,3 +35,12 @@ let direction_testable =
     in
     Alcotest.testable pp ( = )
 
+let player_testable =
+    let pp fmt p =
+        Format.fprintf fmt "%s"
+            (match p with
+            | X -> Common.sym_x
+            | O -> Common.sym_o)
+    in
+    Alcotest.testable pp ( = )
+
