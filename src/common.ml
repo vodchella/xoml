@@ -118,8 +118,8 @@ let string_of_int_direction_list (lst : (int * direction) list) : string =
     in
     "[" ^ String.concat "; " items ^ "]"
 
-let random_index_near_center_opt (g: game) =
-    let (offset, side) = match g.board_width with
+let get_board_center_borders = function
+    (* returns: (offset, side) *)
     | 10 -> (3, 4)
     |  9 -> (3, 3)
     |  8 -> (2, 4)
@@ -127,7 +127,9 @@ let random_index_near_center_opt (g: game) =
     |  6 -> (2, 2)
     |  5 -> (2, 1)
     |  _ -> failwith "Invalid board size"
-    in
+
+let random_index_near_center_opt (g: game) =
+    let (offset, side) = get_board_center_borders g.board_width in
     let x = offset + (1 + Random.int side) in
     let y = offset + (1 + Random.int side) in
     index_of_point g {x; y}
