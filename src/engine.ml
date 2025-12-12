@@ -325,65 +325,58 @@ let eval_position (g : game) (pl : player) : int =
 
 let find_best_move (g: game) (pl: player) : int option =
     let max_depth = 4 in
-    let win_score = 1_000_000 in
 
     let rec minimax (g: game) (depth: int) (alpha: int) (beta: int) (cur_pl: player) : int =
-        match find_winner g with
-        | Some p ->
-            (* Slightly reward a quick win and penalize a quick loss *)
-            if p = pl then win_score + depth
-            else -win_score - depth
-        | None ->
-            if depth = 0 then
+        if depth = 0 then
+            eval_position g pl
+        else
+            let moves = get_possible_moves g in
+            if moves = [] then
                 eval_position g pl
+            else if cur_pl = pl then
+                (* The "maximizing" player is making a move *)
+                let best = ref min_int in
+                let a = ref alpha in
+                let rec loop = function
+                    | [] ->
+                        !best
+                    | m :: ms ->
+                        let old_cell = g.board.(m) in
+                        g.board.(m) <- Some cur_pl;
+
+                        let score = minimax g (depth - 1) !a beta (opponent_of cur_pl) in
+                        g.board.(m) <- old_cell;
+
+                        if score > !best then best := score;
+                        if score > !a then a := score;
+
+                        (* beta-cutoff *)
+                        if !a >= beta then !best
+                        else loop ms
+                in
+                loop moves
             else
-                let moves = get_possible_moves g in
-                if moves = [] then
-                    eval_position g pl
-                else if cur_pl = pl then
-                    (* The "maximizing" player is making a move *)
-                    let best = ref min_int in
-                    let a = ref alpha in
-                    let rec loop = function
-                        | [] ->
-                            !best
-                        | m :: ms ->
-                            let old_cell = g.board.(m) in
-                            g.board.(m) <- Some cur_pl;
+                (* The "minimizing" player is making a move (the opponent) *)
+                let best = ref max_int in
+                let b = ref beta in
+                let rec loop = function
+                    | [] ->
+                        !best
+                    | m :: ms ->
+                        let old_cell = g.board.(m) in
+                        g.board.(m) <- Some cur_pl;
 
-                            let score = minimax g (depth - 1) !a beta (opponent_of cur_pl) in
-                            g.board.(m) <- old_cell;
+                        let score = minimax g (depth - 1) alpha !b (opponent_of cur_pl) in
+                        g.board.(m) <- old_cell;
 
-                            if score > !best then best := score;
-                            if score > !a then a := score;
+                        if score < !best then best := score;
+                        if score < !b then b := score;
 
-                            (* beta-cutoff *)
-                            if !a >= beta then !best
-                            else loop ms
-                    in
-                    loop moves
-                else
-                    (* The "minimizing" player is making a move (the opponent) *)
-                    let best = ref max_int in
-                    let b = ref beta in
-                    let rec loop = function
-                        | [] ->
-                            !best
-                        | m :: ms ->
-                            let old_cell = g.board.(m) in
-                            g.board.(m) <- Some cur_pl;
-
-                            let score = minimax g (depth - 1) alpha !b (opponent_of cur_pl) in
-                            g.board.(m) <- old_cell;
-
-                            if score < !best then best := score;
-                            if score < !b then b := score;
-
-                            (* alpha-cutoff *)
-                            if alpha >= !b then !best
-                            else loop ms
-                    in
-                    loop moves
+                        (* alpha-cutoff *)
+                        if alpha >= !b then !best
+                        else loop ms
+                in
+                loop moves
     in
 
     let moves = get_possible_moves g in
