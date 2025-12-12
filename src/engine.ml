@@ -28,7 +28,7 @@ let opponent_of = function
     | O -> X
 
 let score_of = function
-    | (c, _) when c >= 5 -> 1_000_000
+    | (c, _) when c >= 5 -> 10_000_000
     | (4, 2) -> 100_000
     | (4, 1) -> 10_000
     | (3, 2) -> 1000
@@ -158,7 +158,7 @@ let get_possible_moves (g: game) : int list =
         let result = ref [] in
         for x = p1.x to p2.x do
             for y = p1.y to p2.y do
-                let i = index_of_point g {x; y} |> Option.get in
+                let i  = index_of_point g {x; y} |> Option.get in
                 let pl = g.board.(i) in
                 match pl with
                 | Some _ -> ()
@@ -269,7 +269,8 @@ let score_position (g: game) (pl: player) (index: int) (dirs: direction list) : 
 
 let init_dirs_array (g: game) (indicies: int list) : direction list option array =
     let dir_arr = Array.make g.board_size None in
-    indicies |> List.iter (fun i ->
+    indicies
+    |> List.iter (fun i ->
         dir_arr.(i) <- Some working_dirs
     );
     dir_arr
@@ -336,11 +337,10 @@ let find_best_move (g: game) (pl: player) : int option =
             else if cur_pl = pl then
                 (* The "maximizing" player is making a move *)
                 let best = ref min_int in
-                let a = ref alpha in
+                let a    = ref alpha   in
                 let rec loop = function
-                    | [] ->
-                        !best
-                    | m :: ms ->
+                    | [] -> !best
+                    | m :: rest ->
                         let old_cell = g.board.(m) in
                         g.board.(m) <- Some cur_pl;
 
@@ -348,21 +348,20 @@ let find_best_move (g: game) (pl: player) : int option =
                         g.board.(m) <- old_cell;
 
                         if score > !best then best := score;
-                        if score > !a then a := score;
+                        if score > !a    then a    := score;
 
                         (* beta-cutoff *)
                         if !a >= beta then !best
-                        else loop ms
+                        else loop rest
                 in
                 loop moves
             else
                 (* The "minimizing" player is making a move (the opponent) *)
                 let best = ref max_int in
-                let b = ref beta in
+                let b    = ref beta    in
                 let rec loop = function
-                    | [] ->
-                        !best
-                    | m :: ms ->
+                    | [] -> !best
+                    | m :: rest ->
                         let old_cell = g.board.(m) in
                         g.board.(m) <- Some cur_pl;
 
@@ -370,20 +369,19 @@ let find_best_move (g: game) (pl: player) : int option =
                         g.board.(m) <- old_cell;
 
                         if score < !best then best := score;
-                        if score < !b then b := score;
+                        if score < !b    then b    := score;
 
                         (* alpha-cutoff *)
                         if alpha >= !b then !best
-                        else loop ms
+                        else loop rest
                 in
                 loop moves
     in
 
     let moves = get_possible_moves g in
     match moves with
-    | [] ->
-        None
-    | _ ->
+    | [] -> None
+    | _  ->
         let best_move  = ref None in
         let best_score = ref min_int in
         let alpha      = ref min_int in
