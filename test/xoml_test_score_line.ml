@@ -40,7 +40,7 @@ let test_one_open_end () =
     in
     let tp1 = Common.point_of_move_str g "H2" in
     let tp2 = Common.point_of_move_str g "J0" in
-    Alcotest.(check int) "score must be 500" 500 score;
+    Alcotest.(check int) "score must be 100" 100 score;
     Alcotest.(check point_testable) "first  point must be H2" p1 tp1;
     Alcotest.(check point_testable) "second point must be J0" p2 tp2
 
@@ -55,7 +55,7 @@ let test_two_open_ends () =
     in
     let tp1 = Common.point_of_move_str g "F4" in
     let tp2 = Common.point_of_move_str g "I1" in
-    Alcotest.(check int) "score must be 100000" 100000 score;
+    Alcotest.(check int) "score must be 10000" 10000 score;
     Alcotest.(check point_testable) "first  point must be F4" p1 tp1;
     Alcotest.(check point_testable) "second point must be I1" p2 tp2
 

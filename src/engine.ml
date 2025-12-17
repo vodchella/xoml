@@ -28,11 +28,11 @@ let opponent_of = function
     | O -> X
 
 let score_of = function
-    | (c, _) when c >= 5 -> 10_000_000
-    | (4, 2) -> 100_000
-    | (4, 1) -> 10_000
+    | (c, _) when c >= 5 -> win_score
+    | (4, 2) -> 10_000
+    | (4, 1) -> 900
     | (3, 2) -> 1000
-    | (3, 1) -> 500
+    | (3, 1) -> 100
     | (2, 2) -> 50
     | (2, 1) -> 10
     | (1, 2) -> 2
@@ -319,21 +319,28 @@ let score_board (g: game) (pl: player) : int =
     in
     score_board' indicies 0
 
-let eval_position (g : game) (pl : player) : int =
+let eval_position (g : game) (pl : player) (_depth: int) : int =
     let my_score  = score_board g pl in
     let opp_score = score_board g (opponent_of pl) in
-    my_score - opp_score
+    (my_score - opp_score)
 
 let find_best_move (g: game) (pl: player) : int option =
-    let max_depth = 4 in
+    let max_depth = 2 in
 
     let rec minimax (g: game) (depth: int) (alpha: int) (beta: int) (cur_pl: player) : int =
-        if depth = 0 then
-            eval_position g pl
+        (* match find_winner g with *)
+        (* | Some p -> *)
+        (*     (* failwith ("!!! " ^ (string_of_int depth)); *) *)
+        (*     if p = pl then win_score + depth *)
+        (*     else -win_score - depth *)
+        (* | None -> *)
+
+        if depth <= 0 then
+            eval_position g pl depth
         else
             let moves = get_possible_moves g in
             if moves = [] then
-                eval_position g pl
+                eval_position g pl depth
             else if cur_pl = pl then
                 (* The "maximizing" player is making a move *)
                 let best = ref min_int in
@@ -355,7 +362,7 @@ let find_best_move (g: game) (pl: player) : int option =
                         else loop rest
                 in
                 loop moves
-            else
+            else if cur_pl != pl then
                 (* The "minimizing" player is making a move (the opponent) *)
                 let best = ref max_int in
                 let b    = ref beta    in
@@ -375,7 +382,9 @@ let find_best_move (g: game) (pl: player) : int option =
                         if alpha >= !b then !best
                         else loop rest
                 in
-                loop moves
+                loop moves;
+            else
+                failwith "unreachable"
     in
 
     let moves = get_possible_moves g in

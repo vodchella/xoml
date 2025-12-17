@@ -33,6 +33,7 @@ type run_args =
 let default_board_width  = 10
 let default_board_height = 10
 let default_win_length   = 5
+let win_score            = 10_000_000
 let input_prompt         = "?> "
 let ascii_esc            = "\x1b"
 let sym_x                = "X"

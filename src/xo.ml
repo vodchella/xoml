@@ -3,6 +3,7 @@ open Common
 
 let rec main_loop (g: game) =
     Board.print_last_figure g;
+    (* Board.print_all_figures g; *)
     match Engine.find_winner g with
     | Some winner ->
         Board.print_congratulations g winner;
