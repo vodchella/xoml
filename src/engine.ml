@@ -29,7 +29,7 @@ let opponent_of = function
 
 let score_of = function
     | (c, _) when c >= 5 -> win_score
-    | (4, 2) -> 10_000
+    | (4, 2) -> win_score
     | (4, 1) -> 900
     | (3, 2) -> 1000
     | (3, 1) -> 100
@@ -325,7 +325,7 @@ let eval_position (g : game) (pl : player) (_depth: int) : int =
     (my_score - opp_score)
 
 let find_best_move (g: game) (pl: player) : int option =
-    let max_depth = 2 in
+    let max_depth = 4 in
 
     let rec minimax (g: game) (depth: int) (alpha: int) (beta: int) (cur_pl: player) : int =
         (* match find_winner g with *)
