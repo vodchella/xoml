@@ -65,7 +65,7 @@ let ( >>! ) opt fn =
 
 let some_if cond value = if cond then value else None
 
-let index_of_point (g: game) (pnt : point) : int option =
+let index_of_point (g: game) (pnt: point) : int option =
     match pnt with
     | { x; _ } when x < 1 -> None
     | { y; _ } when y < 1 -> None
@@ -83,7 +83,7 @@ let point_of_index (g: game) (index : int) : point option =
         let y = (i  /  g.board_width) + 1 in
         Some { x; y }
 
-let point_of_move_str (g: game) (s : string) : point =
+let point_of_move_str (g: game) (s: string) : point =
     let letter_to_x  c = chrc c - chrc 'A' + 1 in
     let digit_to_int c = chrc c - chrc '0'     in
     let c1 = s.[0] in
@@ -93,12 +93,24 @@ let point_of_move_str (g: game) (s : string) : point =
     let y  = g.board_height - y' in
     { x; y }
 
-let move_str_of_point (g : game) (p : point) : string =
+let index_of_move_str (g: game) (s: string) : int =
+    s
+    |> point_of_move_str g
+    |> index_of_point g
+    |> Option.get
+
+let move_str_of_point (g : game) (p: point) : string =
     let x_to_letter x = Char.chr (Char.code 'A' + x - 1) in
     let y_to_digit  y = Char.chr (Char.code '0' + (g.board_height - y)) in
     let c1 = x_to_letter p.x in
     let c2 = y_to_digit  p.y in
     String.make 1 c1 ^ String.make 1 c2
+
+let move_str_of_index (g: game) (index: int) : string =
+    index
+    |> point_of_index g
+    |> Option.get
+    |> move_str_of_point g
 
 let string_of_direction = function
     | N  -> "N"

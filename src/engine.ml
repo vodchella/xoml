@@ -319,13 +319,15 @@ let score_board (g: game) (pl: player) : int =
     in
     score_board' indicies 0
 
-let eval_position (g : game) (pl : player) (_depth: int) : int =
+let eval_position (g : game) (pl : player) : int =
     let my_score  = score_board g pl in
     let opp_score = score_board g (opponent_of pl) in
-    (my_score - opp_score)
+    let score     = my_score - opp_score in
+    score
 
 let find_best_move (g: game) (pl: player) : int option =
-    let max_depth = 4 in
+    let max_depth      = 4 in
+    let break_on_index = ref None in
 
     let rec minimax (g: game) (depth: int) (alpha: int) (beta: int) (cur_pl: player) : int =
         (* match find_winner g with *)
@@ -336,11 +338,11 @@ let find_best_move (g: game) (pl: player) : int option =
         (* | None -> *)
 
         if depth <= 0 then
-            eval_position g pl depth
+            eval_position g pl
         else
             let moves = get_possible_moves g in
             if moves = [] then
-                eval_position g pl depth
+                eval_position g pl
             else if cur_pl = pl then
                 (* The "maximizing" player is making a move *)
                 let best = ref min_int in
@@ -357,8 +359,8 @@ let find_best_move (g: game) (pl: player) : int option =
                         if score > !best then best := score;
                         if score > !a    then a    := score;
 
-                        (* beta-cutoff *)
-                        if !a >= beta then !best
+                        if abs(score) >= win_score || Option.is_some !break_on_index then score
+                        else if !a >= beta then !best  (* beta-cutoff *)
                         else loop rest
                 in
                 loop moves
@@ -372,15 +374,23 @@ let find_best_move (g: game) (pl: player) : int option =
                         let old_cell = g.board.(m) in
                         g.board.(m) <- Some cur_pl;
 
-                        let score = minimax g (depth - 1) alpha !b (opponent_of cur_pl) in
-                        g.board.(m) <- old_cell;
+                        let opp_score = score_board g cur_pl in
+                        if opp_score >= win_score && depth = (max_depth - 1) then (
+                            g.board.(m) <- old_cell;
+                            break_on_index := Some m;
+                            opp_score
+                        )
+                        else (
+                            let score = minimax g (depth - 1) alpha !b (opponent_of cur_pl) in
+                            g.board.(m) <- old_cell;
 
-                        if score < !best then best := score;
-                        if score < !b    then b    := score;
+                            if score < !best then best := score;
+                            if score < !b    then b    := score;
 
-                        (* alpha-cutoff *)
-                        if alpha >= !b then !best
-                        else loop rest
+                            if abs(score) >= win_score then score
+                            else if alpha >= !b then !best  (* alpha-cutoff *)
+                            else loop rest
+                        )
                 in
                 loop moves;
             else
@@ -397,18 +407,23 @@ let find_best_move (g: game) (pl: player) : int option =
 
         moves
         |> List.iter (fun m ->
-            let old_cell = g.board.(m) in
-            g.board.(m) <- Some pl;
+            match !break_on_index with
+            | Some i ->
+                best_move := Some i;
+            | _ -> (
+                let old_cell = g.board.(m) in
+                g.board.(m) <- Some pl;
 
-            let score = minimax g (max_depth - 1) !alpha max_int (opponent_of pl) in
-            g.board.(m) <- old_cell;
+                let score = minimax g (max_depth - 1) !alpha max_int (opponent_of pl) in
+                g.board.(m) <- old_cell;
 
-            if score > !best_score then begin
-                best_score := score;
-                best_move  := Some m;
-            end;
+                if score > !best_score then begin
+                    best_score := score;
+                    best_move  := Some m;
+                end;
 
-            if score > !alpha then alpha := score;
+                if score > !alpha then alpha := score;
+            )
         );
 
         !best_move

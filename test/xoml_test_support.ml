@@ -20,6 +20,16 @@ let move_str_of_point (p : Common.point) : string =
     let c2 = y_to_digit  p.y in
     String.make 1 c1 ^ String.make 1 c2
 
+let check_best_move (g: game) (pl: player) (e: string) =
+    let m = Engine.find_best_move g pl  in
+    match m with
+    | Some i ->
+        let ms = Common.move_str_of_index g i in
+        Alcotest.(check string) ("best move must be " ^ e) e ms
+    | None ->
+        failwith "best move not found"
+
+
 let point_testable =
     let pp fmt p =
         Format.fprintf fmt "%s { x = %d; y = %d }"
