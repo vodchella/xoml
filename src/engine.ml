@@ -374,11 +374,16 @@ let find_best_move (g: game) (pl: player) : int option =
                         let old_cell = g.board.(m) in
                         g.board.(m) <- Some cur_pl;
 
-                        let opp_score = score_board g cur_pl in
-                        if opp_score >= win_score && depth = (max_depth - 1) then (
+                        let break = ref false in
+                        if depth = (max_depth - 1) then (
+                            let opp_score = score_board g cur_pl in
+                            if opp_score >= win_score then break := true
+                        );
+
+                        if !break then (
                             g.board.(m) <- old_cell;
                             break_on_index := Some m;
-                            opp_score
+                            0  (* Score doesn't matter in this case *)
                         )
                         else (
                             let score = minimax g (depth - 1) alpha !b (opponent_of cur_pl) in
