@@ -22,7 +22,7 @@ let test_check_winner () =
     let winner = Engine.find_winner g in
     Alcotest.(check (option player_testable)) "winner must be X" (Some X) winner
 
-let recognize_4_in_row_threat () =
+let recognize_4_in_row_threat_1 () =
     let g = init_test_board () in
     let g = Engine.apply_move g X "D7" in
     let g = Engine.apply_move g X "C6" in
@@ -38,6 +38,35 @@ let recognize_4_in_row_threat () =
     let g = Engine.apply_move g O "F4" in
     let g = Engine.apply_move g X "G4" in
     check_best_move g O "F5"
+
+let recognize_4_in_row_threat_2 () =
+    let g = init_test_board () in
+    let g = Engine.apply_move g X "G7" in
+    let g = Engine.apply_move g O "E6" in
+    let g = Engine.apply_move g X "E5" in
+    let g = Engine.apply_move g O "F5" in
+    let g = Engine.apply_move g X "H5" in
+    let g = Engine.apply_move g X "C4" in
+    let g = Engine.apply_move g X "D4" in
+    let g = Engine.apply_move g X "E4" in
+    let g = Engine.apply_move g O "F4" in
+    let g = Engine.apply_move g O "H4" in
+    let g = Engine.apply_move g X "I4" in
+    let g = Engine.apply_move g O "D3" in
+    let g = Engine.apply_move g X "E3" in
+    let g = Engine.apply_move g O "F3" in
+    let g = Engine.apply_move g X "G3" in
+    let g = Engine.apply_move g X "H3" in
+    let g = Engine.apply_move g O "C2" in
+    let g = Engine.apply_move g O "D2" in
+    let g = Engine.apply_move g O "E2" in
+    let g = Engine.apply_move g X "F2" in
+    let g = Engine.apply_move g O "D1" in
+    let g = Engine.apply_move g X "E1" in
+    let g = Engine.apply_move g O "F1" in
+    let g = Engine.apply_move g O "G1" in
+    let g = Engine.apply_move g X "C0" in
+    check_best_move g O "F6"
 
 let recognize_next_move_loss () =
     let g = init_test_board () in
@@ -72,11 +101,12 @@ let recognize_next_move_loss () =
 
 
 let suite : string * unit Alcotest.test_case list =
-    "Score board",
+    "Board situations",
     [
         Alcotest.test_case "Score simple board"                 `Quick test_score_board;
         Alcotest.test_case "Check winner"                       `Quick test_check_winner;
-        Alcotest.test_case "Recognize 4-in-row threat"          `Quick recognize_4_in_row_threat;
+        Alcotest.test_case "Recognize 4-in-row threat (1)"      `Quick recognize_4_in_row_threat_1;
+        Alcotest.test_case "Recognize 4-in-row threat (2)"      `Quick recognize_4_in_row_threat_2;
         Alcotest.test_case "Recognize a loss on the next move"  `Quick recognize_next_move_loss;
     ]
 
