@@ -36,12 +36,12 @@
         in {
           default = ocamlPackages.buildDunePackage {
             pname = "xoml";
-            version = "0.1.4";
+            version = "0.1.5";
             src = ./.;
           };
           static = staticPkgs.ocamlPackages.buildDunePackage {
             pname = "xoml";
-            version = "0.1.4";
+            version = "0.1.5";
             src = ./.;
           };
         }
