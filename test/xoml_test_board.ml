@@ -124,6 +124,23 @@ let recognize_next_move_loss () =
     let g = Engine.apply_move g X "I0" in
     check_best_move g O "C8"
 
+let check_for_not_useless_move () =
+    let g = init_test_board () in
+    let g = Engine.apply_move g O "F6" in
+    let g = Engine.apply_move g O "G6" in
+    let g = Engine.apply_move g X "H6" in
+    let g = Engine.apply_move g X "F5" in
+    let g = Engine.apply_move g O "H5" in
+    let g = Engine.apply_move g X "E4" in
+    let g = Engine.apply_move g X "F4" in
+    let g = Engine.apply_move g O "G4" in
+    let g = Engine.apply_move g O "H4" in
+    let g = Engine.apply_move g O "I4" in
+    let g = Engine.apply_move g X "F3" in
+    let g = Engine.apply_move g X "G3" in
+    let g = Engine.apply_move g X "J3" in
+    check_best_move_is_not g O "J0"
+
 
 let suite : string * unit Alcotest.test_case list =
     "Board situations",
@@ -134,5 +151,6 @@ let suite : string * unit Alcotest.test_case list =
         Alcotest.test_case "Recognize 4-in-row threat (2)"      `Quick recognize_4_in_row_threat_2;
         Alcotest.test_case "Recognize 4-in-row threat (3)"      `Quick recognize_4_in_row_threat_3;
         Alcotest.test_case "Recognize a loss on the next move"  `Quick recognize_next_move_loss;
+        Alcotest.test_case "Check for a useless move"           `Quick check_for_not_useless_move;
     ]
 

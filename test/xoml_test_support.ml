@@ -29,6 +29,15 @@ let check_best_move (g: game) (pl: player) (e: string) =
     | None ->
         failwith "best move not found"
 
+let check_best_move_is_not (g: game) (pl: player) (e: string) =
+    let m = Engine.find_best_move g pl  in
+    match m with
+    | Some i ->
+        let ms = Common.move_str_of_index g i in
+        Alcotest.(check bool) ("best move must NOT be " ^ e) true (ms <> e)
+    | None ->
+        failwith "best move not found"
+
 
 let point_testable =
     let pp fmt p =

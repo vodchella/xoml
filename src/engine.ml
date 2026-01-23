@@ -395,10 +395,7 @@ let find_best_move (g: game) (pl: player) : int option =
                             if score < !best then best := score;
                             if score < !b    then b    := score;
 
-                            if score >= win_score then (
-                                break_on_index := Some m;
-                                0  (* Score doesn't matter in this case *)
-                            )
+                            if score >= win_score then score
                             else if alpha >= !b then !best  (* alpha-cutoff *)
                             else loop rest
                         )
