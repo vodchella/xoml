@@ -65,6 +65,10 @@ let ( >>! ) opt fn =
 
 let some_if cond value = if cond then value else None
 
+let string_of_player = function
+    | X -> sym_x
+    | O -> sym_o
+
 let index_of_point (g: game) (pnt: point) : int option =
     match pnt with
     | { x; _ } when x < 1 -> None

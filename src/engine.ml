@@ -72,10 +72,13 @@ let get_line_points (p1: point) (p2: point) : point list =
         build [] p1
 
 let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
-    let rel = relative_point_of_direction d in
-    { x = p.x + (rel.x * times)
-    ; y = p.y + (rel.y * times)
-    }
+    match times with
+    | 0 -> p
+    | _ ->
+        let rel = relative_point_of_direction d in
+        { x = p.x + (rel.x * times)
+        ; y = p.y + (rel.y * times)
+        }
 
 let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
     let rec count_in_direction' counter =
@@ -392,7 +395,10 @@ let find_best_move (g: game) (pl: player) : int option =
                             if score < !best then best := score;
                             if score < !b    then b    := score;
 
-                            if abs(score) >= win_score then score
+                            if score >= win_score then (
+                                break_on_index := Some m;
+                                0  (* Score doesn't matter in this case *)
+                            )
                             else if alpha >= !b then !best  (* alpha-cutoff *)
                             else loop rest
                         )

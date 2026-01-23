@@ -68,6 +68,31 @@ let recognize_4_in_row_threat_2 () =
     let g = Engine.apply_move g X "C0" in
     check_best_move g O "F6"
 
+let recognize_4_in_row_threat_3 () =
+    let g = init_test_board () in
+    let g = Engine.apply_move g X "E5" in
+    let g = Engine.apply_move g X "G3" in
+    let g = Engine.apply_move g X "H2" in
+    let g = Engine.apply_move g X "C7" in
+    let g = Engine.apply_move g O "C6" in
+    let g = Engine.apply_move g O "B5" in
+    let g = Engine.apply_move g O "C5" in
+    let g = Engine.apply_move g X "D5" in
+    let g = Engine.apply_move g X "F5" in
+    let g = Engine.apply_move g O "C4" in
+    let g = Engine.apply_move g O "D4" in
+    let g = Engine.apply_move g X "E4" in
+    let g = Engine.apply_move g X "B3" in
+    let g = Engine.apply_move g O "C3" in
+    let g = Engine.apply_move g O "D3" in
+    let g = Engine.apply_move g O "E3" in
+    let g = Engine.apply_move g O "F3" in
+    let g = Engine.apply_move g X "C2" in
+    let g = Engine.apply_move g O "D2" in
+    let g = Engine.apply_move g X "E2" in
+    let g = Engine.apply_move g X "F2" in
+    check_best_move g O "F4"
+
 let recognize_next_move_loss () =
     let g = init_test_board () in
     let g = Engine.apply_move g X "D7" in
@@ -107,6 +132,7 @@ let suite : string * unit Alcotest.test_case list =
         Alcotest.test_case "Check winner"                       `Quick test_check_winner;
         Alcotest.test_case "Recognize 4-in-row threat (1)"      `Quick recognize_4_in_row_threat_1;
         Alcotest.test_case "Recognize 4-in-row threat (2)"      `Quick recognize_4_in_row_threat_2;
+        Alcotest.test_case "Recognize 4-in-row threat (3)"      `Quick recognize_4_in_row_threat_3;
         Alcotest.test_case "Recognize a loss on the next move"  `Quick recognize_next_move_loss;
     ]
 

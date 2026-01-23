@@ -59,9 +59,6 @@ let main () =
     Printexc.record_backtrace true;
     Random.self_init ();
 
-    (* Board.print_all_figures g; *)
-    (* Benchmark.bench_game_fn ~count:1000000 g "score_board" Engine.score_board_test; *)
-
     let first_move = some_if playerO_starts (Engine.find_best_move g O) in
     let g = Engine.apply_move_by_index_opt g O first_move in
     Board.screen_clear ();
