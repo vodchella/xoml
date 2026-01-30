@@ -15,9 +15,10 @@ let rec main_loop (g: game) =
             match Engine.find_best_move g O with
             | Some i ->
                 let g' = Engine.apply_move_by_index g O i in
+                Logger.write_game_move_by_index g O i;
                 (main_loop[@tailcall]) g'
             | _ ->
-                Board.print_draw g)
+                Board.print_draw g )
         | Waiting ->
             let input =
                 read_line ()
@@ -31,6 +32,7 @@ let rec main_loop (g: game) =
                 (main_loop[@tailcall]) g'
             | Move move ->
                 let g' = Engine.apply_move g X move in
+                Logger.write_game_move g X move;
                 (main_loop[@tailcall]) g'
             | Help ->
                 let g' = { g with last_tip = initial_tip } in
@@ -40,7 +42,7 @@ let rec main_loop (g: game) =
 let main () =
     let { board_side; playerO_starts } = Args.parse_args in
     let g = initial_game in
-    (* let g = Logger.create g in *)
+    let g = Logger.create g in
     let g = { g with
               board_width   = board_side
             ; board_height  = board_side
@@ -63,6 +65,11 @@ let main () =
     let g = Engine.apply_move_by_index_opt g O first_move in
     Board.screen_clear ();
     Board.draw g;
+
+    (* Board.print_all_figures g; *)
+    (* Board.print_prompt g; *)
+    (* failwith "Stop"; *)
+
     (main_loop[@tailcall]) g
 
 let () = main ()

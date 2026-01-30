@@ -15,11 +15,11 @@ let timestamp () : string =
         tm.tm_sec
         ms
 
-let create (g : game) : game =
+let create (g: game) : game =
     let ch = open_out_gen [Open_wronly; Open_creat; Open_trunc] 0o666 "xoml.log" in
     { g with log_file = Some ch }
 
-let write (g : game) (s : string) : unit =
+let write (g: game) (s: string) : unit =
     match g.log_file with
     | Some ch ->
         let ts = timestamp () in
@@ -30,4 +30,12 @@ let write (g : game) (s : string) : unit =
         flush ch
     | None ->
         ()
+
+let write_game_move (g: game) (pl: player) (move_str: string) : unit =
+    match g.log_moves with
+    | true  -> write g ("let g = Engine.apply_move g " ^ (string_of_player pl) ^ " \"" ^ move_str ^ "\" in"); ()
+    | false -> ()
+
+let write_game_move_by_index (g: game) (pl: player) (index: int) : unit =
+    write_game_move g pl (move_str_of_index g index)
 

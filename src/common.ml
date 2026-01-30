@@ -24,6 +24,7 @@ type game =
     ; last_player     : player option
     ; state           : game_state
     ; log_file        : out_channel option
+    ; log_moves       : bool
     }
 type run_args =
     { board_side      : int
@@ -64,6 +65,7 @@ let initial_game         =
     ; last_player     = None
     ; state           = Waiting
     ; log_file        = None
+    ; log_moves       = true
     }
 
 
