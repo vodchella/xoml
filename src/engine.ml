@@ -352,7 +352,6 @@ let score_board (g: game) (pl: player) : int =
                 score_board' rest (accum + score)
     in
     let final_score = score_board' indicies 0 in
-    Logger.write g ("fork_patterns_count = " ^ (string_of_int !fork_patterns_count));
     let score_for_forks =
         match !fork_patterns_count with
         | pc when pc >= 2 -> score_win
@@ -394,15 +393,28 @@ let find_best_move (g: game) (pl: player) : int option =
                         let old_cell = g.board.(m) in
                         g.board.(m) <- Some cur_pl;
 
-                        let score = minimax g (depth - 1) !a beta (opponent_of cur_pl) in
-                        g.board.(m) <- old_cell;
+                        let break = ref false in
+                        if depth = (max_depth - 2) then (
+                            let my_score = score_board g cur_pl in
+                            if my_score >= score_win then break := true
+                        );
 
-                        if score > !best then best := score;
-                        if score > !a    then a    := score;
+                        if !break then (
+                            g.board.(m) <- old_cell;
+                            break_on_index := Some m;
+                            0  (* Score doesn't matter in this case *)
+                        )
+                        else (
+                            let score = minimax g (depth - 1) !a beta (opponent_of cur_pl) in
+                            g.board.(m) <- old_cell;
 
-                        if abs(score) >= score_win || Option.is_some !break_on_index then score
-                        else if !a >= beta then !best  (* beta-cutoff *)
-                        else loop rest
+                            if score > !best then best := score;
+                            if score > !a    then a    := score;
+
+                            if abs(score) >= score_win || Option.is_some !break_on_index then score
+                            else if !a >= beta then !best  (* beta-cutoff *)
+                            else loop rest
+                        )
                 in
                 loop moves
             else if cur_pl != pl then
@@ -456,12 +468,14 @@ let find_best_move (g: game) (pl: player) : int option =
             match !break_on_index with
             | Some i ->
                 best_move := Some i;
+                (* Logger.write g ((move_str_of_index g i) ^ " break_on_index"); *)
             | _ -> (
                 let old_cell = g.board.(m) in
                 g.board.(m) <- Some pl;
 
                 let score = minimax g (max_depth - 1) !alpha max_int (opponent_of pl) in
                 g.board.(m) <- old_cell;
+                (* Logger.write g ((move_str_of_index g m) ^ " final score = " ^ (string_of_int score)); *)
 
                 if score > !best_score then begin
                     best_score := score;
