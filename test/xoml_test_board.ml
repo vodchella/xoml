@@ -4,6 +4,16 @@ open Xoml_test_support
 
 (* Score board *)
 
+let test_check_winner () =
+    let g = init_test_board () in
+    let g = apply_move g X "B8" in
+    let g = apply_move g X "C7" in
+    let g = apply_move g X "D6" in
+    let g = apply_move g X "E5" in
+    let g = apply_move g X "F4" in
+    let winner = find_winner g in
+    Alcotest.(check (option player_testable)) "winner must be X" (Some X) winner
+
 let test_score_board () =
     let g = init_test_board () in
     let g = apply_move g X "B8" in
@@ -26,15 +36,13 @@ let test_score_board_with_type1_fork () =
     let score = score_board g X in
     Alcotest.(check int) "score must be 2036" 2036 score
 
-let test_check_winner () =
+let recognize_type2_fork_threat () =
     let g = init_test_board () in
-    let g = apply_move g X "B8" in
-    let g = apply_move g X "C7" in
-    let g = apply_move g X "D6" in
-    let g = apply_move g X "E5" in
-    let g = apply_move g X "F4" in
-    let winner = find_winner g in
-    Alcotest.(check (option player_testable)) "winner must be X" (Some X) winner
+    let g = apply_move g X "C6" in
+    let g = apply_move g X "E4" in
+    let g = apply_move g X "D3" in
+    let g = apply_move g X "G3" in
+    check_best_move g O "F3"
 
 let recognize_4_in_row_threat_1 () =
     let g = init_test_board () in
@@ -159,9 +167,10 @@ let check_for_not_useless_move () =
 let suite : string * unit Alcotest.test_case list =
     "Board situations",
     [
+        Alcotest.test_case "Check winner"                       `Quick test_check_winner;
         Alcotest.test_case "Score simple board"                 `Quick test_score_board;
         Alcotest.test_case "Score board with type1 fork"        `Quick test_score_board_with_type1_fork;
-        Alcotest.test_case "Check winner"                       `Quick test_check_winner;
+        Alcotest.test_case "Recognize type2 fork threat"        `Quick recognize_type2_fork_threat;
         Alcotest.test_case "Recognize 4-in-row threat (1)"      `Quick recognize_4_in_row_threat_1;
         Alcotest.test_case "Recognize 4-in-row threat (2)"      `Quick recognize_4_in_row_threat_2;
         Alcotest.test_case "Recognize 4-in-row threat (3)"      `Quick recognize_4_in_row_threat_3;
