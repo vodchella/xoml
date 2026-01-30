@@ -9,4 +9,5 @@
  (name xo)
  (public_name xoml)
  (modules xo)
- (libraries xoml unix))
+ (libraries xoml unix)
+ (flags (:standard -warn-error -21)))
