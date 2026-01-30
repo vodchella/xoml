@@ -28,15 +28,15 @@ let opponent_of = function
     | O -> X
 
 let score_of = function
-    | (c, _) when c >= 5 -> win_score
-    | (4, 2) -> win_score
-    | (4, 1) -> 900
-    | (3, 2) -> 1000
-    | (3, 1) -> 100
-    | (2, 2) -> 50
-    | (2, 1) -> 10
-    | (1, 2) -> 2
-    | (1, 1) -> 1
+    | (c, _) when c >= 5 -> score_win
+    | (4, 2) -> score_win
+    | (4, 1) -> score_4_1
+    | (3, 2) -> score_3_2
+    | (3, 1) -> score_3_1
+    | (2, 2) -> score_2_2
+    | (2, 1) -> score_2_1
+    | (1, 2) -> score_1_2
+    | (1, 1) -> score_1_1
     | _      -> 0
 
 let get_direction_between_points (p1 : point) (p2 : point) : direction option =
@@ -336,8 +336,8 @@ let find_best_move (g: game) (pl: player) : int option =
         (* match find_winner g with *)
         (* | Some p -> *)
         (*     (* failwith ("!!! " ^ (string_of_int depth)); *) *)
-        (*     if p = pl then win_score + depth *)
-        (*     else -win_score - depth *)
+        (*     if p = pl then score_win + depth *)
+        (*     else -score_win - depth *)
         (* | None -> *)
 
         if depth <= 0 then
@@ -362,7 +362,7 @@ let find_best_move (g: game) (pl: player) : int option =
                         if score > !best then best := score;
                         if score > !a    then a    := score;
 
-                        if abs(score) >= win_score || Option.is_some !break_on_index then score
+                        if abs(score) >= score_win || Option.is_some !break_on_index then score
                         else if !a >= beta then !best  (* beta-cutoff *)
                         else loop rest
                 in
@@ -380,7 +380,7 @@ let find_best_move (g: game) (pl: player) : int option =
                         let break = ref false in
                         if depth = (max_depth - 1) then (
                             let opp_score = score_board g cur_pl in
-                            if opp_score >= win_score then break := true
+                            if opp_score >= score_win then break := true
                         );
 
                         if !break then (
@@ -395,7 +395,7 @@ let find_best_move (g: game) (pl: player) : int option =
                             if score < !best then best := score;
                             if score < !b    then b    := score;
 
-                            if score >= win_score then score
+                            if score >= score_win then score
                             else if alpha >= !b then !best  (* alpha-cutoff *)
                             else loop rest
                         )

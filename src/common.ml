@@ -30,10 +30,19 @@ type run_args =
     ; playerO_starts  : bool
     }
 
+let score_win            = 10_000_000
+let score_4_2            = score_win
+let score_4_1            = 900
+let score_3_2            = 1000
+let score_3_1            = 100
+let score_2_2            = 50
+let score_2_1            = 10
+let score_1_2            = 2
+let score_1_1            = 1
+
 let default_board_width  = 10
 let default_board_height = 10
 let default_win_length   = 5
-let win_score            = 10_000_000
 let input_prompt         = "?> "
 let ascii_esc            = "\x1b"
 let sym_x                = "X"
