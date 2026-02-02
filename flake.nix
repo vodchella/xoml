@@ -33,17 +33,14 @@
           pkgs = import nixpkgs { inherit system; };
           ocamlPackages = pkgs.ocamlPackages;
           staticPkgs = pkgs.pkgsStatic;
+          mkPkg = ocamlPkgs: ocamlPkgs.buildDunePackage {
+            pname = "xoml";
+            version = "0.1.6";
+            src = ./.;
+          };
         in {
-          default = ocamlPackages.buildDunePackage {
-            pname = "xoml";
-            version = "0.1.5";
-            src = ./.;
-          };
-          static = staticPkgs.ocamlPackages.buildDunePackage {
-            pname = "xoml";
-            version = "0.1.5";
-            src = ./.;
-          };
+          default = mkPkg ocamlPackages;
+          static  = mkPkg staticPkgs.ocamlPackages;
         }
       );
 
