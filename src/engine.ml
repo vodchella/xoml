@@ -352,7 +352,7 @@ let score_board (g: game) (pl: player) : int =
     let final_score, fork_patterns_count = score_board' indicies 0 0 in
     let score_for_forks =
         match fork_patterns_count with
-        | pc when pc >= 2 -> score_win / 2
+        | pc when pc >= 2 -> score_fork
         | _ -> 0
     in
     final_score + score_for_forks
