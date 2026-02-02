@@ -279,11 +279,10 @@ let check_line_for_fork_patterns (g: game) (pl: player) (p: point) (dir: directi
     | _ -> 0
 
 let score_position (g: game) (pl: player) (index: int) (dirs: direction list) : int * ((int * direction) list) * int =
-    let fork_patterns_count = ref 0 in
     let point = point_of_index g index |> Option.get in
-    let rec score_position' dirs score_accum indicies_accum =
+    let rec score_position' dirs score_accum indicies_accum fork_patterns_count =
         match dirs with
-        | [] -> (score_accum, indicies_accum)
+        | [] -> (score_accum, indicies_accum, fork_patterns_count)
         | d :: rest ->
             let score, p1, p2 = score_line g pl point d in
             let pc = check_line_for_fork_patterns g pl point d score in
@@ -293,11 +292,9 @@ let score_position (g: game) (pl: player) (index: int) (dirs: direction list) : 
                 (i, d)
             )
             in
-            fork_patterns_count := !fork_patterns_count + pc;
-            score_position' rest (score + score_accum) (indicies_accum @ processed_indicies)
+            score_position' rest (score + score_accum) (indicies_accum @ processed_indicies) (fork_patterns_count + pc)
     in
-    let score, processed_indicies = score_position' dirs 0 [] in
-    (score, processed_indicies, !fork_patterns_count)
+    score_position' dirs 0 [] 0
 
 let init_dirs_array (g: game) (indicies: int list) : direction list option array =
     let dir_arr = Array.make g.board_size None in
@@ -321,7 +318,6 @@ let remove_dir_opt (d: direction) (lst: direction list) : direction list option 
     aux [] lst
 
 let score_board (g: game) (pl: player) : int =
-    let fork_patterns_count = ref 0 in
     let indicies = get_occupied_indices g pl  in
     let dir_arr  = ref (init_dirs_array g indicies) in
     let actualize_dir_array indicies_and_dirs_to_remove =
@@ -335,25 +331,24 @@ let score_board (g: game) (pl: player) : int =
             | None -> ()
         )
     in
-    let rec score_board' indexes accum =
+    let rec score_board' indexes accum fork_patterns_count =
         match indexes with
-        | [] -> accum
+        | [] -> (accum, fork_patterns_count)
         | i :: rest ->
             match !dir_arr.(i) with
             | None ->
-                score_board' rest accum
+                score_board' rest accum fork_patterns_count
             | Some dirs ->
                 let score, processed_indicies, pc = score_position g pl i dirs in
-                fork_patterns_count := !fork_patterns_count + pc;
                 (* NOTE: use string_of_int_direction_list to view processed_indicies: *)
                 (*       print_endline ((string_of_int i) ^ "i: " ^
                                        (Common.string_of_int_direction_list processed_indicies)); *)
                 actualize_dir_array processed_indicies;
-                score_board' rest (accum + score)
+                score_board' rest (accum + score) (fork_patterns_count + pc)
     in
-    let final_score = score_board' indicies 0 in
+    let final_score, fork_patterns_count = score_board' indicies 0 0 in
     let score_for_forks =
-        match !fork_patterns_count with
+        match fork_patterns_count with
         | pc when pc >= 2 -> score_win
         | _ -> 0
     in
