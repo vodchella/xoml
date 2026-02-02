@@ -31,7 +31,7 @@ let test_score_board_with_type1_fork () =
     let g = apply_move g X "C7" in
     let g = apply_move g X "D6" in
     let score = score_board g X in
-    Alcotest.(check int) "score must be 10002036" 10002036 score;
+    Alcotest.(check int) "score must be 5002036" 5002036 score;
     let g = apply_move g O "F4" in
     let score = score_board g X in
     Alcotest.(check int) "score must be 2036" 2036 score
@@ -115,6 +115,19 @@ let recognize_4_in_row_threat_3 () =
     let g = apply_move g X "F2" in
     check_best_move g O "F4"
 
+let recognize_4_in_row_threat_with_fork () =
+    let g = init_test_board () in
+    let g = Engine.apply_move g X "E6" in
+    let g = Engine.apply_move g O "F5" in
+    let g = Engine.apply_move g X "D5" in
+    let g = Engine.apply_move g O "F7" in
+    let g = Engine.apply_move g X "F4" in
+    let g = Engine.apply_move g O "E7" in
+    let g = Engine.apply_move g X "D6" in
+    let g = Engine.apply_move g O "G7" in
+    let g = Engine.apply_move g X "D7" in
+    check_best_move g O "D4"
+
 let recognize_next_move_loss () =
     let g = init_test_board () in
     let g = apply_move g X "D7" in
@@ -167,14 +180,15 @@ let check_for_not_useless_move () =
 let suite : string * unit Alcotest.test_case list =
     "Board situations",
     [
-        Alcotest.test_case "Check winner"                       `Quick test_check_winner;
-        Alcotest.test_case "Score simple board"                 `Quick test_score_board;
-        Alcotest.test_case "Score board with type1 fork"        `Quick test_score_board_with_type1_fork;
-        Alcotest.test_case "Recognize type2 fork threat"        `Quick recognize_type2_fork_threat;
-        Alcotest.test_case "Recognize 4-in-row threat (1)"      `Quick recognize_4_in_row_threat_1;
-        Alcotest.test_case "Recognize 4-in-row threat (2)"      `Quick recognize_4_in_row_threat_2;
-        Alcotest.test_case "Recognize 4-in-row threat (3)"      `Quick recognize_4_in_row_threat_3;
-        Alcotest.test_case "Recognize a loss on the next move"  `Quick recognize_next_move_loss;
-        Alcotest.test_case "Check for a useless move"           `Quick check_for_not_useless_move;
+        Alcotest.test_case "Check winner"                        `Quick test_check_winner;
+        Alcotest.test_case "Score simple board"                  `Quick test_score_board;
+        Alcotest.test_case "Score board with type1 fork"         `Quick test_score_board_with_type1_fork;
+        Alcotest.test_case "Recognize type2 fork threat"         `Quick recognize_type2_fork_threat;
+        Alcotest.test_case "Recognize 4-in-row threat (1)"       `Quick recognize_4_in_row_threat_1;
+        Alcotest.test_case "Recognize 4-in-row threat (2)"       `Quick recognize_4_in_row_threat_2;
+        Alcotest.test_case "Recognize 4-in-row threat (3)"       `Quick recognize_4_in_row_threat_3;
+        Alcotest.test_case "Recognize 4-in-row threat with fork" `Quick recognize_4_in_row_threat_with_fork;
+        Alcotest.test_case "Recognize a loss on the next move"   `Quick recognize_next_move_loss;
+        Alcotest.test_case "Check for a useless move"            `Quick check_for_not_useless_move;
     ]
 

@@ -294,6 +294,9 @@ let score_position (g: game) (pl: player) (index: int) (dirs: direction list) : 
             in
             score_position' rest (score + score_accum) (indicies_accum @ processed_indicies) (fork_patterns_count + pc)
     in
+    (* TODO: надо здесь рассчитывать угрозы вилок. Брать fork_patterns_count, учитывать линию 4+1
+             если набралось два пункта, значит угроза есть
+     *)
     score_position' dirs 0 [] 0
 
 let init_dirs_array (g: game) (indicies: int list) : direction list option array =
@@ -349,7 +352,7 @@ let score_board (g: game) (pl: player) : int =
     let final_score, fork_patterns_count = score_board' indicies 0 0 in
     let score_for_forks =
         match fork_patterns_count with
-        | pc when pc >= 2 -> score_win
+        | pc when pc >= 2 -> score_win / 2
         | _ -> 0
     in
     final_score + score_for_forks
