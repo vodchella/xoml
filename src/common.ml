@@ -32,6 +32,7 @@ type run_args =
     }
 
 let score_win            = 10_000_000
+let score_insta_win      = score_win * 4
 let score_fork           = score_win / 2
 let score_4_2            = score_win
 let score_4_1            = 900

@@ -14,6 +14,33 @@ let test_check_winner () =
     let winner = find_winner g in
     Alcotest.(check (option player_testable)) "winner must be X" (Some X) winner
 
+let test_check_insta_win () =
+    let g = init_test_board () in
+    let g = Engine.apply_move g X "E5" in
+    let g = Engine.apply_move g O "F4" in
+    let g = Engine.apply_move g X "D4" in
+    let g = Engine.apply_move g O "F6" in
+    let g = Engine.apply_move g X "F3" in
+    let g = Engine.apply_move g O "E6" in
+    let g = Engine.apply_move g X "C6" in
+    let g = Engine.apply_move g O "G6" in
+    let g = Engine.apply_move g X "D6" in
+    let g = Engine.apply_move g O "H6" in
+    let g = Engine.apply_move g X "I6" in
+    let g = Engine.apply_move g O "G5" in
+    let g = Engine.apply_move g X "E3" in
+    let g = Engine.apply_move g O "I7" in
+    let g = Engine.apply_move g X "J8" in
+    let g = Engine.apply_move g O "H4" in
+    let g = Engine.apply_move g X "I3" in
+    let g = Engine.apply_move g O "G4" in
+    let g = Engine.apply_move g X "G3" in
+    let g = Engine.apply_move g O "H3" in
+    let g = Engine.apply_move g X "H5" in
+    let g = Engine.apply_move g O "I4" in
+    let g = Engine.apply_move g X "E4" in
+    check_best_move g O "J4"
+
 let test_score_board () =
     let g = init_test_board () in
     let g = apply_move g X "B8" in
@@ -181,6 +208,7 @@ let suite : string * unit Alcotest.test_case list =
     "Board situations",
     [
         Alcotest.test_case "Check winner"                        `Quick test_check_winner;
+        Alcotest.test_case "Check insta win"                     `Quick test_check_insta_win;
         Alcotest.test_case "Score simple board"                  `Quick test_score_board;
         Alcotest.test_case "Score board with type1 fork"         `Quick test_score_board_with_type1_fork;
         Alcotest.test_case "Recognize type2 fork threat"         `Quick recognize_type2_fork_threat;

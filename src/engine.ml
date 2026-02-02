@@ -28,7 +28,7 @@ let opponent_of = function
     | O -> X
 
 let score_of = function
-    | (c, _) when c >= 5 -> score_win * 4
+    | (c, _) when c >= 5 -> score_insta_win
     | (4, 2) -> score_win * 2
     | (4, 1) -> score_4_1
     | (3, 2) -> score_3_2
@@ -460,6 +460,21 @@ let find_best_move (g: game) (pl: player) : int option =
         let best_move  = ref None in
         let best_score = ref min_int in
         let alpha      = ref min_int in
+        let insta_win_found  = ref false in
+
+        moves
+        |> List.iter (fun m ->
+            if not !insta_win_found then (
+                let old_cell = g.board.(m) in
+                g.board.(m) <- Some pl;
+                let my_score = score_board g pl in
+                if my_score >= score_insta_win then (
+                    break_on_index := Some m;
+                    insta_win_found := true;
+                );
+                g.board.(m) <- old_cell;
+            )
+        );
 
         moves
         |> List.iter (fun m ->
