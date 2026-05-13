@@ -48,6 +48,26 @@ let draw (g: game) =
     printf "%s"     headers
     |> ignore
 
+let print (g: game) =
+    let headers    =  make_column_headers  g.board_width      in
+    printf "\n%s\n" headers;
+    for r = g.board_height - 1 downto 0 do
+        printf "  %d " r;
+        for c = 0 to g.board_width - 1 do
+            let idx = index_of_point g {x=c + 1; y=g.board_height - r} in
+            match idx with
+            | Some index -> (
+                match g.board.(index) with
+                | Some pl -> printf " %s" (string_of_player pl)
+                | None    -> printf " .";
+            )
+            | None   -> failwith "invalid point";
+        done;
+        printf "  %d\n" r;
+    done;
+    printf "%s"     headers
+    |> ignore
+
 let symbol_of_cell = function
    | Some X  -> sym_x
    | Some O  -> sym_o

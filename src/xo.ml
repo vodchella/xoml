@@ -49,7 +49,7 @@ let rec main_gtp_loop (g: game) =
     in
     match input with
     | Quit -> (
-        print_endline ("=\n");
+        print_endline ("= \n");
     )
     | Name -> (
         print_endline ("= XOML engine\n");
@@ -89,7 +89,9 @@ let rec main_gtp_loop (g: game) =
         (main_gtp_loop[@tailcall]) g
     )
     | ShowBoard -> (
-        print_endline ("? not implemented\n");
+        print_endline ("= ");
+        Board.print g;
+        print_endline "\n";
         (main_gtp_loop[@tailcall]) g
     )
     | BoardSize size -> (

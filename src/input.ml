@@ -62,7 +62,7 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
     | "VERSION"          -> Version
     | "PROTOCOL_VERSION" -> ProtocolVersion
     | "CLEAN_BOARD"      -> CleanBoard
-    | "SHOW_BOARD"       -> ShowBoard
+    | "SHOW_BOARD" | "S" -> ShowBoard
     | "WINNER"           -> Winner
     | str                -> (
         match split_gtp_string_and_validate str with
@@ -85,7 +85,7 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
                 )
                 else Unknown ("invalid arguments count: " ^ cmd_str)
             )
-            | "GEN_MOVE" -> (
+            | "GEN_MOVE" | "G" -> (
                 if arg_len == 1 then (
                     let player_str = List.nth parts 1 in
                     match player_of_string player_str with
