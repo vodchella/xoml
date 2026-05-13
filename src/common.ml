@@ -147,6 +147,15 @@ let string_of_direction = function
     | SW -> "SW"
     | NW -> "NW"
 
+let init_board_with_side (g: game) (board_side : int) : game =
+    { g with
+      board_width   = board_side
+    ; board_height  = board_side
+    ; board_size    = board_side * board_side
+    ; input_vmargin = board_side + 5
+    ; board = Array.make (board_side * board_side) None
+    }
+
 (* NOTE: just for debugging *)
 let string_of_int_direction_list (lst : (int * direction) list) : string =
     let items =

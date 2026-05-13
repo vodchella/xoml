@@ -85,7 +85,8 @@ let rec main_gtp_loop (g: game) =
         (main_gtp_loop[@tailcall]) g
     )
     | CleanBoard -> (
-        print_endline ("? not implemented\n");
+        let g = init_board_with_side g g.board_width in
+        print_endline ("= \n");
         (main_gtp_loop[@tailcall]) g
     )
     | ShowBoard -> (
@@ -94,8 +95,9 @@ let rec main_gtp_loop (g: game) =
         print_endline "\n";
         (main_gtp_loop[@tailcall]) g
     )
-    | BoardSize size -> (
-        print_endline ("? not implemented " ^ (string_of_int size) ^ "\n");
+    | BoardSize board_side -> (
+        let g = init_board_with_side g board_side in
+        print_endline ("= \n");
         (main_gtp_loop[@tailcall]) g
     )
     | Unknown err -> (
@@ -108,14 +110,7 @@ let rec main_gtp_loop (g: game) =
 let main () =
     let { board_side; playerO_starts; gtp_mode } = Args.parse_args in
     let g = initial_game in
-    let g = { g with
-              board_width   = board_side
-            ; board_height  = board_side
-            ; board_size    = board_side * board_side
-            ; input_vmargin = board_side + 5
-            ; board = Array.make (board_side * board_side) None
-            }
-    in
+    let g = init_board_with_side g board_side in
     assert (g.board_width  >= 5);
     assert (g.board_width  <= 10);
     assert (g.board_height >= 5);
