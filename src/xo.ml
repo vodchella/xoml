@@ -64,15 +64,23 @@ let rec main_gtp_loop (g: game) =
         (main_gtp_loop[@tailcall]) g
     )
     | Play (pl, move_str) -> (
-        print_endline ("= " ^ (string_of_player pl) ^ " " ^ move_str ^ "\n");
+        print_endline ("? not implemented " ^ (string_of_player pl) ^ " " ^ move_str ^ "\n");
         (main_gtp_loop[@tailcall]) g
     )
     | GenMove pl -> (
-        print_endline ("= " ^ (string_of_player pl) ^ "\n");
+        print_endline ("? not implemented " ^ (string_of_player pl) ^ "\n");
+        (main_gtp_loop[@tailcall]) g
+    )
+    | CleanBoard -> (
+        print_endline ("? not implemented\n");
+        (main_gtp_loop[@tailcall]) g
+    )
+    | ShowBoard -> (
+        print_endline ("? not implemented\n");
         (main_gtp_loop[@tailcall]) g
     )
     | BoardSize size -> (
-        print_endline ("= " ^ (string_of_int size) ^ "\n");
+        print_endline ("? not implemented " ^ (string_of_int size) ^ "\n");
         (main_gtp_loop[@tailcall]) g
     )
     | Unknown err -> (

@@ -14,6 +14,8 @@ type gtp_input_result =
     | ProtocolVersion
     | Play of player * string
     | GenMove of player
+    | CleanBoard
+    | ShowBoard
     | BoardSize of int
     | Quit
 
@@ -58,6 +60,8 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
     | "NAME"             -> Name
     | "VERSION"          -> Version
     | "PROTOCOL_VERSION" -> ProtocolVersion
+    | "CLEAN_BOARD"      -> CleanBoard
+    | "SHOW_BOARD"       -> ShowBoard
     | str                -> (
         match split_gtp_string_and_validate str with
         | Ok parts  -> (
@@ -79,7 +83,7 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
                 )
                 else Unknown ("invalid arguments count: " ^ cmd_str)
             )
-            | "GENMOVE" -> (
+            | "GEN_MOVE" -> (
                 if arg_len == 1 then (
                     let player_str = List.nth parts 1 in
                     match player_of_string player_str with
@@ -88,7 +92,7 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
                 )
                 else Unknown ("invalid arguments count: " ^ cmd_str)
             )
-            | "BOARDSIZE" -> (
+            | "BOARD_SIZE" -> (
                 if arg_len == 1 then (
                     let size_opt = List.nth parts 1 |> int_of_string_opt in
                     match size_opt with
