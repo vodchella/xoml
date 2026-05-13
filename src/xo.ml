@@ -49,26 +49,26 @@ let rec main_gtp_loop (g: game) =
     in
     match input with
     | Quit -> (
-        print_endline ("= \n");
+        print_endline "= \n";
     )
     | Name -> (
-        print_endline ("= XOML engine\n");
+        print_endline "= XOML engine\n";
         (main_gtp_loop[@tailcall]) g
     )
     | Version -> (
-        print_endline ("= 0.1.9\n");
+        print_endline "= 0.1.9\n";
         (main_gtp_loop[@tailcall]) g
     )
     | ProtocolVersion -> (
-        print_endline ("= 1\n");
+        print_endline "= 1\n";
         (main_gtp_loop[@tailcall]) g
     )
     | Play (pl, move_str) -> (
         let g' = Engine.apply_move g pl move_str in
         if g'.last_move_ok then (
-            print_endline("= \n");
+            print_endline "= \n";
         )
-        else print_endline("? cell is occupied \n");
+        else print_endline "? cell is occupied \n";
         (main_gtp_loop[@tailcall]) g'
     )
     | GenMove pl -> (
@@ -81,16 +81,18 @@ let rec main_gtp_loop (g: game) =
             print_endline "? draw\n"
     )
     | Winner -> (
-        print_endline ("? not implemented\n");
+        match Engine.find_winner g with
+        | Some winner -> print_endline ("= " ^ (string_of_player winner) ^ "\n");
+        | None        -> print_endline "= ?\n";
         (main_gtp_loop[@tailcall]) g
     )
     | CleanBoard -> (
         let g = init_board_with_side g g.board_width in
-        print_endline ("= \n");
+        print_endline "= \n";
         (main_gtp_loop[@tailcall]) g
     )
     | ShowBoard -> (
-        print_endline ("= ");
+        print_endline "= ";
         Board.print g;
         print_endline "\n";
         (main_gtp_loop[@tailcall]) g
