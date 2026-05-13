@@ -102,9 +102,9 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
                         if size >= 5 && size <= 10 then (
                             BoardSize size
                         )
-                        else Unknown ("invalid board size")
+                        else Unknown "invalid board size"
                     )
-                    | None -> Unknown ("invalid board size")
+                    | None -> Unknown "invalid board size"
                 )
                 else Unknown ("invalid arguments count: " ^ cmd_str)
             )

@@ -54,18 +54,18 @@ let print (g: game) =
     for r = g.board_height - 1 downto 0 do
         printf "  %d " r;
         for c = 0 to g.board_width - 1 do
-            let idx = index_of_point g {x=c + 1; y=g.board_height - r} in
+            let idx = index_of_point g { x = c + 1; y = g.board_height - r } in
             match idx with
             | Some index -> (
                 match g.board.(index) with
                 | Some pl -> printf " %s" (string_of_player pl)
                 | None    -> printf " .";
             )
-            | None   -> failwith "invalid point";
+            | None -> failwith "invalid point";
         done;
         printf "  %d\n" r;
     done;
-    printf "%s"     headers
+    printf "%s" headers
     |> ignore
 
 let symbol_of_cell = function
