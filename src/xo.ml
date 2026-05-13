@@ -63,8 +63,12 @@ let rec main_gtp_loop (g: game) =
         print_endline ("= 1\n");
         (main_gtp_loop[@tailcall]) g
     )
-    | Play (player, move_str) -> (
-        print_endline ("= " ^ (string_of_player player) ^ " " ^ move_str ^ "\n");
+    | Play (pl, move_str) -> (
+        print_endline ("= " ^ (string_of_player pl) ^ " " ^ move_str ^ "\n");
+        (main_gtp_loop[@tailcall]) g
+    )
+    | GenMove pl -> (
+        print_endline ("= " ^ (string_of_player pl) ^ "\n");
         (main_gtp_loop[@tailcall]) g
     )
     | Unknown err -> (

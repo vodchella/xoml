@@ -13,6 +13,7 @@ type gtp_input_result =
     | Version
     | ProtocolVersion
     | Play of player * string
+    | GenMove of player
     | Quit
 
 let str_is_valid_move (g: game) str =
@@ -52,7 +53,7 @@ let split_gtp_string_and_validate s =
 
 let of_gtp_string (g: game) (s: string) : gtp_input_result =
     match s with
-    | "QUIT"             -> Quit
+    | "QUIT" | "Q"       -> Quit
     | "NAME"             -> Name
     | "VERSION"          -> Version
     | "PROTOCOL_VERSION" -> ProtocolVersion
@@ -60,7 +61,8 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
         match split_gtp_string_and_validate str with
         | Ok parts  -> (
             let arg_len = List.length parts - 1 in
-            match List.nth parts 0 with
+            let cmd_str = List.nth parts 0 in
+            match cmd_str with
             | "PLAY" -> (
                 if arg_len == 2 then (
                     let player_str = List.nth parts 1 in
@@ -74,7 +76,16 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
                     )
                     | None -> Unknown ("unknown player: " ^ player_str)
                 )
-                else Unknown ("invalid arguments count: PLAY")
+                else Unknown ("invalid arguments count: " ^ cmd_str)
+            )
+            | "GENMOVE" -> (
+                if arg_len == 1 then (
+                    let player_str = List.nth parts 1 in
+                    match player_of_string player_str with
+                    | Some pl -> GenMove pl
+                    | None    -> Unknown ("unknown player: " ^ player_str)
+                )
+                else Unknown ("invalid arguments count: " ^ cmd_str)
             )
             | _         -> Unknown ("unknown command: " ^ s)
         )
