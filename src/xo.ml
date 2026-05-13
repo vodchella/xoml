@@ -49,7 +49,7 @@ let rec main_gtp_loop (g: game) =
     in
     match input with
     | Quit -> (
-        print_endline "= \n";
+        print_endline "= QUIT\n";
     )
     | Name -> (
         print_endline "= XOML engine\n";
@@ -66,7 +66,7 @@ let rec main_gtp_loop (g: game) =
     | Play (pl, move_str) -> (
         let g' = Engine.apply_move g pl move_str in
         if g'.last_move_ok then (
-            print_endline "= \n";
+            print_endline "= PLAY\n";
         )
         else print_endline "? cell is occupied \n";
         (main_gtp_loop[@tailcall]) g'
@@ -88,18 +88,18 @@ let rec main_gtp_loop (g: game) =
     )
     | CleanBoard -> (
         let g = init_board_with_side g g.board_width in
-        print_endline "= \n";
+        print_endline "= CLEAR_BOARD\n";
         (main_gtp_loop[@tailcall]) g
     )
     | ShowBoard -> (
-        print_endline "= ";
+        print_endline "= SHOW_BOARD";
         Board.print g;
         print_endline "\n";
         (main_gtp_loop[@tailcall]) g
     )
     | BoardSize board_side -> (
         let g = init_board_with_side g board_side in
-        print_endline ("= \n");
+        print_endline ("= BOARD_SIZE\n");
         (main_gtp_loop[@tailcall]) g
     )
     | Unknown err -> (

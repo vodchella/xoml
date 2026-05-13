@@ -50,7 +50,7 @@ let draw (g: game) =
 
 let print (g: game) =
     let headers    =  make_column_headers  g.board_width      in
-    printf "\n%s\n" headers;
+    printf "%s\n" headers;
     for r = g.board_height - 1 downto 0 do
         printf "  %d " r;
         for c = 0 to g.board_width - 1 do

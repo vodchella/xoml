@@ -51,7 +51,7 @@ let split_gtp_string_and_validate s =
     in
     let len = List.length parts in
     if len > 3 || len < 2 then
-        Error ("invalid arguments count: " ^ s)
+        Error ("unknown command: " ^ s)
     else
         Ok parts
 
