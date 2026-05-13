@@ -83,6 +83,11 @@ let string_of_player = function
     | X -> sym_x
     | O -> sym_o
 
+let player_of_string = function
+    | "X" -> Some X
+    | "O" -> Some O
+    | _     -> None
+
 let index_of_point (g: game) (pnt: point) : int option =
     match pnt with
     | { x; _ } when x < 1 -> None

@@ -41,12 +41,12 @@ let rec main_loop (g: game) =
 
 
 let rec main_gtp_loop (g: game) =
-    let input_str =
+    let input =
         read_line ()
         |> String.trim
         |> String.uppercase_ascii
+        |> Input.of_gtp_string g
     in
-    let input = input_str |> Input.of_gtp_string g in
     match input with
     | Quit -> (
         print_endline ("=\n");
@@ -63,8 +63,12 @@ let rec main_gtp_loop (g: game) =
         print_endline ("= 1\n");
         (main_gtp_loop[@tailcall]) g
     )
+    | Play (player, move_str) -> (
+        print_endline ("= " ^ (string_of_player player) ^ " " ^ move_str ^ "\n");
+        (main_gtp_loop[@tailcall]) g
+    )
     | Unknown err -> (
-        print_endline ("? " ^ err);
+        print_endline ("? " ^ err ^ "\n");
         (main_gtp_loop[@tailcall]) g
     )
 

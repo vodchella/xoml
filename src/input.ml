@@ -12,6 +12,7 @@ type gtp_input_result =
     | Name
     | Version
     | ProtocolVersion
+    | Play of player * string
     | Quit
 
 let str_is_valid_move (g: game) str =
@@ -37,10 +38,45 @@ let of_string (g: game) (s: string) : input_result =
     | s when str_is_valid_move g s      -> Move s
     | s                                 -> Invalid ("Invalid move: '" ^ s ^ "'")
 
-let of_gtp_string (_g: game) (s: string) : gtp_input_result =
+let split_gtp_string_and_validate s =
+    let parts = s
+        |> String.split_on_char ' '
+        |> List.map String.trim
+        |> List.filter (fun x -> x <> "")
+    in
+    let len = List.length parts in
+    if len > 3 || len < 2 then
+        Error ("invalid arguments count: " ^ s)
+    else
+        Ok parts
+
+let of_gtp_string (g: game) (s: string) : gtp_input_result =
     match s with
     | "QUIT"             -> Quit
     | "NAME"             -> Name
     | "VERSION"          -> Version
     | "PROTOCOL_VERSION" -> ProtocolVersion
-    | _                  -> Unknown ("unknown command: " ^ s ^ "\n")
+    | str                -> (
+        match split_gtp_string_and_validate str with
+        | Ok parts  -> (
+            let arg_len = List.length parts - 1 in
+            match List.nth parts 0 with
+            | "PLAY" -> (
+                if arg_len == 2 then (
+                    let player_str = List.nth parts 1 in
+                    match player_of_string player_str with
+                    | Some pl -> (
+                        let move_str   = List.nth parts 2 in
+                        if str_is_valid_move g move_str then
+                            Play (pl, move_str)
+                        else
+                            Unknown ("unknown move: " ^ move_str)
+                    )
+                    | None -> Unknown ("unknown player: " ^ player_str)
+                )
+                else Unknown ("invalid arguments count: PLAY")
+            )
+            | _         -> Unknown ("unknown command: " ^ s)
+        )
+        | Error msg -> Unknown msg
+    )
