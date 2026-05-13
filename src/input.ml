@@ -7,6 +7,10 @@ type input_result =
     | Help
     | Quit
 
+type gtp_input_result =
+    | Unknown of string
+    | Quit
+
 let str_is_valid_move (g: game) str =
     match String.length str with
     | 2 ->
@@ -23,9 +27,14 @@ let str_is_valid_move (g: game) str =
         is_letter c1 && is_digit c2
     | _ -> false
 
-let of_string (g: game) = function
+let of_string (g: game) (s: string) : input_result =
+    match s with
     | "Q" | "E" | "X" | "QUIT" | "EXIT" -> Quit
-    | "H" | "HELP" -> Help
-    | s when (str_is_valid_move g s) -> Move s
-    | s -> Invalid ("Invalid move: '" ^ s ^ "'")
+    | "H" | "HELP"                      -> Help
+    | s when str_is_valid_move g s      -> Move s
+    | s                                 -> Invalid ("Invalid move: '" ^ s ^ "'")
 
+let of_gtp_string (_g: game) (s: string) : gtp_input_result =
+    match s with
+    | "QUIT" -> Quit
+    | _      -> Unknown ("unknown command: " ^ s ^ "\n")
