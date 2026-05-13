@@ -14,6 +14,7 @@ type gtp_input_result =
     | ProtocolVersion
     | Play of player * string
     | GenMove of player
+    | BoardSize of int
     | Quit
 
 let str_is_valid_move (g: game) str =
@@ -84,6 +85,20 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
                     match player_of_string player_str with
                     | Some pl -> GenMove pl
                     | None    -> Unknown ("unknown player: " ^ player_str)
+                )
+                else Unknown ("invalid arguments count: " ^ cmd_str)
+            )
+            | "BOARDSIZE" -> (
+                if arg_len == 1 then (
+                    let size_opt = List.nth parts 1 |> int_of_string_opt in
+                    match size_opt with
+                    | Some size -> (
+                        if size >= 5 && size <= 10 then (
+                            BoardSize size
+                        )
+                        else Unknown ("invalid board size")
+                    )
+                    | None -> Unknown ("invalid board size")
                 )
                 else Unknown ("invalid arguments count: " ^ cmd_str)
             )

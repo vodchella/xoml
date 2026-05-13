@@ -71,6 +71,10 @@ let rec main_gtp_loop (g: game) =
         print_endline ("= " ^ (string_of_player pl) ^ "\n");
         (main_gtp_loop[@tailcall]) g
     )
+    | BoardSize size -> (
+        print_endline ("= " ^ (string_of_int size) ^ "\n");
+        (main_gtp_loop[@tailcall]) g
+    )
     | Unknown err -> (
         print_endline ("? " ^ err ^ "\n");
         (main_gtp_loop[@tailcall]) g
