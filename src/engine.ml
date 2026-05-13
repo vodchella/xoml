@@ -170,6 +170,7 @@ let get_possible_moves (g: game) : int list =
         done;
         !result
 
+(* TODO: factor out last_move_ok *)
 let apply_move_by_index (g: game) (pl: player) index : game =
     let point     = point_of_index g index |> Option.get in
     let move_str  = move_str_of_point g point in
@@ -191,10 +192,14 @@ let apply_move_by_index (g: game) (pl: player) index : game =
         ; last_move_point = Some point
         ; last_move_index = Some index
         ; last_player     = Some pl
+        ; last_move_ok    = true
         ; state           = new_state
         }
     | Some _ ->
-        { g with last_tip = "Cell '" ^ move_str ^ "' is occupied" }
+        { g with
+          last_tip = "Cell '" ^ move_str ^ "' is occupied"
+        ; last_move_ok = false
+        }
 
 let apply_move_by_index_opt (g: game) (pl: player) (index_opt: int option) : game =
     match index_opt with

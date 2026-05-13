@@ -64,12 +64,21 @@ let rec main_gtp_loop (g: game) =
         (main_gtp_loop[@tailcall]) g
     )
     | Play (pl, move_str) -> (
-        print_endline ("? not implemented " ^ (string_of_player pl) ^ " " ^ move_str ^ "\n");
-        (main_gtp_loop[@tailcall]) g
+        let g' = Engine.apply_move g pl move_str in
+        if g'.last_move_ok then (
+            print_endline("= \n");
+        )
+        else print_endline("? cell is occupied \n");
+        (main_gtp_loop[@tailcall]) g'
     )
     | GenMove pl -> (
-        print_endline ("? not implemented " ^ (string_of_player pl) ^ "\n");
-        (main_gtp_loop[@tailcall]) g
+        match Engine.find_best_move g pl with
+        | Some i ->
+            let g' = Engine.apply_move_by_index g pl i in
+            print_endline ("= " ^ (move_str_of_index g i) ^ "\n");
+            (main_gtp_loop[@tailcall]) g'
+        | _ ->
+            print_endline "? draw\n"
     )
     | Winner -> (
         print_endline ("? not implemented\n");
@@ -97,7 +106,6 @@ let rec main_gtp_loop (g: game) =
 let main () =
     let { board_side; playerO_starts; gtp_mode } = Args.parse_args in
     let g = initial_game in
-    let g = Logger.create g in
     let g = { g with
               board_width   = board_side
             ; board_height  = board_side
@@ -120,6 +128,7 @@ let main () =
         (main_gtp_loop[@tailcall]) g
     else (
         let first_move = some_if playerO_starts (Engine.find_best_move g O) in
+        let g = Logger.create g in
         let g = Engine.apply_move_by_index_opt g O first_move in
         Board.screen_clear ();
         Board.draw g;

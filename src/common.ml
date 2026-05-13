@@ -21,6 +21,7 @@ type game =
     ; last_move_str   : string option
     ; last_move_point : point option
     ; last_move_index : int option
+    ; last_move_ok    : bool
     ; last_player     : player option
     ; state           : game_state
     ; log_file        : out_channel option
@@ -65,6 +66,7 @@ let initial_game         =
     ; last_move_str   = None
     ; last_move_point = None
     ; last_move_index = None
+    ; last_move_ok    = false
     ; last_player     = None
     ; state           = Waiting
     ; log_file        = None
