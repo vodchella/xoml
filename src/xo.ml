@@ -51,6 +51,14 @@ let rec main_gtp_loop (g: game) =
     | Quit -> (
         print_endline ("=\n");
     )
+    | Name -> (
+        print_endline ("= XOML engine\n");
+        (main_gtp_loop[@tailcall]) g
+    )
+    | Version -> (
+        print_endline ("= 0.1.9\n");
+        (main_gtp_loop[@tailcall]) g
+    )
     | Unknown err -> (
         print_endline ("? " ^ err);
         (main_gtp_loop[@tailcall]) g
