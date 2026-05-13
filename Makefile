@@ -4,7 +4,7 @@ all:
 	dune build
 
 run:
-	dune exec xoml
+	dune exec xoml -- $(ARGS)
 
 clean:
 	dune clean

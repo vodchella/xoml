@@ -39,8 +39,11 @@ let rec main_loop (g: game) =
                 (main_loop[@tailcall]) g'
             | Quit -> ()
 
+let main_gtp_loop (_g: game) =
+    print_endline "TODO: GTP-mode"
+
 let main () =
-    let { board_side; playerO_starts } = Args.parse_args in
+    let { board_side; playerO_starts; gtp_mode } = Args.parse_args in
     let g = initial_game in
     let g = Logger.create g in
     let g = { g with
@@ -58,19 +61,23 @@ let main () =
     assert (g.win_length   >= 3);
     assert (g.win_length   <= 5);
 
-    Printexc.record_backtrace true;
-    Random.self_init ();
+    if gtp_mode then
+        (main_gtp_loop[@tailcall]) g
+    else (
+        Printexc.record_backtrace true;
+        Random.self_init ();
 
-    let first_move = some_if playerO_starts (Engine.find_best_move g O) in
-    let g = Engine.apply_move_by_index_opt g O first_move in
-    Board.screen_clear ();
-    Board.draw g;
+        let first_move = some_if playerO_starts (Engine.find_best_move g O) in
+        let g = Engine.apply_move_by_index_opt g O first_move in
+        Board.screen_clear ();
+        Board.draw g;
 
-    (* Board.print_all_figures g; *)
-    (* Board.print_prompt g; *)
-    (* failwith "Stop"; *)
+        (* Board.print_all_figures g; *)
+        (* Board.print_prompt g; *)
+        (* failwith "Stop"; *)
 
-    (main_loop[@tailcall]) g
+        (main_loop[@tailcall]) g
+    )
 
 let () = main ()
 

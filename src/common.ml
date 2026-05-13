@@ -29,6 +29,7 @@ type game =
 type run_args =
     { board_side      : int
     ; playerO_starts  : bool
+    ; gtp_mode        : bool
     }
 
 let score_win            = 10_000_000
