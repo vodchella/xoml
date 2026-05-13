@@ -56,7 +56,7 @@ let rec main_gtp_loop (g: game) =
         (main_gtp_loop[@tailcall]) g
     )
     | Version -> (
-        print_endline "= 0.1.9\n";
+        print_endline "= 0.2.0\n";
         (main_gtp_loop[@tailcall]) g
     )
     | ProtocolVersion -> (
