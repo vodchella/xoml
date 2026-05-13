@@ -71,6 +71,10 @@ let rec main_gtp_loop (g: game) =
         print_endline ("? not implemented " ^ (string_of_player pl) ^ "\n");
         (main_gtp_loop[@tailcall]) g
     )
+    | Winner -> (
+        print_endline ("? not implemented\n");
+        (main_gtp_loop[@tailcall]) g
+    )
     | CleanBoard -> (
         print_endline ("? not implemented\n");
         (main_gtp_loop[@tailcall]) g

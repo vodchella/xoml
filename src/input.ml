@@ -14,6 +14,7 @@ type gtp_input_result =
     | ProtocolVersion
     | Play of player * string
     | GenMove of player
+    | Winner
     | CleanBoard
     | ShowBoard
     | BoardSize of int
@@ -62,6 +63,7 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
     | "PROTOCOL_VERSION" -> ProtocolVersion
     | "CLEAN_BOARD"      -> CleanBoard
     | "SHOW_BOARD"       -> ShowBoard
+    | "WINNER"           -> Winner
     | str                -> (
         match split_gtp_string_and_validate str with
         | Ok parts  -> (
