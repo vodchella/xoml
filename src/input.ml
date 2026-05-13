@@ -11,6 +11,7 @@ type gtp_input_result =
     | Unknown of string
     | Name
     | Version
+    | ProtocolVersion
     | Quit
 
 let str_is_valid_move (g: game) str =
@@ -38,7 +39,8 @@ let of_string (g: game) (s: string) : input_result =
 
 let of_gtp_string (_g: game) (s: string) : gtp_input_result =
     match s with
-    | "QUIT"    -> Quit
-    | "NAME"    -> Name
-    | "VERSION" -> Version
-    | _         -> Unknown ("unknown command: " ^ s ^ "\n")
+    | "QUIT"             -> Quit
+    | "NAME"             -> Name
+    | "VERSION"          -> Version
+    | "PROTOCOL_VERSION" -> ProtocolVersion
+    | _                  -> Unknown ("unknown command: " ^ s ^ "\n")

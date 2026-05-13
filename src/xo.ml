@@ -59,6 +59,10 @@ let rec main_gtp_loop (g: game) =
         print_endline ("= 0.1.9\n");
         (main_gtp_loop[@tailcall]) g
     )
+    | ProtocolVersion -> (
+        print_endline ("= 1\n");
+        (main_gtp_loop[@tailcall]) g
+    )
     | Unknown err -> (
         print_endline ("? " ^ err);
         (main_gtp_loop[@tailcall]) g
