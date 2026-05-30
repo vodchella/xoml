@@ -67,6 +67,7 @@ let rec main_gtp_loop (g: game) =
         let g' = Engine.apply_move g pl move_str in
         if g'.last_move_ok then (
             print_endline "= PLAY\n";
+            Logger.write_game_move g pl move_str;
         )
         else print_endline "? cell is occupied \n";
         (main_gtp_loop[@tailcall]) g'
@@ -76,9 +77,12 @@ let rec main_gtp_loop (g: game) =
         | Some i ->
             let g' = Engine.apply_move_by_index g pl i in
             print_endline ("= " ^ (move_str_of_index g i) ^ "\n");
+            Logger.write_game_move_by_index g pl i;
             (main_gtp_loop[@tailcall]) g'
-        | _ ->
-            print_endline "? draw\n"
+        | _ -> (
+            print_endline "? draw\n";
+            (main_gtp_loop[@tailcall]) g
+        )
     )
     | Winner -> (
         ( (* Parens are important!!! *)
@@ -121,6 +125,7 @@ let main () =
     assert (g.board_height <= 10);
     assert (g.win_length   >= 3);
     assert (g.win_length   <= 5);
+    let g = Logger.create g in
 
     Printexc.record_backtrace true;
     Random.self_init ();
@@ -129,7 +134,6 @@ let main () =
         (main_gtp_loop[@tailcall]) g
     else (
         let first_move = some_if playerO_starts (Engine.find_best_move g O) in
-        let g = Logger.create g in
         let g = Engine.apply_move_by_index_opt g O first_move in
         Board.screen_clear ();
         Board.draw g;
