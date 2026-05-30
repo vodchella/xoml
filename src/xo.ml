@@ -81,9 +81,11 @@ let rec main_gtp_loop (g: game) =
             print_endline "? draw\n"
     )
     | Winner -> (
-        match Engine.find_winner g with
-        | Some winner -> print_endline ("= " ^ (string_of_player winner) ^ "\n");
-        | None        -> print_endline "= ?\n";
+        ( (* Parens are important!!! *)
+            match Engine.find_winner g with
+            | Some winner -> print_endline ("= " ^ (string_of_player winner) ^ "\n");
+            | None        -> print_endline "= ?\n"
+        );
         (main_gtp_loop[@tailcall]) g
     )
     | CleanBoard -> (
