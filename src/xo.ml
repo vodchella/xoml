@@ -52,7 +52,7 @@ let rec main_gtp_loop (g: game) =
         print_endline "= QUIT\n";
     )
     | Name -> (
-        print_endline "= XOML engine\n";
+        print_endline "= XOml\n";
         (main_gtp_loop[@tailcall]) g
     )
     | Version -> (
