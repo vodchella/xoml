@@ -211,6 +211,10 @@ let apply_move (g: game) (pl: player) move_str : game =
     let index = index_of_point    g point |> Option.get in
     apply_move_by_index g pl index
 
+let is_draw (g: game) : bool =
+    Array.exists (fun c -> Option.is_none c) g.board
+    |> Bool.not
+
 (* TODO: optimize like score_board, so that visited cells are not checked again *)
 let find_winner (g: game) : player option =
     let check_player_at_index index pl =
