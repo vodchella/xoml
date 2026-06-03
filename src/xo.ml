@@ -94,7 +94,7 @@ let rec main_gtp_loop (g: game) =
     )
     | CleanBoard -> (
         let g = init_board_with_side g g.board_width in
-        print_endline "= CLEAR_BOARD\n";
+        print_endline "= CLEAN_BOARD\n";
         (main_gtp_loop[@tailcall]) g
     )
     | ShowBoard -> (
