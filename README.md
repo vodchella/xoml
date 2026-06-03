@@ -27,3 +27,10 @@
     - `make run` to build and run.
     - `make clean` to clean up build artifacts.
     - `make test` to run tests
+
+## GTP protocol
+
+The `XOml` engine supports the **GTP** communication protocol. This protocol is commonly used by applications that provide graphical user interfaces for board games such as Go. `XOml` also has its own graphical frontend called [XoGui](https://github.com/vodchella/xogui).
+
+Read the detailed protocol specification and the list of supported commands [here](GTP.md).
+
