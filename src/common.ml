@@ -90,14 +90,18 @@ let player_of_string = function
     | "O" -> Some O
     | _     -> None
 
-let index_of_point (g: game) (pnt: point) : int option =
+let point_is_valid (g: game) (pnt: point) : bool =
     match pnt with
-    | { x; _ } when x < 1 -> None
-    | { y; _ } when y < 1 -> None
-    | { x; _ } when x > g.board_width  -> None
-    | { y; _ } when y > g.board_height -> None
-    | { x; y } ->
-        Some ((y - 1) * g.board_width + (x - 1))
+    | { x; _ } when x < 1 -> false
+    | { y; _ } when y < 1 -> false
+    | { x; _ } when x > g.board_width  -> false
+    | { y; _ } when y > g.board_height -> false
+    | _ -> true
+
+let index_of_point (g: game) (pnt: point) : int option =
+    if point_is_valid g pnt then
+        Some ((pnt.y - 1) * g.board_width + (pnt.x - 1))
+    else None
 
 let point_of_index (g: game) (index : int) : point option =
     match index with
