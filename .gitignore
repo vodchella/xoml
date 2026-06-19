@@ -3,6 +3,8 @@ result
 .direnv/
 _build/
 build/
+xoml
+xogui
 *.cmi
 *.cmx
 *.o
