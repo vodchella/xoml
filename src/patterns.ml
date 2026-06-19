@@ -12,7 +12,7 @@ type pattern =
     }
 
 let patterns : pattern array = [|
-    (* XXXXX *)
+    (* ***** : 5-in-a-row *)
     { rel_points = [|
           ({ x = 0; y = 0 }, true);
           ({ x = 1; y = 0 }, true);
@@ -53,6 +53,52 @@ let patterns : pattern array = [|
     ; kind = PAT50
     ; dir  = SW
     };
+
+    (* .****. : 4-in-a-row with 2 open ends *)
+    { rel_points = [|
+          ({ x = -1; y = 0 }, false);
+          ({ x =  0; y = 0 }, true);
+          ({ x =  1; y = 0 }, true);
+          ({ x =  2; y = 0 }, true);
+          ({ x =  3; y = 0 }, true);
+          ({ x =  4; y = 0 }, false);
+      |]
+    ; kind = PAT42
+    ; dir  = E
+    };
+    { rel_points = [|
+          ({ x = -1; y = -1 }, false);
+          ({ x =  0; y =  0 }, true);
+          ({ x =  1; y =  1 }, true);
+          ({ x =  2; y =  2 }, true);
+          ({ x =  3; y =  3 }, true);
+          ({ x =  4; y =  4 }, false);
+      |]
+    ; kind = PAT42
+    ; dir  = SE
+    };
+    { rel_points = [|
+          ({ x = 0; y = -1 }, false);
+          ({ x = 0; y =  0 }, true);
+          ({ x = 0; y =  1 }, true);
+          ({ x = 0; y =  2 }, true);
+          ({ x = 0; y =  3 }, true);
+          ({ x = 0; y =  4 }, false);
+      |]
+    ; kind = PAT42
+    ; dir  = S
+    };
+    { rel_points = [|
+          ({ x =  1; y = -1 }, false);
+          ({ x =  0; y =  0 }, true);
+          ({ x = -1; y =  1 }, true);
+          ({ x = -2; y =  2 }, true);
+          ({ x = -3; y =  3 }, true);
+          ({ x = -3; y =  4 }, false);
+      |]
+    ; kind = PAT42
+    ; dir  = SW
+    };
 |]
 
 let string_of_pattern_kind = function
@@ -74,7 +120,6 @@ let pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point
             let rel_pnt  = fst elem in
             let required = snd elem in
             let point    = { x = pnt.x + rel_pnt.x; y = pnt.y + rel_pnt.y } in
-            Logger.write g (move_str_of_point g point);
             match index_of_point g point with
             | Some index -> (
                 let pl_opt = g.board.(index) in
