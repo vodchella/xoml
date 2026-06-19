@@ -10,4 +10,5 @@
  (public_name xoml)
  (modules xo)
  (libraries xoml unix)
+ (modes byte exe)
  (flags (:standard -warn-error -21)))

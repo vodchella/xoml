@@ -3,6 +3,7 @@ result
 .direnv/
 _build/
 build/
+.nvim.lua
 xoml
 xogui
 *.cmi
