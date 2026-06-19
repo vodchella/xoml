@@ -85,7 +85,7 @@ let pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point
                     ) else [], false
                 )
                 | None -> (
-                    if not required then loop (i + 1) (point :: res_points)
+                    if not required then loop (i + 1) res_points
                     else [], false
                 )
             )
