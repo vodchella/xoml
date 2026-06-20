@@ -1,5 +1,6 @@
 open Common
 open Engine
+open Engine_easy
 open Xoml_test_support
 
 (* Score line *)

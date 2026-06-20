@@ -1,108 +1,82 @@
 open Common
+open Engine_easy
 
 
-let opposite_direction_of = function
-    | N  ->  S
-    | E  ->  W
-    | S  ->  N
-    | W  ->  E
-    | NE ->  SW
-    | SE ->  NW
-    | SW ->  NE
-    | NW ->  SE
+let score_board_fn = score_board_easy
 
-let opponent_of = function
-    | X -> O
-    | O -> X
+(* TODO: optimize like score_board, so that visited cells are not checked again *)
+let find_winner (g: game) : player option =
+    let check_player_at_index index pl =
+        let pl' = g.board.(index) in
+        match pl' with
+        | Some pl'' when pl'' = pl ->
+            let point = point_of_index g index |> Option.get in
+            let rec check_player_at_index' dirs =
+                match dirs with
+                | []          -> None
+                | dir :: rest ->
+                    match count_in_direction g pl point dir with
+                    | c when c == g.win_length -> Some pl
+                    | _ -> check_player_at_index' rest
+            in
+            check_player_at_index' working_dirs
+        | _ -> None
+    in
+    (* TODO: need to be improved with get_active_bounds_rect usage *)
+    let rec find_winner' index =
+        match index with
+        | i when i > (g.board_size - 1) -> None
+        | _ ->
+            check_player_at_index index X
+            >>! (fun () -> check_player_at_index index O)
+            >>! (fun () -> find_winner'          (index + 1))
+    in
+    find_winner' 0
 
-let score_of = function
-    | (c, _) when c >= 5 -> score_insta_win
-    | (4, 2) -> score_win * 2
-    | (4, 1) -> score_4_1
-    | (3, 2) -> score_3_2
-    | (3, 1) -> score_3_1
-    | (2, 2) -> score_2_2
-    | (2, 1) -> score_2_1
-    | (1, 2) -> score_1_2
-    | (1, 1) -> score_1_1
-    | _      -> 0
-
-let get_direction_between_points (p1 : point) (p2 : point) : direction option =
-    let { x = x1; y = y1 } = p1 in
-    let { x = x2; y = y2 } = p2 in
-    let cx = compare x2 x1 in
-    let cy = compare y2 y1 in
-    match cx, cy with
-    |  0,  0  -> None
-    | -1,  0  -> Some W
-    |  1,  0  -> Some E
-    |  0, -1  -> Some N
-    |  0,  1  -> Some S
-    | -1, -1  -> Some NW
-    | -1,  1  -> Some SW
-    |  1, -1  -> Some NE
-    |  1,  1  -> Some SE
-    | _       -> None
-
-let get_line_points (p1: point) (p2: point) : point list =
-    match get_direction_between_points p1 p2 with
+(* TODO: factor out last_move_ok *)
+let apply_move_by_index (g: game) (pl: player) index : game =
+    let point     = point_of_index g index |> Option.get in
+    let move_str  = move_str_of_point g point in
+    let cell      = g.board.(index) in
+    let new_state = match pl with
+        | O -> Waiting
+        | X -> Thinking
+    in
+    let new_tip = match pl with
+        | X -> "Your move: '"       ^ move_str ^ "'. Thinking..."
+        | O -> "Computer's move: '" ^ move_str ^ "'. Now it's your turn..."
+    in
+    match cell with
     | None ->
-        [p1]
-    | Some dir ->
-        let step = relative_point_of_direction dir in
-        let rec build acc p =
-            if p = p2 then
-                List.rev (p :: acc)
-            else
-                let next = { x = p.x + step.x; y = p.y + step.y } in
-                build (p :: acc) next
-        in
-        build [] p1
-
-let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
-    match times with
-    | 0 -> p
-    | _ ->
-        let rel = relative_point_of_direction d in
-        { x = p.x + (rel.x * times)
-        ; y = p.y + (rel.y * times)
+        g.board.(index) <- Some pl;
+        { g with
+          last_tip        = new_tip
+        ; last_move_str   = Some move_str
+        ; last_move_point = Some point
+        ; last_move_index = Some index
+        ; last_player     = Some pl
+        ; last_move_ok    = true
+        ; state           = new_state
+        }
+    | Some _ ->
+        { g with
+          last_tip = "Cell '" ^ move_str ^ "' is occupied"
+        ; last_move_ok = false
         }
 
-let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
-    let rec count_in_direction' counter =
-        match counter with
-        | c when c > g.win_length -> g.win_length
-        | c ->
-            let point = shift_point_according_to_direction p d c in
-            match index_of_point g point with
-            | None       -> c
-            | Some index ->
-                match g.board.(index) with
-                | Some p' when p' == pl -> count_in_direction' (c + 1)
-                | _ -> c
-    in
-    count_in_direction' 0
+let apply_move_by_index_opt (g: game) (pl: player) (index_opt: int option) : game =
+    match index_opt with
+    | Some index -> apply_move_by_index g pl index
+    | None       -> g
 
-let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: int) : int =
-    let point = shift_point_according_to_direction p d cnt_in_dir in
-    match index_of_point g point with
-    | None       -> 0
-    | Some index ->
-        match g.board.(index) with
-        | None -> 1
-        | _    -> 0
+let apply_move (g: game) (pl: player) move_str : game =
+    let point = point_of_move_str g move_str in
+    let index = index_of_point    g point |> Option.get in
+    apply_move_by_index g pl index
 
-let filter_board_indices (g : game) (fn : int * player option -> bool) : int list =
-    let acc = ref [] in
-    g.board |>
-    Array.iteri (fun i cell ->
-        if fn (i, cell) then acc := i :: !acc
-    );
-    !acc
-
-let get_occupied_indices (g: game) (pl: player) : int list =
-    let pl_opt = Some pl in
-    filter_board_indices g (fun (_, v) -> v = pl_opt)
+let is_draw (g: game) : bool =
+    Array.exists (fun c -> Option.is_none c) g.board
+    |> Bool.not
 
 let get_active_bounds_rect (g: game) : point * point * int =
     let cnt = ref 0 in
@@ -158,205 +132,9 @@ let get_possible_moves (g: game) : int list =
         done;
         !result
 
-(* TODO: factor out last_move_ok *)
-let apply_move_by_index (g: game) (pl: player) index : game =
-    let point     = point_of_index g index |> Option.get in
-    let move_str  = move_str_of_point g point in
-    let cell      = g.board.(index) in
-    let new_state = match pl with
-        | O -> Waiting
-        | X -> Thinking
-    in
-    let new_tip = match pl with
-        | X -> "Your move: '"       ^ move_str ^ "'. Thinking..."
-        | O -> "Computer's move: '" ^ move_str ^ "'. Now it's your turn..."
-    in
-    match cell with
-    | None ->
-        g.board.(index) <- Some pl;
-        { g with
-          last_tip        = new_tip
-        ; last_move_str   = Some move_str
-        ; last_move_point = Some point
-        ; last_move_index = Some index
-        ; last_player     = Some pl
-        ; last_move_ok    = true
-        ; state           = new_state
-        }
-    | Some _ ->
-        { g with
-          last_tip = "Cell '" ^ move_str ^ "' is occupied"
-        ; last_move_ok = false
-        }
-
-let apply_move_by_index_opt (g: game) (pl: player) (index_opt: int option) : game =
-    match index_opt with
-    | Some index -> apply_move_by_index g pl index
-    | None       -> g
-
-let apply_move (g: game) (pl: player) move_str : game =
-    let point = point_of_move_str g move_str in
-    let index = index_of_point    g point |> Option.get in
-    apply_move_by_index g pl index
-
-let is_draw (g: game) : bool =
-    Array.exists (fun c -> Option.is_none c) g.board
-    |> Bool.not
-
-(* TODO: optimize like score_board, so that visited cells are not checked again *)
-let find_winner (g: game) : player option =
-    let check_player_at_index index pl =
-        let pl' = g.board.(index) in
-        match pl' with
-        | Some pl'' when pl'' = pl ->
-            let point = point_of_index g index |> Option.get in
-            let rec check_player_at_index' dirs =
-                match dirs with
-                | []          -> None
-                | dir :: rest ->
-                    match count_in_direction g pl point dir with
-                    | c when c == g.win_length -> Some pl
-                    | _ -> check_player_at_index' rest
-            in
-            check_player_at_index' working_dirs
-        | _ -> None
-    in
-    (* TODO: need to be improved with get_active_bounds_rect usage *)
-    let rec find_winner' index =
-        match index with
-        | i when i > (g.board_size - 1) -> None
-        | _ ->
-            check_player_at_index index X
-            >>! (fun () -> check_player_at_index index O)
-            >>! (fun () -> find_winner'          (index + 1))
-    in
-    find_winner' 0
-
-let score_line (g: game) (pl: player) (p: point) (dir: direction) : int * point * point =
-    let index = index_of_point g p |> Option.get in
-    match g.board.(index) with
-    | None -> ( 0, p, p )
-    | _ ->
-        let opp_dir         = opposite_direction_of dir in
-        let shifted_point_1 = shift_point_according_to_direction p dir     1  in
-        let shifted_point_2 = shift_point_according_to_direction p opp_dir 1  in
-        let cnt_in_dir_1    = count_in_direction g pl shifted_point_1 dir     in
-        let cnt_in_dir_2    = count_in_direction g pl shifted_point_2 opp_dir in
-        let opened_1        = have_open_end_in_direction g shifted_point_1 dir     cnt_in_dir_1 in
-        let opened_2        = have_open_end_in_direction g shifted_point_2 opp_dir cnt_in_dir_2 in
-        let count           = cnt_in_dir_1 + cnt_in_dir_2 + 1 in
-        let open_ends       = opened_1 + opened_2 in
-        let edge_point_1    = shift_point_according_to_direction p dir     cnt_in_dir_1 in
-        let edge_point_2    = shift_point_according_to_direction p opp_dir cnt_in_dir_2 in
-        ( score_of (count, open_ends), edge_point_1, edge_point_2 )
-
-(* ..OOO. or .OOO.. *)
-let check_line_for_fork_pattern_1 (g: game) (pl: player) (p: point) (dir: direction) : int =
-    let shift1, shift2 =
-        match dir with
-        | E | SE | S | SW -> 2, 4
-        | W | NW | N | NE -> 4, 2
-    in
-    let opp = opponent_of pl in
-    let check_point (pnt: point) : int =
-        match index_of_point g pnt with
-        | Some i -> (
-            match g.board.(i) with
-            | Some player when player = opp -> 0
-            | _ -> 1 )
-        | None   -> 0
-    in
-    let p1 = shift_point_according_to_direction p dir shift1 in
-    let p2 = shift_point_according_to_direction p (opposite_direction_of dir) shift2 in
-    max (check_point p1) (check_point p2)
-
-let check_line_for_fork_patterns (g: game) (pl: player) (p: point) (dir: direction) (score: int) : int =
-    match score with
-    | s when s = score_3_2 -> check_line_for_fork_pattern_1 g pl p dir
-    | _ -> 0
-
-let score_position (g: game) (pl: player) (index: int) (dirs: direction list) : int * ((int * direction) list) * int =
-    let point = point_of_index g index |> Option.get in
-    let rec score_position' dirs score_accum indicies_accum fork_patterns_count =
-        match dirs with
-        | [] -> (score_accum, indicies_accum, fork_patterns_count)
-        | d :: rest ->
-            let score, p1, p2 = score_line g pl point d in
-            let pc = check_line_for_fork_patterns g pl point d score in
-            let points = get_line_points p1 p2 in
-            let processed_indicies = points |> List.map (fun p ->
-                let i = index_of_point g p |> Option.get in
-                (i, d)
-            )
-            in
-            score_position' rest (score + score_accum) (indicies_accum @ processed_indicies) (fork_patterns_count + pc)
-    in
-    (* TODO: надо здесь рассчитывать угрозы вилок. Брать fork_patterns_count, учитывать линию 4+1
-             если набралось два пункта, значит угроза есть
-     *)
-    score_position' dirs 0 [] 0
-
-let init_dirs_array (g: game) (indicies: int list) : direction list option array =
-    let dir_arr = Array.make g.board_size None in
-    indicies
-    |> List.iter (fun i ->
-        dir_arr.(i) <- Some working_dirs
-    );
-    dir_arr
-
-let remove_dir_opt (d: direction) (lst: direction list) : direction list option =
-    let rec aux acc = function
-        | [] ->
-            let result = List.rev acc in
-            if result = [] then None else Some result
-        | x :: xs when x = d ->
-            let result = List.rev_append acc xs in
-            if result = [] then None else Some result
-        | x :: xs ->
-            aux (x :: acc) xs
-    in
-    aux [] lst
-
-let score_board (g: game) (pl: player) : int =
-    let indicies = get_occupied_indices g pl  in
-    let dir_arr  = ref (init_dirs_array g indicies) in
-    let actualize_dir_array indicies_and_dirs_to_remove =
-        indicies_and_dirs_to_remove
-        |> List.iter (fun ind_dir ->
-            let ind, dir = ind_dir in
-            match !dir_arr.(ind) with
-            | Some arr ->
-                let new_arr = remove_dir_opt dir arr in
-                !dir_arr.(ind) <- new_arr
-            | None -> ()
-        )
-    in
-    let rec score_board' indexes accum fork_patterns_count =
-        match indexes with
-        | [] -> (accum, fork_patterns_count)
-        | i :: rest ->
-            match !dir_arr.(i) with
-            | None ->
-                score_board' rest accum fork_patterns_count
-            | Some dirs ->
-                let score, processed_indicies, pc = score_position g pl i dirs in
-                (* NOTE: use string_of_int_direction_list to view processed_indicies: *)
-                (*       print_endline ((string_of_int i) ^ "i: " ^
-                                       (Common.string_of_int_direction_list processed_indicies)); *)
-                actualize_dir_array processed_indicies;
-                score_board' rest (accum + score) (fork_patterns_count + pc)
-    in
-    let final_score, fork_patterns_count = score_board' indicies 0 0 in
-    let score_for_forks =
-        match fork_patterns_count with
-        | pc when pc >= 2 -> score_fork
-        | _ -> 0
-    in
-    final_score + score_for_forks
-
 let eval_position (g : game) (pl : player) : int =
-    let my_score  = score_board g pl in
-    let opp_score = score_board g (opponent_of pl) in
+    let my_score  = score_board_fn g pl in
+    let opp_score = score_board_fn g (opponent_of pl) in
     let score     = my_score - opp_score in
     score
 
@@ -365,13 +143,6 @@ let find_best_move (g: game) (pl: player) : int option =
     let break_on_index = ref None in
 
     let rec minimax (g: game) (depth: int) (alpha: int) (beta: int) (cur_pl: player) : int =
-        (* match find_winner g with *)
-        (* | Some p -> *)
-        (*     (* failwith ("!!! " ^ (string_of_int depth)); *) *)
-        (*     if p = pl then score_win + depth *)
-        (*     else -score_win - depth *)
-        (* | None -> *)
-
         if depth <= 0 then
             eval_position g pl
         else
@@ -390,7 +161,7 @@ let find_best_move (g: game) (pl: player) : int option =
 
                         let break = ref false in
                         if depth = (max_depth - 2) then (
-                            let my_score = score_board g cur_pl in
+                            let my_score = score_board_fn g cur_pl in
                             if my_score >= score_win then break := true
                         );
 
@@ -424,7 +195,7 @@ let find_best_move (g: game) (pl: player) : int option =
 
                         let break = ref false in
                         if depth = (max_depth - 1) then (
-                            let opp_score = score_board g cur_pl in
+                            let opp_score = score_board_fn g cur_pl in
                             if opp_score >= score_win then break := true
                         );
 
@@ -464,7 +235,7 @@ let find_best_move (g: game) (pl: player) : int option =
             if not !insta_win_found then (
                 let old_cell = g.board.(m) in
                 g.board.(m) <- Some pl;
-                let my_score = score_board g pl in
+                let my_score = score_board_fn g pl in
                 if my_score >= score_insta_win then (
                     break_on_index := Some m;
                     insta_win_found := true;
@@ -478,14 +249,12 @@ let find_best_move (g: game) (pl: player) : int option =
             match !break_on_index with
             | Some i ->
                 best_move := Some i;
-                (* Logger.write g ((move_str_of_index g i) ^ " break_on_index"); *)
             | _ -> (
                 let old_cell = g.board.(m) in
                 g.board.(m) <- Some pl;
 
                 let score = minimax g (max_depth - 1) !alpha max_int (opponent_of pl) in
                 g.board.(m) <- old_cell;
-                (* Logger.write g ((move_str_of_index g m) ^ " final score = " ^ (string_of_int score)); *)
 
                 if score > !best_score then begin
                     best_score := score;

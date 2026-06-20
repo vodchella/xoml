@@ -33,6 +33,7 @@ type run_args =
     ; gtp_mode        : bool
     }
 
+
 let working_dirs         = [ SW; S; SE; E ]
 
 let score_win            = 10_000_000
@@ -82,6 +83,20 @@ let ( >>! ) opt fn =
     | None   -> fn ()
 
 let some_if cond value = if cond then value else None
+
+let opposite_direction_of = function
+    | N  ->  S
+    | E  ->  W
+    | S  ->  N
+    | W  ->  E
+    | NE ->  SW
+    | SE ->  NW
+    | SW ->  NE
+    | NW ->  SE
+
+let opponent_of = function
+    | X -> O
+    | O -> X
 
 let string_of_player = function
     | X -> sym_x
@@ -142,6 +157,23 @@ let move_str_of_index (g: game) (index: int) : string =
     |> point_of_index g
     |> Option.get
     |> move_str_of_point g
+
+let get_direction_between_points (p1 : point) (p2 : point) : direction option =
+    let { x = x1; y = y1 } = p1 in
+    let { x = x2; y = y2 } = p2 in
+    let cx = compare x2 x1 in
+    let cy = compare y2 y1 in
+    match cx, cy with
+    |  0,  0  -> None
+    | -1,  0  -> Some W
+    |  1,  0  -> Some E
+    |  0, -1  -> Some N
+    |  0,  1  -> Some S
+    | -1, -1  -> Some NW
+    | -1,  1  -> Some SW
+    |  1, -1  -> Some NE
+    |  1,  1  -> Some SE
+    | _       -> None
 
 let string_of_direction = function
     | N  -> "N"
