@@ -11,4 +11,4 @@
  (modules xo)
  (libraries xoml unix)
  (modes byte exe)
- (flags (:standard -warn-error -21)))
+ (flags (:standard -g -warn-error -21)))
