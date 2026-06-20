@@ -4,6 +4,8 @@ open Common
 type pattern_kind =
     | PAT50
     | PAT42
+    | PAT41L
+    | PAT41R
 type pattern_point = point * bool
 type pattern =
     { rel_points : pattern_point array
@@ -99,12 +101,98 @@ let patterns : pattern array = [|
     ; kind = PAT42
     ; dir  = SW
     };
+
+    (* .****. : 4-in-a-row with 1 left open end *)
+    { rel_points = [|
+          ({ x = -1; y = 0 }, false);
+          ({ x =  0; y = 0 }, true);
+          ({ x =  1; y = 0 }, true);
+          ({ x =  2; y = 0 }, true);
+          ({ x =  3; y = 0 }, true);
+      |]
+    ; kind = PAT41L
+    ; dir  = E
+    };
+    { rel_points = [|
+          ({ x = -1; y = -1 }, false);
+          ({ x =  0; y =  0 }, true);
+          ({ x =  1; y =  1 }, true);
+          ({ x =  2; y =  2 }, true);
+          ({ x =  3; y =  3 }, true);
+      |]
+    ; kind = PAT41L
+    ; dir  = SE
+    };
+    { rel_points = [|
+          ({ x = 0; y = -1 }, false);
+          ({ x = 0; y =  0 }, true);
+          ({ x = 0; y =  1 }, true);
+          ({ x = 0; y =  2 }, true);
+          ({ x = 0; y =  3 }, true);
+      |]
+    ; kind = PAT41L
+    ; dir  = S
+    };
+    { rel_points = [|
+          ({ x =  1; y = -1 }, false);
+          ({ x =  0; y =  0 }, true);
+          ({ x = -1; y =  1 }, true);
+          ({ x = -2; y =  2 }, true);
+          ({ x = -3; y =  3 }, true);
+      |]
+    ; kind = PAT41L
+    ; dir  = SW
+    };
+
+    (* .****. : 4-in-a-row with 1 right open end *)
+    { rel_points = [|
+          ({ x =  0; y = 0 }, true);
+          ({ x =  1; y = 0 }, true);
+          ({ x =  2; y = 0 }, true);
+          ({ x =  3; y = 0 }, true);
+          ({ x =  4; y = 0 }, false);
+      |]
+    ; kind = PAT41R
+    ; dir  = E
+    };
+    { rel_points = [|
+          ({ x =  0; y =  0 }, true);
+          ({ x =  1; y =  1 }, true);
+          ({ x =  2; y =  2 }, true);
+          ({ x =  3; y =  3 }, true);
+          ({ x =  4; y =  4 }, false);
+      |]
+    ; kind = PAT41R
+    ; dir  = SE
+    };
+    { rel_points = [|
+          ({ x = 0; y =  0 }, true);
+          ({ x = 0; y =  1 }, true);
+          ({ x = 0; y =  2 }, true);
+          ({ x = 0; y =  3 }, true);
+          ({ x = 0; y =  4 }, false);
+      |]
+    ; kind = PAT41R
+    ; dir  = S
+    };
+    { rel_points = [|
+          ({ x =  0; y =  0 }, true);
+          ({ x = -1; y =  1 }, true);
+          ({ x = -2; y =  2 }, true);
+          ({ x = -3; y =  3 }, true);
+          ({ x = -3; y =  4 }, false);
+      |]
+    ; kind = PAT41R
+    ; dir  = SW
+    };
 |]
 let patterns_list = patterns |> Array.to_list
 
 let string_of_pattern_kind = function
-    | PAT50 -> "PAT50"
-    | PAT42 -> "PAT42"
+    | PAT50  -> "PAT50"
+    | PAT42  -> "PAT42"
+    | PAT41L -> "PAT41L"
+    | PAT41R -> "PAT41R"
 
 let string_of_pattern_values (kind: pattern_kind) (dir: direction) : string =
     let dir  = string_of_direction dir     in
