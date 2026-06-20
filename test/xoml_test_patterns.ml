@@ -6,11 +6,31 @@ open Xoml_test_support
 (* Patterns *)
 
 let check_pattern (g: game) (move_str: string) (ptrn: pattern) =
-    let p        = point_of_move_str g move_str       in
-    let lst, res = pattern_at_point g p X ptrn        in
-    let cnt      = pattern_required_points_count ptrn in
-    Alcotest.(check bool) ("pattern " ^ (string_of_pattern_values ptrn.kind ptrn.dir) ^ " found") true res;
-    Alcotest.(check int)  ("pattern " ^ (string_of_pattern_values ptrn.kind ptrn.dir) ^ " occupied points count") cnt (List.length lst)
+    let p           = point_of_move_str g move_str                in
+    let lst, res, i = pattern_at_point  g p X ptrn                in
+    let cnt         = pattern_required_points_count ptrn          in
+    let name        = string_of_pattern_values ptrn.kind ptrn.dir in
+    Alcotest.(check bool) ("pattern " ^ name ^ " found") true res;
+    Alcotest.(check int)  ("pattern " ^ name ^ " occupied points count") cnt (List.length lst);
+    Alcotest.(check int)  ("pattern " ^ name ^ " failed index") (-1) i
+
+
+let test_failed_index () =
+    let g       = init_test_board ()           in
+    let g       = apply_move g X "B5"          in
+    let g       = apply_move g X "C5"          in
+    let g       = apply_move g X "D5"          in
+    let g       = apply_move g X "E5"          in
+    let g       = apply_move g O "F5"          in
+    let ptrn    = pattern_find PAT50 E         in
+    let p       = point_of_move_str g "B5"     in
+    let _, _, i = pattern_at_point  g p X ptrn in
+    let name    = string_of_pattern_values ptrn.kind ptrn.dir in
+    Alcotest.(check int)  ("pattern " ^ name ^ " failed index") 4 i;
+
+    let g = apply_move g X "B5" in
+    let _, _, i = pattern_at_point  g p O ptrn in
+    Alcotest.(check int)  ("pattern " ^ name ^ " failed index") 0 i
 
 
 let test_patterns_50 () =
@@ -564,5 +584,6 @@ let suite : string * unit Alcotest.test_case list =
         Alcotest.test_case "Patterns 12"   `Quick test_patterns_12;
         Alcotest.test_case "Patterns 11L"  `Quick test_patterns_11L;
         Alcotest.test_case "Patterns 11R"  `Quick test_patterns_11R;
+        Alcotest.test_case "Failed index"  `Quick test_failed_index;
     ]
 

@@ -162,10 +162,10 @@ let pattern_find (kind: pattern_kind) (dir: direction) : pattern =
     | [] -> failwith ("Pattern " ^ (string_of_pattern_values kind dir) ^ " not found")
     | _  -> failwith ("Multiple " ^ (string_of_pattern_values kind dir) ^ " patterns found")
 
-let pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point list * bool =
+let pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point list * bool * int =
     let rec loop i res_points =
         if i >= Array.length ptrn.rel_points then
-            res_points, true
+            res_points, true, -1
         else
             let elem     = ptrn.rel_points.(i) in
             let rel_pnt  = fst elem in
@@ -178,16 +178,16 @@ let pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point
                 | Some pl' -> (
                     if required && pl' == pl then (
                         loop (i + 1) (point :: res_points)
-                    ) else [], false
+                    ) else [], false, i
                 )
                 | None -> (
                     if not required then loop (i + 1) res_points
-                    else [], false
+                    else [], false, i
                 )
             )
-            | None -> [], false
+            | None -> [], false, i
     in
     if point_is_valid g pnt then (
         loop 0 []
-    ) else [], false
+    ) else [], false, -1
 
