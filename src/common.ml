@@ -33,6 +33,8 @@ type run_args =
     ; gtp_mode        : bool
     }
 
+let working_dirs         = [ SW; S; SE; E ]
+
 let score_win            = 10_000_000
 let score_insta_win      = score_win * 4
 let score_fork           = score_win / 2
@@ -150,6 +152,16 @@ let string_of_direction = function
     | SE -> "SE"
     | SW -> "SW"
     | NW -> "NW"
+
+let relative_point_of_direction = function
+    | N  -> { x =  0; y = -1 }
+    | E  -> { x =  1; y =  0 }
+    | S  -> { x =  0; y =  1 }
+    | W  -> { x = -1; y =  0 }
+    | NE -> { x =  1; y = -1 }
+    | SE -> { x =  1; y =  1 }
+    | SW -> { x = -1; y =  1 }
+    | NW -> { x = -1; y = -1 }
 
 let init_board_with_side (g: game) (board_side : int) : game =
     { g with
