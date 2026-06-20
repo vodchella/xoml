@@ -421,6 +421,127 @@ let test_patterns_31H2 () =
     let g = apply_move g O "B1" in
     check_pattern g "F5" (pattern_find PAT31H2 SW)
 
+let test_patterns_22 () =
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    let g = apply_move g X "D5" in
+    check_pattern g "C5" (pattern_find PAT22 E);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    let g = apply_move g X "D4" in
+    check_pattern g "C5" (pattern_find PAT22 SE);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    let g = apply_move g X "C4" in
+    check_pattern g "C5" (pattern_find PAT22 S);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "F5" in
+    let g = apply_move g X "E4" in
+    check_pattern g "F5" (pattern_find PAT22 SW)
+
+let test_patterns_21L () =
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    let g = apply_move g X "D5" in
+    let g = apply_move g O "E5" in
+    check_pattern g "C5" (pattern_find PAT21L E);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    let g = apply_move g X "D4" in
+    let g = apply_move g O "E3" in
+    check_pattern g "C5" (pattern_find PAT21L SE);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    let g = apply_move g X "C4" in
+    let g = apply_move g O "C3" in
+    check_pattern g "C5" (pattern_find PAT21L S);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "F5" in
+    let g = apply_move g X "E4" in
+    let g = apply_move g O "D3" in
+    check_pattern g "F5" (pattern_find PAT21L SW)
+
+let test_patterns_21R () =
+    let g = init_test_board ()  in
+    let g = apply_move g O "B5" in
+    let g = apply_move g X "C5" in
+    let g = apply_move g X "D5" in
+    check_pattern g "C5" (pattern_find PAT21R E);
+
+    let g = init_test_board ()  in
+    let g = apply_move g O "B6" in
+    let g = apply_move g X "C5" in
+    let g = apply_move g X "D4" in
+    check_pattern g "C5" (pattern_find PAT21R SE);
+
+    let g = init_test_board ()  in
+    let g = apply_move g O "C6" in
+    let g = apply_move g X "C5" in
+    let g = apply_move g X "C4" in
+    check_pattern g "C5" (pattern_find PAT21R S);
+
+    let g = init_test_board ()  in
+    let g = apply_move g O "G6" in
+    let g = apply_move g X "F5" in
+    let g = apply_move g X "E4" in
+    check_pattern g "F5" (pattern_find PAT21R SW)
+
+let test_patterns_12 () =
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    check_pattern g "C5" (pattern_find PAT12 E);
+    check_pattern g "C5" (pattern_find PAT12 SE);
+    check_pattern g "C5" (pattern_find PAT12 S);
+    check_pattern g "C5" (pattern_find PAT12 SW)
+
+let test_patterns_11L () =
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    let g = apply_move g O "D5" in
+    check_pattern g "C5" (pattern_find PAT11L E);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    let g = apply_move g O "D4" in
+    check_pattern g "C5" (pattern_find PAT11L SE);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "C5" in
+    let g = apply_move g O "C4" in
+    check_pattern g "C5" (pattern_find PAT11L S);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "F5" in
+    let g = apply_move g O "E4" in
+    check_pattern g "F5" (pattern_find PAT11L SW)
+
+let test_patterns_11R () =
+    let g = init_test_board ()  in
+    let g = apply_move g O "B5" in
+    let g = apply_move g X "C5" in
+    check_pattern g "C5" (pattern_find PAT11R E);
+
+    let g = init_test_board ()  in
+    let g = apply_move g O "B6" in
+    let g = apply_move g X "C5" in
+    check_pattern g "C5" (pattern_find PAT11R SE);
+
+    let g = init_test_board ()  in
+    let g = apply_move g O "C6" in
+    let g = apply_move g X "C5" in
+    check_pattern g "C5" (pattern_find PAT11R S);
+
+    let g = init_test_board ()  in
+    let g = apply_move g O "G6" in
+    let g = apply_move g X "F5" in
+    check_pattern g "F5" (pattern_find PAT11R SW)
+
 
 let suite : string * unit Alcotest.test_case list =
     "Patterns",
@@ -437,5 +558,11 @@ let suite : string * unit Alcotest.test_case list =
         Alcotest.test_case "Patterns 31R"  `Quick test_patterns_31R;
         Alcotest.test_case "Patterns 31H1" `Quick test_patterns_31H1;
         Alcotest.test_case "Patterns 31H2" `Quick test_patterns_31H2;
+        Alcotest.test_case "Patterns 22"   `Quick test_patterns_22;
+        Alcotest.test_case "Patterns 21L"  `Quick test_patterns_21L;
+        Alcotest.test_case "Patterns 21R"  `Quick test_patterns_21R;
+        Alcotest.test_case "Patterns 12"   `Quick test_patterns_12;
+        Alcotest.test_case "Patterns 11L"  `Quick test_patterns_11L;
+        Alcotest.test_case "Patterns 11R"  `Quick test_patterns_11R;
     ]
 

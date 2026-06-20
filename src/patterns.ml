@@ -17,6 +17,9 @@ type pattern_kind =
     | PAT22
     | PAT21L
     | PAT21R
+    | PAT12
+    | PAT11L
+    | PAT11R
 type pattern_point = point * bool
 type pattern =
     { rel_points : pattern_point array
@@ -37,6 +40,12 @@ let pattern_kinds =
     ; PAT31R
     ; PAT31H1
     ; PAT31H2
+    ; PAT22
+    ; PAT21L
+    ; PAT21R
+    ; PAT12
+    ; PAT11L
+    ; PAT11R
     ]
 let pattern_dirs = working_dirs |> Array.of_list
 
@@ -56,6 +65,9 @@ let string_of_pattern_kind = function
     | PAT22   -> "PAT22"
     | PAT21L  -> "PAT21L"
     | PAT21R  -> "PAT21R"
+    | PAT12   -> "PAT12"
+    | PAT11L  -> "PAT11L"
+    | PAT11R  -> "PAT11R"
 
 let pattern_string_of_pattern_kind = function
     | PAT50   -> "*****"
@@ -73,6 +85,9 @@ let pattern_string_of_pattern_kind = function
     | PAT22   -> ".**."
     | PAT21L  -> ".**"
     | PAT21R  -> "**."
+    | PAT12   -> ".*."
+    | PAT11L  -> ".*"
+    | PAT11R  -> "*."
 
 let string_of_pattern_values (kind: pattern_kind) (dir: direction) : string =
     let dir  = string_of_direction dir     in
