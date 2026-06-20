@@ -167,7 +167,7 @@ let pattern_find (kind: pattern_kind) (dir: direction) : pattern =
     | [] -> failwith ("Pattern " ^ (string_of_pattern_values kind dir) ^ " not found")
     | _  -> failwith ("Multiple " ^ (string_of_pattern_values kind dir) ^ " patterns found")
 
-let pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point list * bool * int =
+let is_pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point list * bool * int =
     let rec loop i res_points =
         if i >= Array.length ptrn.rel_points then
             res_points, true, -1

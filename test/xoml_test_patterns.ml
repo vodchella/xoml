@@ -6,8 +6,8 @@ open Xoml_test_support
 (* Patterns *)
 
 let check_pattern (g: game) (move_str: string) (ptrn: pattern) =
-    let p           = point_of_move_str g move_str                in
-    let lst, res, i = pattern_at_point  g p X ptrn                in
+    let p           = point_of_move_str   g move_str              in
+    let lst, res, i = is_pattern_at_point g p X ptrn              in
     let cnt         = pattern_required_points_count ptrn          in
     let name        = string_of_pattern_values ptrn.kind ptrn.dir in
     Alcotest.(check bool) ("pattern " ^ name ^ " found") true res;
@@ -16,20 +16,20 @@ let check_pattern (g: game) (move_str: string) (ptrn: pattern) =
 
 
 let test_failed_index () =
-    let g       = init_test_board ()           in
-    let g       = apply_move g X "B5"          in
-    let g       = apply_move g X "C5"          in
-    let g       = apply_move g X "D5"          in
-    let g       = apply_move g X "E5"          in
-    let g       = apply_move g O "F5"          in
-    let ptrn    = pattern_find PAT50 E         in
-    let p       = point_of_move_str g "B5"     in
-    let _, _, i = pattern_at_point  g p X ptrn in
+    let g       = init_test_board ()              in
+    let g       = apply_move g X "B5"             in
+    let g       = apply_move g X "C5"             in
+    let g       = apply_move g X "D5"             in
+    let g       = apply_move g X "E5"             in
+    let g       = apply_move g O "F5"             in
+    let ptrn    = pattern_find PAT50 E            in
+    let p       = point_of_move_str g "B5"        in
+    let _, _, i = is_pattern_at_point  g p X ptrn in
     let name    = string_of_pattern_values ptrn.kind ptrn.dir in
     Alcotest.(check int)  ("pattern " ^ name ^ " failed index") 4 i;
 
     let g = apply_move g X "B5" in
-    let _, _, i = pattern_at_point  g p O ptrn in
+    let _, _, i = is_pattern_at_point  g p O ptrn in
     Alcotest.(check int)  ("pattern " ^ name ^ " failed index") 0 i
 
 
