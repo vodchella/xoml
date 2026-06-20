@@ -66,6 +66,41 @@ let test_patterns_50 () =
     let g = apply_move g X "B1" in
     check_pattern g "F5" (pattern_find PAT50 SW)
 
+let test_patterns_50H () =
+    let g = init_test_board ()  in
+    let g = apply_move g X "B5" in
+    let g = apply_move g X "D5" in
+    let g = apply_move g X "E5" in
+    let g = apply_move g X "F5" in
+    let g = apply_move g X "H5" in
+    check_pattern g "B5" (pattern_find PAT50H E);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "B6" in
+    let g = apply_move g X "D4" in
+    let g = apply_move g X "E3" in
+    let g = apply_move g X "F2" in
+    let g = apply_move g X "H0" in
+    check_pattern g "B6" (pattern_find PAT50H SE);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "B6" in
+    let g = apply_move g X "B4" in
+    let g = apply_move g X "B3" in
+    let g = apply_move g X "B2" in
+    let g = apply_move g X "B0" in
+    check_pattern g "B6" (pattern_find PAT50H S);
+
+    let g = init_test_board ()  in
+    let g = apply_move g X "H6" in
+    let g = apply_move g X "F4" in
+    let g = apply_move g X "E3" in
+    let g = apply_move g X "D2" in
+    let g = apply_move g X "B0" in
+    check_pattern g "H6" (pattern_find PAT50H SW);
+
+    ()
+
 let test_patterns_42 () =
     let g = init_test_board ()  in
     let g = apply_move g X "C5" in
@@ -567,6 +602,7 @@ let suite : string * unit Alcotest.test_case list =
     "Patterns",
     [
         Alcotest.test_case "Patterns 50"   `Quick test_patterns_50;
+        Alcotest.test_case "Patterns 50H"  `Quick test_patterns_50H;
         Alcotest.test_case "Patterns 42"   `Quick test_patterns_42;
         Alcotest.test_case "Patterns 41L"  `Quick test_patterns_41L;
         Alcotest.test_case "Patterns 41R"  `Quick test_patterns_41R;

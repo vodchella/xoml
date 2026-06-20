@@ -3,6 +3,7 @@ open Common
 
 type pattern_kind =
     | PAT50
+    | PAT50H   (* TODO: are we realy need it? *)
     | PAT42
     | PAT41L
     | PAT41R
@@ -29,6 +30,7 @@ type pattern =
 
 let pattern_kinds =
     [ PAT50
+    ; PAT50H
     ; PAT42
     ; PAT41L
     ; PAT41R
@@ -51,6 +53,7 @@ let pattern_dirs = working_dirs |> Array.of_list
 
 let string_of_pattern_kind = function
     | PAT50   -> "PAT50"
+    | PAT50H  -> "PAT50H"
     | PAT42   -> "PAT42"
     | PAT41L  -> "PAT41L"
     | PAT41R  -> "PAT41R"
@@ -71,6 +74,7 @@ let string_of_pattern_kind = function
 
 let pattern_string_of_pattern_kind = function
     | PAT50   -> "*****"
+    | PAT50H  -> "*.***.*"
     | PAT42   -> ".****."
     | PAT41L  -> ".****"
     | PAT41R  -> "****."
@@ -91,6 +95,7 @@ let pattern_string_of_pattern_kind = function
 
 let score_of_pattern = function
     | PAT50   -> score_insta_win
+    | PAT50H  -> score_win * 2
     | PAT42   -> score_win * 2
     | PAT41L  -> score_4_1
     | PAT41R  -> score_4_1
