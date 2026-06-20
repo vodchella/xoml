@@ -100,16 +100,33 @@ let patterns : pattern array = [|
     ; dir  = SW
     };
 |]
+let patterns_list = patterns |> Array.to_list
 
 let string_of_pattern_kind = function
     | PAT50 -> "PAT50"
     | PAT42 -> "PAT42"
 
-let pattern_required_points_count (ptrn: pattern) =
+let string_of_pattern_values (kind: pattern_kind) (dir: direction) : string =
+    let dir  = string_of_direction dir     in
+    let kind = string_of_pattern_kind kind in
+    kind ^ "_" ^ dir
+
+
+let pattern_required_points_count (ptrn: pattern) : int =
     Array.fold_left
         (fun acc (_, required) -> acc + if required then 1 else 0)
         0
         ptrn.rel_points
+
+let pattern_find (kind: pattern_kind) (dir: direction) : pattern =
+    let matches =
+        patterns_list
+        |> List.filter (fun pattern -> pattern.kind = kind && pattern.dir = dir)
+    in
+    match matches with
+    | [ pattern ] -> pattern
+    | [] -> failwith ("Pattern " ^ (string_of_pattern_values kind dir) ^ " not found")
+    | _  -> failwith ("Multiple " ^ (string_of_pattern_values kind dir) ^ " patterns found")
 
 let pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point list * bool =
     let rec loop i res_points =
