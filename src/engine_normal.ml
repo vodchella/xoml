@@ -6,14 +6,14 @@ let score_of_pattern_kind = function
     | PAT50   -> score_insta_win
     | PAT50H  -> score_inevitable_win
     | PAT42   -> score_inevitable_win
+    | PAT33L  -> score_3_2
+    | PAT33R  -> score_3_2
+    | PAT32   -> score_3_2
     | PAT41L  -> score_4_1
     | PAT41R  -> score_4_1
     | PAT41H1 -> score_4_1
     | PAT41H2 -> score_4_1
     | PAT41H3 -> score_4_1
-    | PAT33L  -> score_3_2
-    | PAT33R  -> score_3_2
-    | PAT32   -> score_3_2
     | PAT31L  -> score_3_1
     | PAT31R  -> score_3_1
     | PAT31H1 -> score_3_1
@@ -42,16 +42,22 @@ let forks : (pattern_kind * pattern_kind) list =
     ; (PAT41H3, PAT41H2)
     ]
 
-let has_forks (pt_kinds : pattern_kind list) : bool =
+let has_forks (pt_kinds : (pattern_kind * point list) list) : bool =
     List.exists
-        (fun (p1, p2) -> List.mem p1 pt_kinds && List.mem p2 pt_kinds)
+        (fun (p1, p2) ->
+            match List.assoc_opt p1 pt_kinds, List.assoc_opt p2 pt_kinds with
+            | Some points1, Some points2 ->
+                points_intersection_size points1 points2 <= 1
+            | _ ->
+                false
+        )
         forks
 
 let score_board_normal (g: game) (pl: player) : int =
     let indicies = get_occupied_indices g pl in
     let points   = indicies |> List.map (fun i -> point_of_index g i |> Option.get) in
-    let pt_kinds = points   |> List.map (fun p -> pattern_kinds_at_point g p pl) |> List.flatten in
-    let scores   = pt_kinds |> List.map (fun k -> score_of_pattern_kind k) in
+    let kinds    = points   |> List.map (fun p -> pattern_kinds_at_point g p pl) |> List.flatten in
+    let scores   = kinds    |> List.map (fun k -> score_of_pattern_kind (fst k)) in
     let score    = scores   |> List.fold_left ( + ) 0 in
     score +
-    if has_forks pt_kinds then score_inevitable_win else 0
+    if has_forks kinds then score_inevitable_win else 0

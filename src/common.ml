@@ -268,3 +268,8 @@ let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
     in
     count_in_direction' 0
 
+let points_intersection_size points1 points2 =
+    List.fold_left
+        (fun acc p -> if List.mem p points2 then acc + 1 else acc)
+        0 points1
+

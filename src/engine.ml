@@ -228,17 +228,17 @@ let find_best_move (g: game) (pl: player) : int option =
         let best_move  = ref None in
         let best_score = ref min_int in
         let alpha      = ref min_int in
-        let insta_win_found  = ref false in
+        let win_found  = ref false in
 
         moves
         |> List.iter (fun m ->
-            if not !insta_win_found then (
+            if not !win_found then (
                 let old_cell = g.board.(m) in
                 g.board.(m) <- Some pl;
                 let my_score = score_board_fn g pl in
-                if my_score >= score_insta_win then (
+                if my_score >= score_inevitable_win then (
                     break_on_index := Some m;
-                    insta_win_found := true;
+                    win_found := true;
                 );
                 g.board.(m) <- old_cell;
             )

@@ -5,14 +5,14 @@ type pattern_kind =
     | PAT50
     | PAT50H   (* TODO: are we realy need it? *)
     | PAT42
+    | PAT33L
+    | PAT33R
+    | PAT32
     | PAT41L
     | PAT41R
     | PAT41H1
     | PAT41H2
     | PAT41H3
-    | PAT33L
-    | PAT33R
-    | PAT32
     | PAT31L
     | PAT31R
     | PAT31H1
@@ -30,18 +30,19 @@ type pattern =
     ; dir        : direction
     }
 
+(* INFO: it MUST be ordered by scores like in score_of_pattern_kind *)
 let pattern_kinds =
     [ PAT50
     ; PAT50H
     ; PAT42
+    ; PAT33L
+    ; PAT33R
+    ; PAT32
     ; PAT41L
     ; PAT41R
     ; PAT41H1
     ; PAT41H2
     ; PAT41H3
-    ; PAT33L
-    ; PAT33R
-    ; PAT32
     ; PAT31L
     ; PAT31R
     ; PAT31H1
@@ -59,14 +60,14 @@ let string_of_pattern_kind = function
     | PAT50   -> "PAT50"
     | PAT50H  -> "PAT50H"
     | PAT42   -> "PAT42"
+    | PAT33L  -> "PAT33L"
+    | PAT33R  -> "PAT33R"
+    | PAT32   -> "PAT32"
     | PAT41L  -> "PAT41L"
     | PAT41R  -> "PAT41R"
     | PAT41H1 -> "PAT41H1"
     | PAT41H2 -> "PAT41H2"
     | PAT41H3 -> "PAT41H3"
-    | PAT33L  -> "PAT33L"
-    | PAT33R  -> "PAT33R"
-    | PAT32   -> "PAT32"
     | PAT31L  -> "PAT31L"
     | PAT31R  -> "PAT31R"
     | PAT31H1 -> "PAT31H1"
@@ -82,14 +83,14 @@ let pattern_string_of_pattern_kind = function
     | PAT50   -> "*****"
     | PAT50H  -> "*.***.*"
     | PAT42   -> ".****."
+    | PAT33L  -> "..***."
+    | PAT33R  -> ".***.."
+    | PAT32   -> ".***."
     | PAT41L  -> ".****"
     | PAT41R  -> "****."
     | PAT41H1 -> "*.***"
     | PAT41H2 -> "**.**"
     | PAT41H3 -> "***.*"
-    | PAT33L  -> "..***."
-    | PAT33R  -> ".***.."
-    | PAT32   -> ".***."
     | PAT31L  -> ".***"
     | PAT31R  -> "***."
     | PAT31H1 -> "*.**"
@@ -194,19 +195,19 @@ let is_pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : po
         loop 0 []
     ) else [], false, -1
 
-let pattern_kind_at_point_and_dir (g: game) (pnt: point) (pl: player) (dir: direction) : pattern_kind option =
+let pattern_kind_at_point_and_dir (g: game) (pnt: point) (pl: player) (dir: direction) : (pattern_kind * point list) option =
     let rec loop ptrns =
         match ptrns with
         | [] -> None
         | ptrn :: tail -> (
             match is_pattern_at_point g pnt pl ptrn with
-            | _, true, _ -> Some ptrn.kind
-            | _          -> loop tail
+            | pnts, true, _ -> Some (ptrn.kind, pnts)
+            | _             -> loop tail
         )
     in
     loop (patterns_of_dir dir)
 
-let pattern_kinds_at_point (g: game) (pnt: point) (pl: player) : pattern_kind list =
+let pattern_kinds_at_point (g: game) (pnt: point) (pl: player) : (pattern_kind * point list) list =
     List.filter_map
         (fun dir -> pattern_kind_at_point_and_dir g pnt pl dir)
         working_dirs
