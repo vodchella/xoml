@@ -232,3 +232,15 @@ let random_index_near_center_opt (g: game) =
 let random_index_near_center (g: game) =
     random_index_near_center_opt g |> Option.get
 
+let filter_board_indices (g : game) (fn : int * player option -> bool) : int list =
+    let acc = ref [] in
+    g.board |>
+    Array.iteri (fun i cell ->
+        if fn (i, cell) then acc := i :: !acc
+    );
+    !acc
+
+let get_occupied_indices (g: game) (pl: player) : int list =
+    let pl_opt = Some pl in
+    filter_board_indices g (fun (_, v) -> v = pl_opt)
+

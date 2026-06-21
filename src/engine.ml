@@ -1,8 +1,18 @@
 open Common
+open Patterns
 open Engine_easy
 
 
-let score_board_fn = score_board_easy
+
+let score_board (g: game) (pl: player) : int =
+    let indicies = get_occupied_indices g pl in
+    let points   = indicies |> List.map (fun i -> point_of_index g i |> Option.get) in
+    let pt_kinds = points   |> List.map (fun p -> pattern_kinds_at_point g p pl) |> List.flatten in
+    let scores   = pt_kinds |> List.map (fun k -> score_of_pattern_kind k) in
+    let score    = scores   |> List.fold_left ( + ) 0 in
+    score
+
+let score_board_fn = score_board
 
 (* TODO: optimize like score_board, so that visited cells are not checked again *)
 let find_winner (g: game) : player option =

@@ -61,18 +61,6 @@ let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: 
         | None -> 1
         | _    -> 0
 
-let filter_board_indices (g : game) (fn : int * player option -> bool) : int list =
-    let acc = ref [] in
-    g.board |>
-    Array.iteri (fun i cell ->
-        if fn (i, cell) then acc := i :: !acc
-    );
-    !acc
-
-let get_occupied_indices (g: game) (pl: player) : int list =
-    let pl_opt = Some pl in
-    filter_board_indices g (fun (_, v) -> v = pl_opt)
-
 let score_line (g: game) (pl: player) (p: point) (dir: direction) : int * point * point =
     let index = index_of_point g p |> Option.get in
     match g.board.(index) with

@@ -93,7 +93,7 @@ let pattern_string_of_pattern_kind = function
     | PAT11L  -> ".*"
     | PAT11R  -> "*."
 
-let score_of_pattern = function
+let score_of_pattern_kind = function
     | PAT50   -> score_insta_win
     | PAT50H  -> score_win * 2
     | PAT42   -> score_win * 2
