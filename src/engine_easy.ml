@@ -28,30 +28,6 @@ let get_line_points (p1: point) (p2: point) : point list =
         in
         build [] p1
 
-let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
-    match times with
-    | 0 -> p
-    | _ ->
-        let rel = relative_point_of_direction d in
-        { x = p.x + (rel.x * times)
-        ; y = p.y + (rel.y * times)
-        }
-
-let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
-    let rec count_in_direction' counter =
-        match counter with
-        | c when c > g.win_length -> g.win_length
-        | c ->
-            let point = shift_point_according_to_direction p d c in
-            match index_of_point g point with
-            | None       -> c
-            | Some index ->
-                match g.board.(index) with
-                | Some p' when p' == pl -> count_in_direction' (c + 1)
-                | _ -> c
-    in
-    count_in_direction' 0
-
 let have_open_end_in_direction (g: game) (p: point) (d: direction) (cnt_in_dir: int) : int =
     let point = shift_point_according_to_direction p d cnt_in_dir in
     match index_of_point g point with

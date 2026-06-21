@@ -101,29 +101,6 @@ let pattern_string_of_pattern_kind = function
     | PAT11L  -> ".*"
     | PAT11R  -> "*."
 
-let score_of_pattern_kind = function
-    | PAT50   -> score_insta_win
-    | PAT50H  -> score_inevitable_win
-    | PAT42   -> score_inevitable_win
-    | PAT41L  -> score_4_1
-    | PAT41R  -> score_4_1
-    | PAT41H1 -> score_4_1
-    | PAT41H2 -> score_4_1
-    | PAT41H3 -> score_4_1
-    | PAT33L  -> score_3_2
-    | PAT33R  -> score_3_2
-    | PAT32   -> score_3_2
-    | PAT31L  -> score_3_1
-    | PAT31R  -> score_3_1
-    | PAT31H1 -> score_3_1
-    | PAT31H2 -> score_3_1
-    | PAT22   -> score_2_2
-    | PAT21L  -> score_2_1
-    | PAT21R  -> score_2_1
-    | PAT12   -> score_1_2
-    | PAT11L  -> score_1_1
-    | PAT11R  -> score_1_1
-
 let string_of_pattern_values (kind: pattern_kind) (dir: direction) : string =
     let dir  = string_of_direction dir     in
     let kind = string_of_pattern_kind kind in

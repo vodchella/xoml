@@ -1,33 +1,8 @@
 open Common
-open Patterns
-open Engine_easy
+open Engine_normal
 
 
-
-let forks : (pattern_kind * pattern_kind) list =
-    [ (PAT41H1, PAT33L)
-    ; (PAT41H1, PAT33R)
-    ; (PAT41H2, PAT33L)
-    ; (PAT41H2, PAT33R)
-    ; (PAT41H3, PAT33L)
-    ; (PAT41H3, PAT33R)
-    ]
-
-let has_forks (pt_kinds : pattern_kind list) : bool =
-    List.exists
-        (fun (p1, p2) -> List.mem p1 pt_kinds && List.mem p2 pt_kinds)
-        forks
-
-let score_board (g: game) (pl: player) : int =
-    let indicies = get_occupied_indices g pl in
-    let points   = indicies |> List.map (fun i -> point_of_index g i |> Option.get) in
-    let pt_kinds = points   |> List.map (fun p -> pattern_kinds_at_point g p pl) |> List.flatten in
-    let scores   = pt_kinds |> List.map (fun k -> score_of_pattern_kind k) in
-    let score    = scores   |> List.fold_left ( + ) 0 in
-    score +
-    if has_forks pt_kinds then score_inevitable_win else 0
-
-let score_board_fn = score_board
+let score_board_fn = score_board_normal
 
 (* TODO: optimize like score_board, so that visited cells are not checked again *)
 let find_winner (g: game) : player option =

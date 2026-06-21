@@ -1,6 +1,7 @@
 open Common
 open Engine
 open Engine_easy
+open Engine_normal
 open Xoml_test_support
 
 (* Score board *)
@@ -59,7 +60,7 @@ let test_score_board_with_41H_33_fork () =
     let g = Engine.apply_move g X "H5" in
     let g = Engine.apply_move g X "H4" in
     let g = Engine.apply_move g X "H3" in
-    let score = score_board g X in
+    let score = score_board_normal g X in
     Alcotest.(check int) "score must be 10002964" 10002964 score
 
 let test_score_board_with_type1_fork () =
