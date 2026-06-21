@@ -2,8 +2,8 @@ open Common
 
 
 let rec main_loop (g: game) =
-    Board.print_last_figure g;
-    (* Board.print_all_figures g; *)
+    (* Board.print_last_figure g; *)
+    Board.print_all_figures g;
     match Engine.find_winner g with
     | Some winner ->
         Board.print_congratulations g winner;
@@ -98,6 +98,7 @@ let rec main_gtp_loop (g: game) =
     )
     | CleanBoard -> (
         let g = init_board_with_side g g.board_width in
+        let g = Logger.reset g in
         print_endline "= CLEAN_BOARD\n";
         (main_gtp_loop[@tailcall]) g
     )

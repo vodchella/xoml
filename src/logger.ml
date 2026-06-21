@@ -19,6 +19,14 @@ let create (g: game) : game =
     let ch = open_out_gen [Open_wronly; Open_creat; Open_trunc] 0o666 "xoml.log" in
     { g with log_file = Some ch }
 
+let reset (g: game) : game =
+    match g.log_file with
+    | Some ch -> (
+        close_out ch;
+        create g
+    )
+    | None -> g
+
 let write (g: game) (s: string) : unit =
     match g.log_file with
     | Some ch ->
