@@ -140,8 +140,7 @@ let main () =
     else (
         let g = if playerO_starts then (
             let first_move = Engine.find_best_move g O in
-            let g = Engine.apply_move_by_index_opt g O first_move in
-            g
+            Engine.apply_move_by_index_opt g O first_move
         ) else g in
         Board.screen_clear ();
         Board.draw g;
