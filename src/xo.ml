@@ -141,11 +141,6 @@ let main () =
         let g = Engine.apply_move_by_index_opt g O first_move in
         Board.screen_clear ();
         Board.draw g;
-
-        (* Board.print_all_figures g; *)
-        (* Board.print_prompt g; *)
-        (* failwith "Stop"; *)
-
         (main_loop[@tailcall]) g
     )
 

@@ -218,7 +218,7 @@ let find_best_move (g: game) (pl: player) : int option =
                 in
                 loop moves;
             else
-                failwith "unreachable"
+                failwith "unreachable: minimax"
     in
 
     let moves = get_possible_moves g in

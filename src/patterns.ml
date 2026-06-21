@@ -155,16 +155,27 @@ let patterns = Array.concat
     (List.map
          (fun kind -> Array.map (fun dir -> pattern_generate kind dir) pattern_dirs)
          pattern_kinds)
-let patterns_list = patterns |> Array.to_list
+let patterns_all = patterns     |> Array.to_list
+let patterns_sw  = patterns_all |> List.filter (fun pattern -> pattern.dir = SW)
+let patterns_s   = patterns_all |> List.filter (fun pattern -> pattern.dir = S)
+let patterns_se  = patterns_all |> List.filter (fun pattern -> pattern.dir = SE)
+let patterns_e   = patterns_all |> List.filter (fun pattern -> pattern.dir = E)
+
+let patterns_of_dir = function
+    | SW -> patterns_sw
+    | S  -> patterns_s
+    | SE -> patterns_se
+    | E  -> patterns_e
+    | _  -> failwith "unreachable: patterns_of_dir"
 
 let pattern_find (kind: pattern_kind) (dir: direction) : pattern =
     let matches =
-        patterns_list
+        patterns_all
         |> List.filter (fun pattern -> pattern.kind = kind && pattern.dir = dir)
     in
     match matches with
     | [ pattern ] -> pattern
-    | [] -> failwith ("Pattern " ^ (string_of_pattern_values kind dir) ^ " not found")
+    | [] -> failwith ("Pattern  " ^ (string_of_pattern_values kind dir) ^ " not found")
     | _  -> failwith ("Multiple " ^ (string_of_pattern_values kind dir) ^ " patterns found")
 
 let is_pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point list * bool * int =
@@ -195,4 +206,21 @@ let is_pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : po
     if point_is_valid g pnt then (
         loop 0 []
     ) else [], false, -1
+
+let pattern_kind_at_point_and_dir (g: game) (pnt: point) (pl: player) (dir: direction) : pattern_kind option =
+    let rec loop ptrns =
+        match ptrns with
+        | [] -> None
+        | ptrn :: tail -> (
+            match is_pattern_at_point g pnt pl ptrn with
+            | _, true, _ -> Some ptrn.kind
+            | _          -> loop tail
+        )
+    in
+    loop (patterns_of_dir dir)
+
+let pattern_kinds_at_point (g: game) (pnt: point) (pl: player) : pattern_kind list =
+    List.filter_map
+        (fun dir -> pattern_kind_at_point_and_dir g pnt pl dir)
+        working_dirs
 
