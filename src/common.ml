@@ -37,7 +37,7 @@ type run_args =
 let working_dirs         = [ SW; S; SE; E ]
 
 let score_inevitable_win = 10_000_000
-let score_insta_win      = score_inevitable_win * 4
+let score_insta_win      = score_inevitable_win * 100
 let score_fork           = score_inevitable_win / 2
 let score_4_2            = score_inevitable_win
 let score_4_1            = 900
