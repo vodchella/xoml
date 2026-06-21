@@ -82,8 +82,6 @@ let ( >>! ) opt fn =
     | Some v -> Some v
     | None   -> fn ()
 
-let some_if cond value = if cond then value else None
-
 let opposite_direction_of = function
     | N  ->  S
     | E  ->  W

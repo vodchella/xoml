@@ -138,8 +138,11 @@ let main () =
     if gtp_mode then
         (main_gtp_loop[@tailcall]) g
     else (
-        let first_move = some_if playerO_starts (Engine.find_best_move g O) in
-        let g = Engine.apply_move_by_index_opt g O first_move in
+        let g = if playerO_starts then (
+            let first_move = Engine.find_best_move g O in
+            let g = Engine.apply_move_by_index_opt g O first_move in
+            g
+        ) else g in
         Board.screen_clear ();
         Board.draw g;
         (main_loop[@tailcall]) g
