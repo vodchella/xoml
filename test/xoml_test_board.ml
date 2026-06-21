@@ -50,6 +50,18 @@ let test_score_board () =
     let score = score_board_easy g X in
     Alcotest.(check int) "score must be 1018" 1018 score
 
+let test_score_board_with_41H_33_fork () =
+    let g = init_test_board () in
+    let g = Engine.apply_move g X "B5" in
+    let g = Engine.apply_move g X "B4" in
+    let g = Engine.apply_move g X "B3" in
+    let g = Engine.apply_move g X "H7" in
+    let g = Engine.apply_move g X "H5" in
+    let g = Engine.apply_move g X "H4" in
+    let g = Engine.apply_move g X "H3" in
+    let score = score_board g X in
+    Alcotest.(check int) "score must be 10002964" 10002964 score
+
 let test_score_board_with_type1_fork () =
     let g = init_test_board () in
     let g = apply_move g X "D2" in
@@ -145,15 +157,15 @@ let recognize_4_in_row_threat_3 () =
 
 let recognize_4_in_row_threat_with_fork () =
     let g = init_test_board () in
-    let g = Engine.apply_move g X "E6" in
-    let g = Engine.apply_move g O "F5" in
-    let g = Engine.apply_move g X "D5" in
-    let g = Engine.apply_move g O "F7" in
-    let g = Engine.apply_move g X "F4" in
-    let g = Engine.apply_move g O "E7" in
-    let g = Engine.apply_move g X "D6" in
-    let g = Engine.apply_move g O "G7" in
-    let g = Engine.apply_move g X "D7" in
+    let g = apply_move g X "E6" in
+    let g = apply_move g O "F5" in
+    let g = apply_move g X "D5" in
+    let g = apply_move g O "F7" in
+    let g = apply_move g X "F4" in
+    let g = apply_move g O "E7" in
+    let g = apply_move g X "D6" in
+    let g = apply_move g O "G7" in
+    let g = apply_move g X "D7" in
     check_best_move g O "D4"
 
 let recognize_next_move_loss () =
@@ -211,6 +223,7 @@ let suite : string * unit Alcotest.test_case list =
         Alcotest.test_case "Check winner"                        `Quick test_check_winner;
         Alcotest.test_case "Check insta win"                     `Quick test_check_insta_win;
         Alcotest.test_case "Score simple board"                  `Quick test_score_board;
+        Alcotest.test_case "Score board with 41H+33 fork"        `Quick test_score_board_with_41H_33_fork;
         Alcotest.test_case "Score board with type1 fork"         `Quick test_score_board_with_type1_fork;
         Alcotest.test_case "Recognize type2 fork threat"         `Quick recognize_type2_fork_threat;
         Alcotest.test_case "Recognize 4-in-row threat (1)"       `Quick recognize_4_in_row_threat_1;

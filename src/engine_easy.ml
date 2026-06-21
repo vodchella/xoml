@@ -3,7 +3,7 @@ open Common
 
 let score_of = function
     | (c, _) when c >= 5 -> score_insta_win
-    | (4, 2) -> score_win * 2
+    | (4, 2) -> score_inevitable_win * 2
     | (4, 1) -> score_4_1
     | (3, 2) -> score_3_2
     | (3, 1) -> score_3_1

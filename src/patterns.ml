@@ -10,6 +10,8 @@ type pattern_kind =
     | PAT41H1
     | PAT41H2
     | PAT41H3
+    | PAT33L
+    | PAT33R
     | PAT32
     | PAT31L
     | PAT31R
@@ -37,6 +39,8 @@ let pattern_kinds =
     ; PAT41H1
     ; PAT41H2
     ; PAT41H3
+    ; PAT33L
+    ; PAT33R
     ; PAT32
     ; PAT31L
     ; PAT31R
@@ -60,6 +64,8 @@ let string_of_pattern_kind = function
     | PAT41H1 -> "PAT41H1"
     | PAT41H2 -> "PAT41H2"
     | PAT41H3 -> "PAT41H3"
+    | PAT33L  -> "PAT33L"
+    | PAT33R  -> "PAT33R"
     | PAT32   -> "PAT32"
     | PAT31L  -> "PAT31L"
     | PAT31R  -> "PAT31R"
@@ -81,6 +87,8 @@ let pattern_string_of_pattern_kind = function
     | PAT41H1 -> "*.***"
     | PAT41H2 -> "**.**"
     | PAT41H3 -> "***.*"
+    | PAT33L  -> "..***."
+    | PAT33R  -> ".***.."
     | PAT32   -> ".***."
     | PAT31L  -> ".***"
     | PAT31R  -> "***."
@@ -95,13 +103,15 @@ let pattern_string_of_pattern_kind = function
 
 let score_of_pattern_kind = function
     | PAT50   -> score_insta_win
-    | PAT50H  -> score_win * 2
-    | PAT42   -> score_win * 2
+    | PAT50H  -> score_inevitable_win
+    | PAT42   -> score_inevitable_win
     | PAT41L  -> score_4_1
     | PAT41R  -> score_4_1
     | PAT41H1 -> score_4_1
     | PAT41H2 -> score_4_1
     | PAT41H3 -> score_4_1
+    | PAT33L  -> score_3_2
+    | PAT33R  -> score_3_2
     | PAT32   -> score_3_2
     | PAT31L  -> score_3_1
     | PAT31R  -> score_3_1
