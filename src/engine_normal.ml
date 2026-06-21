@@ -32,6 +32,14 @@ let forks : (pattern_kind * pattern_kind) list =
     ; (PAT41H2, PAT33R)
     ; (PAT41H3, PAT33L)
     ; (PAT41H3, PAT33R)
+    ; (PAT33L,  PAT33R)
+    ; (PAT41L,  PAT41R)
+    ; (PAT41H1, PAT41H2)
+    ; (PAT41H1, PAT41H3)
+    ; (PAT41H2, PAT41H1)
+    ; (PAT41H2, PAT41H3)
+    ; (PAT41H3, PAT41H1)
+    ; (PAT41H3, PAT41H2)
     ]
 
 let has_forks (pt_kinds : pattern_kind list) : bool =
