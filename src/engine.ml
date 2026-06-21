@@ -159,10 +159,16 @@ let find_best_move (g: game) (pl: player) : int option =
                         let old_cell = g.board.(m) in
                         g.board.(m) <- Some cur_pl;
 
+                        (* TODO: do we really need this check? *)
                         let break = ref false in
                         if depth = (max_depth - 2) then (
                             let my_score = score_board_fn g cur_pl in
-                            if my_score >= score_inevitable_win then break := true
+                            if my_score >= score_inevitable_win then (
+                                break := true;
+                                (* let move_str = move_str_of_index g m in *)
+                                (* let pl_str   = string_of_player pl in *)
+                                (* Logger.write g ("!!! INEVITABLE WIN FOUND " ^ move_str ^ " " ^ pl_str); *)
+                            )
                         );
 
                         if !break then (
@@ -193,23 +199,6 @@ let find_best_move (g: game) (pl: player) : int option =
                         let old_cell = g.board.(m) in
                         g.board.(m) <- Some cur_pl;
 
-                        (* let break = ref false in *)
-                        (* if depth = (max_depth - 1) then ( *)
-                        (*     let opp_score = score_board_fn g cur_pl in *)
-                        (*     if opp_score >= score_inevitable_win then ( *)
-                        (*         let move_str = move_str_of_index g m in *)
-                        (*         let pl_str   = string_of_player cur_pl in *)
-                        (*         Logger.write g ("!!! INSTA DEFEAT FOUND " ^ move_str ^ " " ^ pl_str); *)
-                        (*         break := true *)
-                        (*     ) *)
-                        (* ); *)
-
-                        (* if !break then ( *)
-                        (*     g.board.(m) <- old_cell; *)
-                        (*     break_on_index := Some m; *)
-                        (*     0  (* Score doesn't matter in this case *) *)
-                        (* ) *)
-                        (* else ( *)
                         let score = minimax g (depth - 1) alpha !b (opponent_of cur_pl) in
                         g.board.(m) <- old_cell;
 
@@ -219,7 +208,6 @@ let find_best_move (g: game) (pl: player) : int option =
                         if score >= score_inevitable_win then score
                         else if alpha >= !b then !best  (* alpha-cutoff *)
                         else loop rest
-                        (* ) *)
                 in
                 loop moves;
             else
@@ -235,13 +223,14 @@ let find_best_move (g: game) (pl: player) : int option =
         let alpha        = ref min_int in
         let win_found    = ref false   in
 
+        (* Check for insta win *)
         moves
         |> List.iter (fun m ->
             if not !win_found then (
                 let old_cell = g.board.(m) in
                 g.board.(m) <- Some pl;
                 let my_score = score_board_fn g pl in
-                if my_score >= score_inevitable_win then (
+                if my_score >= score_insta_win then (
                     break_on_index := Some m;
                     win_found := true;
                     (* let move_str = move_str_of_index g m in *)
@@ -250,6 +239,26 @@ let find_best_move (g: game) (pl: player) : int option =
                 );
                 g.board.(m) <- old_cell;
             )
+        );
+
+        (* Check for inevitable win *)
+        if not !win_found then (
+            moves
+            |> List.iter (fun m ->
+                if not !win_found then (
+                    let old_cell = g.board.(m) in
+                    g.board.(m) <- Some pl;
+                    let my_score = score_board_fn g pl in
+                    if my_score >= score_inevitable_win then (
+                        break_on_index := Some m;
+                        win_found := true;
+                        (* let move_str = move_str_of_index g m in *)
+                        (* let pl_str   = string_of_player pl in *)
+                        (* Logger.write g ("!!! INEVITABLE WIN FOUND " ^ move_str ^ " " ^ pl_str); *)
+                    );
+                    g.board.(m) <- old_cell;
+                )
+            );
         );
 
         moves
