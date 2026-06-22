@@ -160,7 +160,15 @@ let find_best_move (g: game) (pl: player) : int option =
                         g.board.(m) <- Some cur_pl;
 
                         let score = minimax g (depth - 1) !a beta (opponent_of cur_pl) in
+                        (* let coef = if score >= score_inevitable_win then (pow 10 depth) else 1 in *)
+                        (* let coef = pow 10 depth in *)
+                        (* let score = score * coef in *)
                         g.board.(m) <- old_cell;
+
+                        (* let move_str = move_str_of_index g m in *)
+                        (* if move_str = "H6" then ( *)
+                        (*     Logger.write g ("!!! " ^ move_str ^ " on depth " ^ (string_of_int depth) ^ "; score = " ^ (string_of_int score)); *)
+                        (* ); *)
 
                         if score > !best then best := score;
                         if score > !a    then a    := score;
@@ -181,12 +189,20 @@ let find_best_move (g: game) (pl: player) : int option =
                         g.board.(m) <- Some cur_pl;
 
                         let score = minimax g (depth - 1) alpha !b (opponent_of cur_pl) in
+                        (* let coef = if score >= score_inevitable_win then (pow 10 depth) else 1 in *)
+                        (* let coef = pow 10 depth in *)
+                        (* let score = score * coef in *)
                         g.board.(m) <- old_cell;
+
+                        let move_str = move_str_of_index g m in
+                        (* if move_str = "H6" then ( *)
+                            Logger.write g ("!!! " ^ move_str ^ " on depth " ^ (string_of_int depth) ^ "; score = " ^ (string_of_int score));
+                        (* ); *)
 
                         if score < !best then best := score;
                         if score < !b    then b    := score;
 
-                        if score >= score_inevitable_win then score
+                        if score >= score_insta_win then score
                         else if alpha >= !b then !best  (* alpha-cutoff *)
                         else loop rest
                 in
@@ -231,8 +247,16 @@ let find_best_move (g: game) (pl: player) : int option =
                 let old_cell = g.board.(m) in
                 g.board.(m) <- Some pl;
 
+                let move_str = move_str_of_index g m in
+                (* Logger.write g ("!!! " ^ move_str ^ " on top"); *)
+
+                Logger.write g ("!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                 let score = minimax g (max_depth - 1) !alpha max_int (opponent_of pl) in
                 g.board.(m) <- old_cell;
+
+                if move_str = "H6" || move_str = "F4" || move_str = "J8" then (
+                    Logger.write g ("!!!!!!!!! score of " ^ move_str ^ " on top: " ^ (string_of_int score));
+                );
 
                 if score > !best_score then begin
                     best_score := score;
@@ -243,5 +267,6 @@ let find_best_move (g: game) (pl: player) : int option =
             )
         );
 
+        Logger.write g ("!!! BEST_SCORE " ^ string_of_int !best_score);
         !best_move
 

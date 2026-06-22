@@ -135,6 +135,16 @@ let main () =
     Printexc.record_backtrace true;
     Random.self_init ();
 
+let g = Engine.apply_move g X "E5" in
+let g = Engine.apply_move g O "F4" in
+let g = Engine.apply_move g X "C6" in
+let g = Engine.apply_move g O "G5" in
+let g = Engine.apply_move g X "B4" in
+let g = Engine.apply_move g O "I7" in
+let g = Engine.apply_move g X "C3" in
+
+(* let g = Engine.apply_move g O "E3" in *)
+
     if gtp_mode then
         (main_gtp_loop[@tailcall]) g
     else (

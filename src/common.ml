@@ -36,17 +36,17 @@ type run_args =
 
 let working_dirs         = [ SW; S; SE; E ]
 
-let score_inevitable_win = 10_000_000
-let score_insta_win      = score_inevitable_win * 100
+let score_inevitable_win = 10_000
+let score_insta_win      = score_inevitable_win * 5
 let score_fork           = score_inevitable_win / 2
 let score_4_2            = score_inevitable_win
-let score_4_1            = 900
-let score_3_2            = 1000
-let score_3_1            = 100
-let score_2_2            = 50
-let score_2_1            = 10
-let score_1_2            = 2
-let score_1_1            = 1
+let score_4_1            = 90
+let score_3_2            = 100
+let score_3_1            = 10
+let score_2_2            = 5
+let score_2_1            = 1
+let score_1_2            = 0
+let score_1_1            = 0
 
 let default_board_width  = 10
 let default_board_height = 10
@@ -76,6 +76,9 @@ let initial_game         =
     ; log_moves       = true
     }
 
+
+let rec pow base exp =
+    if exp = 0 then 1 else base * pow base (exp - 1)
 
 let ( >>! ) opt fn =
     match opt with
