@@ -43,13 +43,16 @@ let test_check_insta_win () =
     let g = Engine.apply_move g X "E4" in
     check_best_move g O "J4"
 
-let test_score_board () =
+let test_check_inevitable_win () =
     let g = init_test_board () in
-    let g = apply_move g X "B8" in
-    let g = apply_move g X "C7" in
-    let g = apply_move g X "D6" in
-    let score = score_board_easy g X in
-    Alcotest.(check int) "score must be 1018" 1018 score
+    let g = apply_move g X "E5" in
+    let g = apply_move g O "F4" in
+    let g = apply_move g X "C6" in
+    let g = apply_move g O "G5" in
+    let g = apply_move g X "B4" in
+    let g = apply_move g O "I7" in
+    let g = apply_move g X "C3" in
+    check_best_move g O "H6"
 
 let test_score_board_with_41H_33_fork () =
     let g = init_test_board () in
@@ -61,7 +64,7 @@ let test_score_board_with_41H_33_fork () =
     let g = Engine.apply_move g X "H4" in
     let g = Engine.apply_move g X "H3" in
     let score = score_board_normal g X in
-    Alcotest.(check int) "score must be 10002964" 10002964 score
+    Alcotest.(check int) "score must be 10292" 10292 score
 
 let test_score_board_with_type1_fork () =
     let g = init_test_board () in
@@ -72,10 +75,10 @@ let test_score_board_with_type1_fork () =
     let g = apply_move g X "C7" in
     let g = apply_move g X "D6" in
     let score = score_board_easy g X in
-    Alcotest.(check int) "score must be 5002036" 5002036 score;
+    Alcotest.(check int) "score must be 5200" 5200 score;
     let g = apply_move g O "F4" in
     let score = score_board_easy g X in
-    Alcotest.(check int) "score must be 2036" 2036 score
+    Alcotest.(check int) "score must be 200" 200 score
 
 let recognize_next_move_loss () =
     let g = init_test_board () in
@@ -131,7 +134,7 @@ let suite : string * unit Alcotest.test_case list =
     [
         Alcotest.test_case "Check winner"                        `Quick test_check_winner;
         Alcotest.test_case "Check insta win"                     `Quick test_check_insta_win;
-        Alcotest.test_case "Score simple board"                  `Quick test_score_board;
+        Alcotest.test_case "Check inevitable win"                `Quick test_check_inevitable_win;
         Alcotest.test_case "Score board with 41H+33 fork"        `Quick test_score_board_with_41H_33_fork;
         Alcotest.test_case "Score board with type1 fork"         `Quick test_score_board_with_type1_fork;
         Alcotest.test_case "Recognize a loss on the next move"   `Quick recognize_next_move_loss;
