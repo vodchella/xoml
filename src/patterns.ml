@@ -166,7 +166,13 @@ let pattern_find (kind: pattern_kind) (dir: direction) : pattern =
     | [] -> failwith ("Pattern  " ^ (string_of_pattern_values kind dir) ^ " not found")
     | _  -> failwith ("Multiple " ^ (string_of_pattern_values kind dir) ^ " patterns found")
 
-let is_pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : point list * bool * int =
+let is_pattern_at_point
+        (g:    game)
+        (pnt:  point)
+        (pl:   player)
+        (ptrn: pattern)
+    : point list * bool * int
+    =
     let rec loop i res_points =
         if i >= Array.length ptrn.rel_points then
             res_points, true, -1
@@ -195,20 +201,32 @@ let is_pattern_at_point (g: game) (pnt: point) (pl: player) (ptrn: pattern) : po
         loop 0 []
     ) else [], false, -1
 
-let pattern_kind_at_point_and_dir (g: game) (pnt: point) (pl: player) (dir: direction) : (pattern_kind * point list) option =
+let pattern_kind_at_point_and_dir
+        (g:   game)
+        (pnt: point)
+        (pl:  player)
+        (dir: direction)
+    : (pattern_kind * point list * direction) option
+    =
     let rec loop ptrns =
         match ptrns with
         | [] -> None
         | ptrn :: tail -> (
             match is_pattern_at_point g pnt pl ptrn with
-            | pnts, true, _ -> Some (ptrn.kind, pnts)
+            | pnts, true, _ -> Some (ptrn.kind, pnts, dir)
             | _             -> loop tail
         )
     in
     loop (patterns_of_dir dir)
 
-let pattern_kinds_at_point (g: game) (pnt: point) (pl: player) : (pattern_kind * point list) list =
+let pattern_kinds_at_point
+        (g:            game)
+        (allowed_dirs: direction list)
+        (pnt:          point)
+        (pl:           player)
+    : (pattern_kind * point list * direction) list
+    =
     List.filter_map
         (fun dir -> pattern_kind_at_point_and_dir g pnt pl dir)
-        working_dirs
+        allowed_dirs
 

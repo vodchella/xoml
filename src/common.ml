@@ -77,8 +77,11 @@ let initial_game         =
     }
 
 
-let rec pow base exp =
-    if exp = 0 then 1 else base * pow base (exp - 1)
+let fst3 (x, _, _) = x
+
+let pairs_of_triples (triples: ('a * 'b * 'c) list) : ('a * 'b) list =
+    triples
+    |> List.map (fun (a, b, _) -> (a, b))
 
 let ( >>! ) opt fn =
     match opt with

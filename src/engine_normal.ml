@@ -56,8 +56,8 @@ let has_forks (pt_kinds : (pattern_kind * point list) list) : bool =
 let score_board_normal (g: game) (pl: player) : int =
     let indicies = get_occupied_indices g pl in
     let points   = indicies |> List.map (fun i -> point_of_index g i |> Option.get) in
-    let kinds    = points   |> List.map (fun p -> pattern_kinds_at_point g p pl) |> List.flatten in
-    let scores   = kinds    |> List.map (fun k -> score_of_pattern_kind (fst k)) in
+    let kinds    = points   |> List.map (fun p -> pattern_kinds_at_point g working_dirs p pl) |> List.flatten in
+    let scores   = kinds    |> List.map (fun k -> score_of_pattern_kind (fst3 k)) in
     let score    = scores   |> List.fold_left ( + ) 0 in
     score +
-    if has_forks kinds then score_inevitable_win else 0
+    if has_forks (pairs_of_triples kinds) then score_inevitable_win else 0
