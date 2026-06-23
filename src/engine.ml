@@ -235,9 +235,11 @@ let find_best_move (g: game) (pl: player) : int option =
                 let new_moves = moves |> List.filter (fun i -> i != m) in
                 let old_cell  = g.board.(m) in
                 g.board.(m) <- Some pl;
-                match check_for_score g new_moves (opponent_of pl) score_insta_win with
-                | false, _ -> break_on_index := Some m;
-                | _ -> ();
+                (
+                    match check_for_score g new_moves (opponent_of pl) score_insta_win with
+                    | false, _ -> break_on_index := Some m
+                    | _ -> ()
+                );
                 g.board.(m) <- old_cell;
             )
             | _ -> ()

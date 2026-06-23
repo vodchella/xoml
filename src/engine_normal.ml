@@ -90,13 +90,13 @@ let score_board_normal (g: game) (pl: player) : int =
             match !dir_arr.(i) with
             | None -> loop rest result kinds_accum
             | Some dirs ->
-                let pnt                = point_of_index g i |> Option.get in
-                let kinds              = pattern_kinds_at_point g dirs pnt pl in
-                let scores             = kinds  |> List.map (fun k -> score_of_pattern_kind (fst k)) in
-                let score              = scores |> List.fold_left ( + ) 0 in
-                let proc_indicies      = kinds  |> List.map (fun k -> snd k) in
-                let proc_indicies_flat = proc_indicies |> List.concat_map (fun (ints, dir) -> List.map (fun i -> (i, dir)) ints) in
-                actualize_dir_array proc_indicies_flat;
+                let pnt               = point_of_index g i |> Option.get in
+                let kinds             = pattern_kinds_at_point g dirs pnt pl in
+                let scores            = kinds  |> List.map (fun k -> score_of_pattern_kind (fst k)) in
+                let score             = scores |> List.fold_left ( + ) 0 in
+                let visited_idxs      = kinds  |> List.map (fun k -> snd k) in
+                let visited_idxs_flat = visited_idxs |> List.concat_map (fun (ints, dir) -> List.map (fun i -> (i, dir)) ints) in
+                actualize_dir_array visited_idxs_flat;
                 loop rest (result + score) (kinds_accum @ kinds)
     in
     let score, kinds      = loop indicies 0 [] in
