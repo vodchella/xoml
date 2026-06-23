@@ -76,21 +76,6 @@ let initial_game         =
     }
 
 
-let ( >>! ) opt fn =
-    match opt with
-    | Some v -> Some v
-    | None   -> fn ()
-
-let opposite_direction_of = function
-    | N  ->  S
-    | E  ->  W
-    | S  ->  N
-    | W  ->  E
-    | NE ->  SW
-    | SE ->  NW
-    | SW ->  NE
-    | NW ->  SE
-
 let opponent_of = function
     | X -> O
     | O -> X
@@ -136,12 +121,6 @@ let point_of_move_str (g: game) (s: string) : point =
     let y  = g.board_height - y' in
     { x; y }
 
-let index_of_move_str (g: game) (s: string) : int =
-    s
-    |> point_of_move_str g
-    |> index_of_point g
-    |> Option.get
-
 let move_str_of_point (g : game) (p: point) : string =
     let x_to_letter x = Char.chr (Char.code 'A' + x - 1) in
     let y_to_digit  y = Char.chr (Char.code '0' + (g.board_height - y)) in
@@ -154,23 +133,6 @@ let move_str_of_index (g: game) (index: int) : string =
     |> point_of_index g
     |> Option.get
     |> move_str_of_point g
-
-let get_direction_between_points (p1 : point) (p2 : point) : direction option =
-    let { x = x1; y = y1 } = p1 in
-    let { x = x2; y = y2 } = p2 in
-    let cx = compare x2 x1 in
-    let cy = compare y2 y1 in
-    match cx, cy with
-    |  0,  0  -> None
-    | -1,  0  -> Some W
-    |  1,  0  -> Some E
-    |  0, -1  -> Some N
-    |  0,  1  -> Some S
-    | -1, -1  -> Some NW
-    | -1,  1  -> Some SW
-    |  1, -1  -> Some NE
-    |  1,  1  -> Some SE
-    | _       -> None
 
 let string_of_direction = function
     | N  -> "N"
@@ -200,15 +162,6 @@ let init_board_with_side (g: game) (board_side : int) : game =
     ; input_vmargin = board_side + 5
     ; board = Array.make (board_side * board_side) None
     }
-
-(* NOTE: just for debugging *)
-let string_of_int_direction_list (lst : (int * direction) list) : string =
-    let items =
-        List.map (fun (i, dir) ->
-            Printf.sprintf "(%d, %s)" i (string_of_direction dir)
-        ) lst
-    in
-    "[" ^ String.concat "; " items ^ "]"
 
 let get_board_center_borders = function
     (* returns: (offset, side) *)
@@ -240,30 +193,6 @@ let filter_board_indices (g : game) (fn : int * player option -> bool) : int lis
 let get_occupied_indices (g: game) (pl: player) : int list =
     let pl_opt = Some pl in
     filter_board_indices g (fun (_, v) -> v = pl_opt)
-
-let shift_point_according_to_direction (p: point) (d: direction) (times: int) : point =
-    match times with
-    | 0 -> p
-    | _ ->
-        let rel = relative_point_of_direction d in
-        { x = p.x + (rel.x * times)
-        ; y = p.y + (rel.y * times)
-        }
-
-let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
-    let rec count_in_direction' counter =
-        match counter with
-        | c when c > g.win_length -> g.win_length
-        | c ->
-            let point = shift_point_according_to_direction p d c in
-            match index_of_point g point with
-            | None       -> c
-            | Some index ->
-                match g.board.(index) with
-                | Some p' when p' == pl -> count_in_direction' (c + 1)
-                | _ -> c
-    in
-    count_in_direction' 0
 
 let indices_intersection_size indices1 indices2 =
     List.fold_left

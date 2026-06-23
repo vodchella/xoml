@@ -1,7 +1,6 @@
 open Common
 open Engine
-open Engine_easy
-open Engine_normal
+open Scoring
 open Xoml_test_support
 
 (* Score board *)
@@ -56,29 +55,15 @@ let test_check_inevitable_win () =
 
 let test_score_board_with_41H_33_fork () =
     let g = init_test_board () in
-    let g = Engine.apply_move g X "B5" in
-    let g = Engine.apply_move g X "B4" in
-    let g = Engine.apply_move g X "B3" in
-    let g = Engine.apply_move g X "H7" in
-    let g = Engine.apply_move g X "H5" in
-    let g = Engine.apply_move g X "H4" in
-    let g = Engine.apply_move g X "H3" in
-    let score = score_board_normal g X in
+    let g = apply_move g X "B5" in
+    let g = apply_move g X "B4" in
+    let g = apply_move g X "B3" in
+    let g = apply_move g X "H7" in
+    let g = apply_move g X "H5" in
+    let g = apply_move g X "H4" in
+    let g = apply_move g X "H3" in
+    let score = score_board g X in
     Alcotest.(check int) "score must be 10292" 10292 score
-
-let test_score_board_with_type1_fork () =
-    let g = init_test_board () in
-    let g = apply_move g X "D2" in
-    let g = apply_move g X "E2" in
-    let g = apply_move g X "F2" in
-    let g = apply_move g X "B8" in
-    let g = apply_move g X "C7" in
-    let g = apply_move g X "D6" in
-    let score = score_board_easy g X in
-    Alcotest.(check int) "score must be 5200" 5200 score;
-    let g = apply_move g O "F4" in
-    let score = score_board_easy g X in
-    Alcotest.(check int) "score must be 200" 200 score
 
 let recognize_next_move_loss () =
     let g = init_test_board () in
@@ -136,7 +121,6 @@ let suite : string * unit Alcotest.test_case list =
         Alcotest.test_case "Check insta win"                     `Quick test_check_insta_win;
         Alcotest.test_case "Check inevitable win"                `Quick test_check_inevitable_win;
         Alcotest.test_case "Score board with 41H+33 fork"        `Quick test_score_board_with_41H_33_fork;
-        Alcotest.test_case "Score board with type1 fork"         `Quick test_score_board_with_type1_fork;
         Alcotest.test_case "Recognize a loss on the next move"   `Quick recognize_next_move_loss;
         Alcotest.test_case "Check for a useless move"            `Quick check_for_not_useless_move;
     ]

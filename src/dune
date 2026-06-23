@@ -2,7 +2,7 @@
  (name xoml)
  (public_name xoml)
  (wrapped false)
- (modules common patterns logger args benchmark input board engine_easy engine_normal engine)
+ (modules common patterns logger args benchmark input board scoring engine)
  (libraries unix))
 
 (executable

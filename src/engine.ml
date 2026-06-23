@@ -1,15 +1,13 @@
 open Common
-open Engine_normal
+open Scoring
 
-
-let score_board_fn = score_board_normal
 
 let find_winner (g: game) : player option =
-    let x_score = score_board_fn g X in
+    let x_score = score_board g X in
     if x_score >= score_insta_win then
         Some X
     else
-        let o_score = score_board_fn g O in
+        let o_score = score_board g O in
         if o_score >= score_insta_win then
             Some O
         else
@@ -115,8 +113,8 @@ let get_possible_moves (g: game) : int list =
         !result
 
 let eval_position (g : game) (pl : player) : int =
-    let my_score  = score_board_fn g pl in
-    let opp_score = score_board_fn g (opponent_of pl) in
+    let my_score  = score_board g pl in
+    let opp_score = score_board g (opponent_of pl) in
     let score     = my_score - opp_score in
     score
 
@@ -128,7 +126,7 @@ let check_for_score (g: game) (moves: int list) (pl: player) (score: int) : int 
         if not !found then (
             let old_cell = g.board.(m) in
             g.board.(m) <- Some pl;
-            let my_score = score_board_fn g pl in
+            let my_score = score_board g pl in
             if my_score >= score then (
                 found := true;
                 index := m;

@@ -69,7 +69,7 @@ let remove_dir_opt (d: direction) (lst: direction list) : direction list option 
     in
     aux [] lst
 
-let score_board_normal (g: game) (pl: player) : int =
+let score_board (g: game) (pl: player) : int =
     let indicies = get_occupied_indices g pl        in
     let dir_arr  = ref (init_dirs_array g indicies) in
     let actualize_dir_array (indicies_and_dirs_to_remove: (int * direction) list) =
