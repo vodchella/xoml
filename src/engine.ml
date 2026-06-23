@@ -138,7 +138,7 @@ let eval_position (g : game) (pl : player) : int =
     let score     = my_score - opp_score in
     score
 
-let check_for_score (g: game) (moves: int list) (pl: player) (score: int) : bool * int =
+let check_for_score (g: game) (moves: int list) (pl: player) (score: int) : int option =
     let found = ref false in
     let index = ref (-1)  in
     moves
@@ -154,7 +154,24 @@ let check_for_score (g: game) (moves: int list) (pl: player) (score: int) : bool
             g.board.(m) <- old_cell;
         )
     );
-    !found, !index
+    if !found then Some !index
+    else None
+
+let check_for_win_with_score (g: game) (moves: int list) (pl: player) (score: int) : int option =
+    match check_for_score g moves pl score with
+    | Some m -> (
+        let new_moves = moves |> List.filter (fun i -> i != m) in
+        let old_cell  = g.board.(m) in
+
+        g.board.(m) <- Some pl;
+        let move_opt = check_for_score g new_moves (opponent_of pl) score_insta_win in
+        g.board.(m) <- old_cell;
+
+        match move_opt with
+        | None -> Some m
+        | _    -> None
+    )
+    | _ -> None
 
 let find_best_move (g: game) (pl: player) : int option =
     let max_depth      = 4 in
@@ -222,27 +239,16 @@ let find_best_move (g: game) (pl: player) : int option =
         let alpha        = ref min_int in
 
         (* Check for insta win *)
-        (
-            match check_for_score g moves pl score_insta_win  with
-            | true, m -> (break_on_index := Some m)
-            | _       -> ()
+        break_on_index := check_for_score g moves pl score_insta_win;
+
+        (* Check for fast inevitable win *)
+        if Option.is_none !break_on_index then (
+            break_on_index := check_for_win_with_score g moves pl score_fast_inev_win;
         );
 
         (* Check for inevitable win *)
         if Option.is_none !break_on_index then (
-            match check_for_score g moves pl score_inevitable_win  with
-            | true, m -> (
-                let new_moves = moves |> List.filter (fun i -> i != m) in
-                let old_cell  = g.board.(m) in
-                g.board.(m) <- Some pl;
-                (
-                    match check_for_score g new_moves (opponent_of pl) score_insta_win with
-                    | false, _ -> break_on_index := Some m
-                    | _ -> ()
-                );
-                g.board.(m) <- old_cell;
-            )
-            | _ -> ()
+            break_on_index := check_for_win_with_score g moves pl score_inevitable_win;
         );
 
         moves

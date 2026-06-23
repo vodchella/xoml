@@ -4,8 +4,8 @@ open Patterns
 
 let score_of_pattern_kind = function
     | PAT50   -> score_insta_win
+    | PAT42   -> score_4_2
     | PAT50H  -> score_inevitable_win
-    | PAT42   -> score_inevitable_win
     | PAT33L  -> score_3_2
     | PAT33R  -> score_3_2
     | PAT32   -> score_3_2

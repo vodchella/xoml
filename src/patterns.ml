@@ -30,8 +30,8 @@ type pattern =
 (* INFO: it MUST be ordered by scores like in score_of_pattern_kind *)
 let pattern_kinds =
     [ PAT50
-    ; PAT50H
     ; PAT42
+    ; PAT50H
     ; PAT33L
     ; PAT33R
     ; PAT32
