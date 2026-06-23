@@ -9,8 +9,6 @@ let score_of = function
     | (3, 1) -> score_3_1
     | (2, 2) -> score_2_2
     | (2, 1) -> score_2_1
-    | (1, 2) -> score_1_2
-    | (1, 1) -> score_1_1
     | _      -> 0
 
 let get_line_points (p1: point) (p2: point) : point list =

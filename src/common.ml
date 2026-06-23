@@ -45,8 +45,6 @@ let score_3_2            = 100
 let score_3_1            = 10
 let score_2_2            = 5
 let score_2_1            = 1
-let score_1_2            = 0
-let score_1_1            = 0
 
 let default_board_width  = 10
 let default_board_height = 10
@@ -76,12 +74,6 @@ let initial_game         =
     ; log_moves       = true
     }
 
-
-let fst3 (x, _, _) = x
-
-let pairs_of_triples (triples: ('a * 'b * 'c) list) : ('a * 'b) list =
-    triples
-    |> List.map (fun (a, b, _) -> (a, b))
 
 let ( >>! ) opt fn =
     match opt with
@@ -272,8 +264,8 @@ let count_in_direction (g: game) (pl: player) (p: point) (d: direction) : int =
     in
     count_in_direction' 0
 
-let points_intersection_size points1 points2 =
+let indices_intersection_size indices1 indices2 =
     List.fold_left
-        (fun acc p -> if List.mem p points2 then acc + 1 else acc)
-        0 points1
+        (fun acc i -> if List.mem i indices2 then acc + 1 else acc)
+        0 indices1
 

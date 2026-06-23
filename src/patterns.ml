@@ -20,9 +20,6 @@ type pattern_kind =
     | PAT22
     | PAT21L
     | PAT21R
-    | PAT12
-    | PAT11L
-    | PAT11R
 type pattern_point = point * bool
 type pattern =
     { rel_points : pattern_point array
@@ -50,9 +47,6 @@ let pattern_kinds =
     ; PAT22
     ; PAT21L
     ; PAT21R
-    ; PAT12
-    ; PAT11L
-    ; PAT11R
     ]
 let pattern_dirs = working_dirs |> Array.of_list
 
@@ -75,9 +69,6 @@ let string_of_pattern_kind = function
     | PAT22   -> "PAT22"
     | PAT21L  -> "PAT21L"
     | PAT21R  -> "PAT21R"
-    | PAT12   -> "PAT12"
-    | PAT11L  -> "PAT11L"
-    | PAT11R  -> "PAT11R"
 
 let pattern_string_of_pattern_kind = function
     | PAT50   -> "*****"
@@ -98,9 +89,6 @@ let pattern_string_of_pattern_kind = function
     | PAT22   -> ".**."
     | PAT21L  -> ".**"
     | PAT21R  -> "**."
-    | PAT12   -> ".*."
-    | PAT11L  -> ".*"
-    | PAT11R  -> "*."
 
 let string_of_pattern_values (kind: pattern_kind) (dir: direction) : string =
     let dir  = string_of_direction dir     in
@@ -171,11 +159,11 @@ let is_pattern_at_point
         (pnt:  point)
         (pl:   player)
         (ptrn: pattern)
-    : point list * bool * int
+    : int list * bool * int
     =
-    let rec loop i res_points =
+    let rec loop i res_indices =
         if i >= Array.length ptrn.rel_points then
-            res_points, true, -1
+            res_indices, true, -1
         else
             let elem     = ptrn.rel_points.(i) in
             let rel_pnt  = fst elem in
@@ -187,11 +175,11 @@ let is_pattern_at_point
                 match pl_opt with
                 | Some pl' -> (
                     if required && pl' == pl then (
-                        loop (i + 1) (point :: res_points)
+                        loop (i + 1) (index :: res_indices)
                     ) else [], false, i
                 )
                 | None -> (
-                    if not required then loop (i + 1) res_points
+                    if not required then loop (i + 1) res_indices
                     else [], false, i
                 )
             )
@@ -206,14 +194,14 @@ let pattern_kind_at_point_and_dir
         (pnt: point)
         (pl:  player)
         (dir: direction)
-    : (pattern_kind * point list * direction) option
+    : (pattern_kind * (int list * direction)) option
     =
     let rec loop ptrns =
         match ptrns with
         | [] -> None
         | ptrn :: tail -> (
             match is_pattern_at_point g pnt pl ptrn with
-            | pnts, true, _ -> Some (ptrn.kind, pnts, dir)
+            | pnts, true, _ -> Some (ptrn.kind, (pnts, dir))
             | _             -> loop tail
         )
     in
@@ -224,7 +212,7 @@ let pattern_kinds_at_point
         (allowed_dirs: direction list)
         (pnt:          point)
         (pl:           player)
-    : (pattern_kind * point list * direction) list
+    : (pattern_kind * (int list * direction)) list
     =
     List.filter_map
         (fun dir -> pattern_kind_at_point_and_dir g pnt pl dir)
