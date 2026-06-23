@@ -4,34 +4,16 @@ open Engine_normal
 
 let score_board_fn = score_board_normal
 
-(* TODO: optimize like score_board, so that visited cells are not checked again *)
 let find_winner (g: game) : player option =
-    let check_player_at_index index pl =
-        let pl' = g.board.(index) in
-        match pl' with
-        | Some pl'' when pl'' = pl ->
-            let point = point_of_index g index |> Option.get in
-            let rec check_player_at_index' dirs =
-                match dirs with
-                | []          -> None
-                | dir :: rest ->
-                    match count_in_direction g pl point dir with
-                    | c when c == g.win_length -> Some pl
-                    | _ -> check_player_at_index' rest
-            in
-            check_player_at_index' working_dirs
-        | _ -> None
-    in
-    (* TODO: need to be improved with get_active_bounds_rect usage *)
-    let rec find_winner' index =
-        match index with
-        | i when i > (g.board_size - 1) -> None
-        | _ ->
-            check_player_at_index index X
-            >>! (fun () -> check_player_at_index index O)
-            >>! (fun () -> find_winner'          (index + 1))
-    in
-    find_winner' 0
+    let x_score = score_board_fn g X in
+    if x_score >= score_insta_win then
+        Some X
+    else
+        let o_score = score_board_fn g O in
+        if o_score >= score_insta_win then
+            Some O
+        else
+            None
 
 (* TODO: factor out last_move_ok *)
 let apply_move_by_index (g: game) (pl: player) index : game =
