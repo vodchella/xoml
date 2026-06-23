@@ -35,7 +35,7 @@
           staticPkgs = pkgs.pkgsStatic;
           mkPkg = ocamlPkgs: ocamlPkgs.buildDunePackage {
             pname = "xoml";
-            version = "0.3.0";
+            version = "0.3.1";
             src = ./.;
           };
         in {

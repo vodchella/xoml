@@ -16,7 +16,7 @@ Supported commands:
 * **VERSION**
   - Returns the engine version.
   - Example request: `VERSION\n`
-  - Example response: `= 0.3.0\n\n`
+  - Example response: `= 0.3.1\n\n`
 
 * **PROTOCOL_VERSION**
   - Returns the protocol version.
