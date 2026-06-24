@@ -85,16 +85,16 @@ let score_board (g: game) (pl: player) : int =
     in
     let rec loop indexes result kinds_accum =
         match indexes with
-        | [] -> result, kinds_accum
+        | []        -> result, kinds_accum
         | i :: rest ->
             match !dir_arr.(i) with
             | None -> loop rest result kinds_accum
             | Some dirs ->
-                let pnt               = point_of_index g i |> Option.get in
-                let kinds             = pattern_kinds_at_point g dirs pnt pl in
-                let scores            = kinds  |> List.map (fun k -> score_of_pattern_kind (fst k)) in
-                let score             = scores |> List.fold_left ( + ) 0 in
-                let visited_idxs      = kinds  |> List.map (fun k -> snd k) in
+                let pnt               = point_of_index g i |> Option.get                                                       in
+                let kinds             = pattern_kinds_at_point g dirs pnt pl                                                   in
+                let scores            = kinds        |> List.map (fun k -> score_of_pattern_kind (fst k))                      in
+                let score             = scores       |> List.fold_left ( + ) 0                                                 in
+                let visited_idxs      = kinds        |> List.map (fun k -> snd k)                                              in
                 let visited_idxs_flat = visited_idxs |> List.concat_map (fun (ints, dir) -> List.map (fun i -> (i, dir)) ints) in
                 actualize_dir_array visited_idxs_flat;
                 loop rest (result + score) (kinds_accum @ kinds)
@@ -103,3 +103,4 @@ let score_board (g: game) (pl: player) : int =
     let kind_without_dirs = kinds |> List.map (fun (k, (ints, _)) -> (k, ints)) in
     score +
     if has_forks kind_without_dirs then score_inevitable_win else 0
+

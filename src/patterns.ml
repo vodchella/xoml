@@ -27,7 +27,7 @@ type pattern =
     ; dir        : direction
     }
 
-(* INFO: it MUST be ordered by scores like in score_of_pattern_kind *)
+(* INFO: it MUST be ordered by scores like in Scoring.score_of_pattern_kind *)
 let pattern_kinds =
     [ PAT50
     ; PAT42
