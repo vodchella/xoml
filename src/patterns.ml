@@ -48,7 +48,6 @@ let pattern_kinds =
     ; PAT21L
     ; PAT21R
     ]
-let pattern_dirs = working_dirs |> Array.of_list
 
 let string_of_pattern_kind = function
     | PAT50   -> "PAT50"
@@ -127,15 +126,14 @@ let pattern_generate (kind: pattern_kind) (dir: direction) : pattern =
     ; dir
     }
 
-let patterns = Array.concat
+let patterns = List.concat
     (List.map
-         (fun kind -> Array.map (fun dir -> pattern_generate kind dir) pattern_dirs)
+         (fun kind -> List.map (fun dir -> pattern_generate kind dir) working_dirs)
          pattern_kinds)
-let patterns_all = patterns     |> Array.to_list
-let patterns_sw  = patterns_all |> List.filter (fun pattern -> pattern.dir = SW)
-let patterns_s   = patterns_all |> List.filter (fun pattern -> pattern.dir = S)
-let patterns_se  = patterns_all |> List.filter (fun pattern -> pattern.dir = SE)
-let patterns_e   = patterns_all |> List.filter (fun pattern -> pattern.dir = E)
+let patterns_sw  = patterns |> List.filter (fun pattern -> pattern.dir = SW)
+let patterns_s   = patterns |> List.filter (fun pattern -> pattern.dir = S)
+let patterns_se  = patterns |> List.filter (fun pattern -> pattern.dir = SE)
+let patterns_e   = patterns |> List.filter (fun pattern -> pattern.dir = E)
 
 let patterns_of_dir = function
     | SW -> patterns_sw
@@ -146,7 +144,7 @@ let patterns_of_dir = function
 
 let pattern_find (kind: pattern_kind) (dir: direction) : pattern =
     let matches =
-        patterns_all
+        patterns
         |> List.filter (fun pattern -> pattern.kind = kind && pattern.dir = dir)
     in
     match matches with
