@@ -131,7 +131,7 @@ let check_for_win_with_score (g: game) (moves: int list) (pl: player) (score: in
     | _ -> None
 
 let find_best_move (g: game) (pl: player) : int option =
-    let max_depth      = 4 in
+    let max_depth      = 6 in
     let break_on_index = ref None in
 
     let rec minimax (g: game) (depth: int) (alpha: int) (beta: int) (cur_pl: player) : int =
