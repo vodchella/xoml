@@ -22,29 +22,39 @@ let score_of_pattern_kind = function
     | PAT21L  -> score_2_1
     | PAT21R  -> score_2_1
 
-let forks : (pattern_kind * pattern_kind) list =
-    [ (PAT41H1, PAT33L)
-    ; (PAT41H1, PAT33R)
-    ; (PAT41H2, PAT33L)
-    ; (PAT41H2, PAT33R)
-    ; (PAT41H3, PAT33L)
-    ; (PAT41H3, PAT33R)
-    ; (PAT33L,  PAT33R)
-    ; (PAT33L,  PAT33L)
-    ; (PAT33R,  PAT33R)
-    ; (PAT41L,  PAT41R)
-    ; (PAT41L,  PAT41L)
-    ; (PAT41R,  PAT41R)
-    ; (PAT41H1, PAT41H1)
-    ; (PAT41H1, PAT41H2)
-    ; (PAT41H1, PAT41H3)
-    ; (PAT41H2, PAT41H1)
-    ; (PAT41H2, PAT41H2)
-    ; (PAT41H2, PAT41H3)
-    ; (PAT41H3, PAT41H1)
-    ; (PAT41H3, PAT41H2)
-    ; (PAT41H3, PAT41H3)
+let simple_four_kinds =
+    [ PAT41L
+    ; PAT41R
+    ; PAT41H1
+    ; PAT41H2
+    ; PAT41H3
     ]
+
+let open_three_kinds =
+    [ PAT33L
+    ; PAT33R
+    ]
+
+(* simple_four + simple_four *)
+(* simple_four + open_three *)
+(* open_three  + open_three *)
+let forks : (pattern_kind * pattern_kind) list =
+    let cross xs ys =
+        xs |> List.concat_map (fun x -> ys |> List.map (fun y -> (x, y)))
+    in
+    let pairs_with_self xs =
+        let rec loop acc = function
+            | [] ->
+                List.rev acc
+            | x :: rest ->
+                let pairs = (x, x) :: (rest |> List.map (fun y -> (x, y))) in
+                loop (pairs @ acc) rest
+        in
+        loop [] xs
+    in
+    pairs_with_self simple_four_kinds
+    @ cross simple_four_kinds open_three_kinds
+    @ pairs_with_self open_three_kinds
 
 let has_forks (pt_kinds : (pattern_kind * int list) list) : bool =
     let entries = List.mapi (fun i (kind, indices) -> (i, kind, indices)) pt_kinds       in
