@@ -30,23 +30,39 @@ let forks : (pattern_kind * pattern_kind) list =
     ; (PAT41H3, PAT33L)
     ; (PAT41H3, PAT33R)
     ; (PAT33L,  PAT33R)
+    ; (PAT33L,  PAT33L)
+    ; (PAT33R,  PAT33R)
     ; (PAT41L,  PAT41R)
+    ; (PAT41L,  PAT41L)
+    ; (PAT41R,  PAT41R)
     ; (PAT41H1, PAT41H2)
     ; (PAT41H1, PAT41H3)
+    ; (PAT41H1, PAT41H1)
     ; (PAT41H2, PAT41H1)
     ; (PAT41H2, PAT41H3)
+    ; (PAT41H2, PAT41H2)
     ; (PAT41H3, PAT41H1)
     ; (PAT41H3, PAT41H2)
+    ; (PAT41H3, PAT41H3)
     ]
 
 let has_forks (pt_kinds : (pattern_kind * int list) list) : bool =
-    List.exists
-        (fun (p1, p2) ->
-            match List.assoc_opt p1 pt_kinds, List.assoc_opt p2 pt_kinds with
-            | Some ind1, Some ind2 -> indices_intersection_size ind1 ind2 <= 1
-            | _ -> false
-        )
-        forks
+    let entries = List.mapi (fun i (kind, indices) -> (i, kind, indices)) pt_kinds       in
+    let fork_matches (fk1, fk2) (_, kind1, _) (_, kind2, _) = kind1 = fk1 && kind2 = fk2 in
+    let different_entries (i1, _, _) (i2, _, _) = i1 <> i2                               in
+    let fork_indices_match (_, _, indices1) (_, _, indices2) =
+        indices_intersection_size indices1 indices2 <= 1
+    in
+    let fork_entries_match fork entry1 entry2 =
+        fork_matches fork entry1 entry2
+        && different_entries entry1 entry2
+        && fork_indices_match entry1 entry2
+    in
+    forks
+    |> List.exists
+        (fun fork ->
+            entries |>
+            List.exists (fun entry1 -> entries |> List.exists (fork_entries_match fork entry1)))
 
 let init_dirs_array (g: game) (indicies: int list) : direction list option array =
     let dir_arr = Array.make g.board_size None in
@@ -69,7 +85,7 @@ let remove_dir_opt (d: direction) (lst: direction list) : direction list option 
     in
     aux [] lst
 
-let score_board (g: game) (pl: player) : int =
+let score_board (g: game) (pl: player) : int * ((pattern_kind * int list) list) =
     let indicies = get_occupied_indices g pl        in
     let dir_arr  = ref (init_dirs_array g indicies) in
     let actualize_dir_array (indicies_and_dirs_to_remove: (int * direction) list) =
@@ -99,8 +115,7 @@ let score_board (g: game) (pl: player) : int =
                 actualize_dir_array visited_idxs_flat;
                 loop rest (result + score) (kinds_accum @ kinds)
     in
-    let score, kinds      = loop indicies 0 [] in
+    let score, kinds      = loop indicies 0 []                                  in
     let kind_without_dirs = kinds |> List.map (fun (k, (ints, _)) -> (k, ints)) in
-    score +
-    if has_forks kind_without_dirs then score_inevitable_win else 0
+    (score + if has_forks kind_without_dirs then score_inevitable_win else 0), kind_without_dirs
 

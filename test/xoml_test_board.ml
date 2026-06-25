@@ -62,7 +62,7 @@ let test_score_board_with_41H_33_fork () =
     let g = apply_move g X "H5" in
     let g = apply_move g X "H4" in
     let g = apply_move g X "H3" in
-    let score = score_board g X in
+    let score, _ = score_board g X in
     Alcotest.(check int) "score must be 10292" 10292 score
 
 let recognize_next_move_loss () =

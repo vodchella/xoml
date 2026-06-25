@@ -94,6 +94,17 @@ let string_of_pattern_values (kind: pattern_kind) (dir: direction) : string =
     let kind = string_of_pattern_kind kind in
     kind ^ "_" ^ dir
 
+let string_of_pattern_kind_with_indices (p: pattern_kind * int list) : string =
+    (fst p |> string_of_pattern_kind) ^ " [" ^
+    (snd p |> List.map string_of_int |> String.concat ", ") ^ "]"
+
+let string_of_pattern_kinds_with_indices (kinds: (pattern_kind * int list) list) : string =
+    let kinds_str =
+        kinds |>
+        List.map (fun p -> string_of_pattern_kind_with_indices p)
+    in
+    String.concat "; " kinds_str
+
 let pattern_required_points_count (ptrn: pattern) : int =
     Array.fold_left
         (fun acc (_, required) -> acc + if required then 1 else 0)
