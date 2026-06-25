@@ -10,12 +10,21 @@ let cursor_move row col =
     printf "%s[%d;%dH%!" ascii_esc row col
     |> ignore
 
+let color_green = "\027[32m"
+let color_red   = "\027[31m"
+let color_reset = "\027[0m"
+
 let print_at str row col =
     cursor_move row col;
     printf "%s" str
     |> ignore
 
-let print_symbol_at_point symbol point =
+let print_symbol_at_point color symbol point =
+    let symbol =
+        match color with
+        | Some color -> color ^ symbol ^ color_reset
+        | None       -> symbol
+    in
     print_at symbol (point.y + 2) (point.x * 2 + 4)
 
 let make_sparse_row count make_chars_fn =
@@ -73,11 +82,17 @@ let symbol_of_cell = function
    | Some O  -> sym_o
    | None    -> sym_none
 
+let color_of_cell = function
+   | Some X  -> Some color_green
+   | Some O  -> Some color_red
+   | None    -> None
+
 let print_last_figure (g: game) =
     match g.last_move_point, g.last_move_index with
     | Some point, Some index ->
         let symbol = symbol_of_cell g.board.(index) in
-        print_symbol_at_point symbol point
+        let color  = color_of_cell  g.board.(index) in
+        print_symbol_at_point color symbol point
     | _ -> ()
 
 let print_all_figures (g: game) =
@@ -88,9 +103,10 @@ let print_all_figures (g: game) =
             let pl = g.board.(index) in
             match pl with
             | Some _ ->
-                let point = point_of_index g index |> Option.get in
-                let symbol = symbol_of_cell g.board.(index) in
-                print_symbol_at_point symbol point;
+                let point  = point_of_index g index |> Option.get in
+                let symbol = symbol_of_cell g.board.(index)       in
+                let color  = color_of_cell  g.board.(index)       in
+                print_symbol_at_point color symbol point;
                 print_figure (index + 1) |> ignore
             | _ -> print_figure (index + 1) |> ignore
     in
