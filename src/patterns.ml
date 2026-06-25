@@ -3,7 +3,7 @@ open Common
 
 type pattern_kind =
     | PAT50
-    | PAT50H   (* TODO: are we realy need it? *)
+    | PAT50H
     | PAT42
     | PAT33L
     | PAT33R
@@ -100,8 +100,8 @@ let string_of_pattern_kind_with_indices (p: pattern_kind * int list) : string =
 
 let string_of_pattern_kinds_with_indices (kinds: (pattern_kind * int list) list) : string =
     let kinds_str =
-        kinds |>
-        List.map (fun p -> string_of_pattern_kind_with_indices p)
+        kinds
+        |> List.map (fun p -> string_of_pattern_kind_with_indices p)
     in
     String.concat "; " kinds_str
 
@@ -117,14 +117,14 @@ let pattern_generate (kind: pattern_kind) (dir: direction) : pattern =
     let base_index =
         match String.index_opt str '*' with
         | Some i -> i
-        | None -> failwith "Pattern has no base point"
+        | None   -> failwith "Pattern has no base point"
     in
     let rel_points =
         Array.init
             (String.length str)
             (fun i ->
                 let offset = i - base_index in
-                let ch = str.[i] in
+                let ch     = str.[i]        in
                 ( { x = step.x * offset
                   ; y = step.y * offset
                   }

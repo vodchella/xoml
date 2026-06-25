@@ -10,10 +10,6 @@ let cursor_move row col =
     printf "%s[%d;%dH%!" ascii_esc row col
     |> ignore
 
-let color_green = "\027[32m"
-let color_red   = "\027[31m"
-let color_reset = "\027[0m"
-
 let print_at str row col =
     cursor_move row col;
     printf "%s" str
