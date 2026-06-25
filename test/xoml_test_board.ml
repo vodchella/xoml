@@ -53,6 +53,31 @@ let test_check_inevitable_win () =
     let g = apply_move g X "C3" in
     check_best_move g O "H6"
 
+let test_prevent_fork () =
+    let g = init_test_board () in
+    let g = apply_move g X "D4" in
+    let g = apply_move g O "C5" in
+    let g = apply_move g X "E5" in
+    let g = apply_move g O "C3" in
+    let g = apply_move g X "E4" in
+    let g = apply_move g O "C4" in
+    let g = apply_move g X "C2" in
+    let g = apply_move g O "C6" in
+    let g = apply_move g X "C7" in
+    let g = apply_move g O "D3" in
+    let g = apply_move g X "D7" in
+    let g = apply_move g O "E3" in
+    let g = apply_move g X "F3" in
+    let g = apply_move g O "B5" in
+    let g = apply_move g X "E2" in
+    let g = apply_move g O "B3" in
+    let g = apply_move g X "A3" in
+    let g = apply_move g O "D5" in
+    let g = apply_move g X "E6" in
+    let g = apply_move g O "E7" in
+    let g = apply_move g X "F5" in
+    check_best_move g O "G4"
+
 let test_score_board_with_41H_33_fork () =
     let g = init_test_board () in
     let g = apply_move g X "B5" in
@@ -120,6 +145,7 @@ let suite : string * unit Alcotest.test_case list =
         Alcotest.test_case "Check winner"                        `Quick test_check_winner;
         Alcotest.test_case "Check insta win"                     `Quick test_check_insta_win;
         Alcotest.test_case "Check inevitable win"                `Quick test_check_inevitable_win;
+        Alcotest.test_case "Prevent fork"                        `Quick test_prevent_fork;
         Alcotest.test_case "Score board with 41H+33 fork"        `Quick test_score_board_with_41H_33_fork;
         Alcotest.test_case "Recognize a loss on the next move"   `Quick recognize_next_move_loss;
         Alcotest.test_case "Check for a useless move"            `Quick check_for_not_useless_move;

@@ -91,12 +91,19 @@ let eval_position (g : game) (pl : player) : int =
 let check_for_score (g: game) (moves: int list) (pl: player) (score: int) : int option =
     let found = ref false in
     let index = ref (-1)  in
+    (* Logger.write g ("moves: " ^ (move_str_of_indices g moves)); *)
     moves
     |> List.iter (fun m ->
         if not !found then (
             let old_cell = g.board.(m) in
             g.board.(m) <- Some pl;
             let my_score, _ = score_board g pl in
+            (* if pl = X then ( *)
+            (*     let move_str = move_str_of_index g m in *)
+            (*     if move_str = "G4" || move_str = "C8" then ( *)
+            (*         Logger.write g (move_str ^ " score: " ^ (string_of_int my_score)); *)
+            (*     ) *)
+            (* ); *)
             if my_score >= score then (
                 found := true;
                 index := m;
@@ -202,16 +209,16 @@ let find_best_move (g: game) (pl: player) : int option =
         );
 
         (* Check for fast inevitable defeat *)
-        if Option.is_none !break_on_index then (
-            break_on_index := check_for_score g moves (opponent_of pl) score_fast_inev_win;
-            (* break_on_index := check_for_win_with_score g moves (opponent_of pl) score_fast_inev_win; *)
-        );
+        (* if Option.is_none !break_on_index then ( *)
+        (*     break_on_index := check_for_score g moves (opponent_of pl) score_fast_inev_win; *)
+        (*     (* break_on_index := check_for_win_with_score g moves (opponent_of pl) score_fast_inev_win; *) *)
+        (* ); *)
 
         (* Check for inevitable defeat *)
-        if Option.is_none !break_on_index then (
-            break_on_index := check_for_score g moves (opponent_of pl) score_inevitable_win;
-            (* break_on_index := check_for_win_with_score g moves (opponent_of pl) score_inevitable_win; *)
-        );
+        (* if Option.is_none !break_on_index then ( *)
+        (*     break_on_index := check_for_score g moves (opponent_of pl) score_inevitable_win; *)
+        (*     (* break_on_index := check_for_win_with_score g moves (opponent_of pl) score_inevitable_win; *) *)
+        (* ); *)
 
         moves
         |> List.iter (fun m ->

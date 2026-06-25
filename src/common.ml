@@ -135,6 +135,10 @@ let move_str_of_index (g: game) (index: int) : string =
     |> Option.get
     |> move_str_of_point g
 
+let move_str_of_indices (g: game) (indices: int list) : string =
+    indices
+    |> List.map (fun m -> move_str_of_index g m) |> String.concat ","
+
 let string_of_direction = function
     | N  -> "N"
     | E  -> "E"
