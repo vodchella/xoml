@@ -201,6 +201,16 @@ let find_best_move (g: game) (pl: player) : int option =
             break_on_index := check_for_win_with_score g moves pl score_inevitable_win;
         );
 
+        (* Check for fast inevitable defeat *)
+        if Option.is_none !break_on_index then (
+            break_on_index := check_for_win_with_score g moves (opponent_of pl) score_fast_inev_win;
+        );
+
+        (* Check for inevitable defeat *)
+        if Option.is_none !break_on_index then (
+            break_on_index := check_for_win_with_score g moves (opponent_of pl) score_inevitable_win;
+        );
+
         moves
         |> List.iter (fun m ->
             match !break_on_index with
