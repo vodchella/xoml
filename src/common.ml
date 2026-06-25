@@ -1,3 +1,5 @@
+module IntSet = Set.Make(Int)
+
 let printf = Printf.printf
 let chrc   = Char.code
 
@@ -191,10 +193,34 @@ let filter_board_indices (g : game) (fn : int * player option -> bool) : int lis
 
 let get_occupied_indices (g: game) (pl: player) : int list =
     let pl_opt = Some pl in
-    filter_board_indices g (fun (_, v) -> v = pl_opt)
+    filter_board_indices g (fun (_, p) -> p = pl_opt)
+
+let get_all_occupied_indices (g: game) : int list =
+    filter_board_indices g (fun (_, p) -> Option.is_some p)
 
 let indices_intersection_size indices1 indices2 =
     List.fold_left
         (fun acc i -> if List.mem i indices2 then acc + 1 else acc)
         0 indices1
+
+let indices_of_rects (g: game) (rects : (point * point) list) : int list =
+    let add_rect acc (p1, p2) =
+        let x_min = min p1.x p2.x in
+        let x_max = max p1.x p2.x in
+        let y_min = min p1.y p2.y in
+        let y_max = max p1.y p2.y in
+        let rec loop_y y acc =
+            if y > y_max then acc
+            else
+                let rec loop_x x acc =
+                    if x > x_max then acc
+                    else loop_x (x + 1) (IntSet.add (index_of_point g { x; y } |> Option.get) acc)
+                in
+                loop_y (y + 1) (loop_x x_min acc)
+        in
+        loop_y y_min acc
+    in
+    rects
+    |> List.fold_left add_rect IntSet.empty
+    |> IntSet.elements
 

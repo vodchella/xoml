@@ -58,28 +58,6 @@ let is_draw (g: game) : bool =
     Array.exists (fun c -> Option.is_none c) g.board
     |> Bool.not
 
-let get_active_bounds_rect (g: game) : point * point * int =
-    let cnt = ref 0 in
-    let p1  = ref { x = max_int; y = max_int } in
-    let p2  = ref { x = min_int; y = min_int } in
-    g.board |>
-    Array.iteri (fun i cell ->
-        match cell with
-        | Some _ ->
-            (* PERF: This can be optimized to avoid
-                     rewriting points that haven’t changed *)
-            let p   = Option.get (point_of_index g i) in
-            let nx1 = min p.x (!p1).x in
-            let ny1 = min p.y (!p1).y in
-            let nx2 = max p.x (!p2).x in
-            let ny2 = max p.y (!p2).y in
-            cnt := !cnt + 1;
-            p1  := { x = nx1; y = ny1 };
-            p2  := { x = nx2; y = ny2 };
-        | None -> ()
-    );
-    ( !p1, !p2, !cnt )
-
 let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * point) =
     let nx1 = p1.x - factor in
     let ny1 = p1.y - factor in
@@ -92,25 +70,17 @@ let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * poi
     ( {x = nx1; y = ny1}, {x = nx2; y = ny2} )
 
 let get_possible_moves (g: game) : int list =
-    let (p1, p2, cnt) = get_active_bounds_rect g in
     (* TODO: If the player places a piece near the wall, the computer should take the center *)
     (* Now computer makes its first move next to the piece placed by the player *)
-    let expand_factor = if cnt = 1 then 1 else 2 in
-    match cnt with
-    | 0 -> (random_index_near_center g) :: []
-    | _ ->
-        let (p1, p2) = expand_bounds g p1 p2 expand_factor in
-        let result = ref [] in
-        for x = p1.x to p2.x do
-            for y = p1.y to p2.y do
-                let i  = index_of_point g {x; y} |> Option.get in
-                let pl = g.board.(i) in
-                match pl with
-                | Some _ -> ()
-                | None -> result := i :: !result
-            done;
-        done;
-        !result
+    let occ_indices = get_all_occupied_indices g in
+    if List.length occ_indices = 0 then
+        [random_index_near_center g]
+    else
+        let occ_points  = occ_indices |> List.map    (fun i -> (point_of_index g i) |> Option.get) in
+        let points      = occ_points  |> List.map    (fun p -> expand_bounds g p p 1)              in
+        let indices     = indices_of_rects g points                                                in
+        let filtered    = indices     |> List.filter (fun i -> Option.is_none g.board.(i))         in
+        filtered
 
 let eval_position (g : game) (pl : player) : int =
     let my_score  = score_board g pl in
