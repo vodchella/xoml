@@ -1,4 +1,5 @@
 open Common
+open Patterns
 
 let init_test_board () =
     let board_side = 10 in
@@ -12,6 +13,14 @@ let init_test_board () =
             }
     in
     g
+
+let score_test_board
+        (g: game)
+        (pl: player)
+    : int * ((pattern_kind * int list) list)
+    =
+    let ptk_infos = pattern_kind_infos_init g pl in
+    Scoring.score_board g pl ptk_infos
 
 let move_str_of_point (p : Common.point) : string =
     let x_to_letter x = Char.chr (Char.code 'A' + x - 1) in
