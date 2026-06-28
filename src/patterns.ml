@@ -28,6 +28,7 @@ type pattern =
     ; kind       : pattern_kind
     ; dir        : direction
     }
+type pattern_kind_info = pattern_kind * (int list * direction)
 
 (* INFO: it MUST be ordered by scores like in Scoring.score_of_pattern_kind *)
 let pattern_kinds =
@@ -206,12 +207,12 @@ let is_pattern_at_point
         loop 0 []
     ) else [], false, -1
 
-let pattern_kind_at_point_and_dir
+let pattern_kind_info_at_point_and_dir
         (g:   game)
         (pnt: point)
         (pl:  player)
         (dir: direction)
-    : (pattern_kind * (int list * direction)) option
+    : pattern_kind_info option
     =
     let rec loop ptrns =
         match ptrns with
@@ -224,14 +225,62 @@ let pattern_kind_at_point_and_dir
     in
     loop (patterns_of_dir dir)
 
-let pattern_kinds_at_point
+let pattern_kind_infos_at_point
         (g:            game)
         (allowed_dirs: direction list)
         (pnt:          point)
         (pl:           player)
-    : (pattern_kind * (int list * direction)) list
+    : pattern_kind_info list
     =
     List.filter_map
-        (fun dir -> pattern_kind_at_point_and_dir g pnt pl dir)
+        (fun dir -> pattern_kind_info_at_point_and_dir g pnt pl dir)
         allowed_dirs
+
+let pattern_kind_infos_init (g: game) (pl: player) : pattern_kind_info list array =
+    let arr = Array.make g.board_size [] in
+    let rec aux idx =
+        match idx with
+        | 0 -> ()
+        | i -> (
+            let pnt = point_of_index g i |> Option.get in
+            let lst = pattern_kind_infos_at_point g working_dirs pnt pl in
+            arr.(i) <- lst;
+            aux (i - 1)
+        )
+    in
+    aux (g.board_size - 1);
+    arr
+
+let points_to_recalc_pattern_kinds (g: game) (idx: int) (pl: player) : (int * point) list =
+    let rec aux (pnt: point) (dir: direction) (aux_accum: (int * point) list) : (int * point) list =
+        let step         = relative_point_of_direction dir            in
+        let tpnt         = { x = pnt.x + step.x; y = pnt.y + step.y } in
+        let tpnt_idx_opt = index_of_point g tpnt                      in
+        match tpnt_idx_opt with
+        | Some tpnt_idx -> (
+            match g.board.(tpnt_idx) with
+            | Some pl' when pl' != pl -> aux_accum
+            | _ -> aux tpnt dir ((tpnt_idx, tpnt) :: aux_accum)
+        )
+        | None -> aux_accum
+    in
+    let p = point_of_index g idx |> Option.get in
+    [W; NW; N; NE]
+    |> List.map(fun d -> aux p d [])
+    |> List.flatten
+
+let pattern_kind_infos_recalc
+        (g:   game)
+        (idx: int)
+        (pl:  player)
+        (arr: pattern_kind_info list array)
+    : pattern_kind_info list array
+    =
+    let new_arr = Array.copy arr in
+    points_to_recalc_pattern_kinds g idx pl
+    |> List.iter (fun (i, p) -> (
+        let infos = pattern_kind_infos_at_point g working_dirs p pl in
+        new_arr.(i) <- infos
+    ));
+    new_arr
 

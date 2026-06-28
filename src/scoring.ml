@@ -99,7 +99,12 @@ let remove_dir_opt (d: direction) (lst: direction list) : direction list option 
     in
     aux [] lst
 
-let score_board (g: game) (pl: player) : int * ((pattern_kind * int list) list) =
+let score_board
+        (g: game)
+        (pl: player)
+        (ptk_infos: pattern_kind_info list array)
+    : int * ((pattern_kind * int list) list)
+    =
     let indicies = get_occupied_indices g pl        in
     let dir_arr  = ref (init_dirs_array g indicies) in
     let actualize_dir_array (indicies_and_dirs_to_remove: (int * direction) list) =
@@ -119,17 +124,16 @@ let score_board (g: game) (pl: player) : int * ((pattern_kind * int list) list) 
         | i :: rest ->
             match !dir_arr.(i) with
             | None -> loop rest result kinds_accum
-            | Some dirs ->
-                let pnt               = point_of_index g i |> Option.get                                                       in
-                let kinds             = pattern_kinds_at_point g dirs pnt pl                                                   in
-                let scores            = kinds        |> List.map (fun k -> score_of_pattern_kind (fst k))                      in
+            | Some _ ->
+                let infos             = ptk_infos.(i)                                                                          in
+                let scores            = infos        |> List.map (fun k -> score_of_pattern_kind (fst k))                      in
                 let score             = scores       |> List.fold_left ( + ) 0                                                 in
-                let visited_idxs      = kinds        |> List.map (fun k -> snd k)                                              in
+                let visited_idxs      = infos        |> List.map (fun k -> snd k)                                              in
                 let visited_idxs_flat = visited_idxs |> List.concat_map (fun (ints, dir) -> List.map (fun i -> (i, dir)) ints) in
                 actualize_dir_array visited_idxs_flat;
-                loop rest (result + score) (kinds_accum @ kinds)
+                loop rest (result + score) (kinds_accum @ infos)
     in
-    let score, kinds      = loop indicies 0 []                                  in
-    let kind_without_dirs = kinds |> List.map (fun (k, (ints, _)) -> (k, ints)) in
+    let score, infos      = loop indicies 0 []                                  in
+    let kind_without_dirs = infos |> List.map (fun (k, (ints, _)) -> (k, ints)) in
     (score + if has_forks kind_without_dirs then score_inevitable_win else 0), kind_without_dirs
 
