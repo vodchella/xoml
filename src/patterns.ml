@@ -264,10 +264,12 @@ let points_to_recalc_pattern_kinds (g: game) (idx: int) (pl: player) : (int * po
         )
         | None -> aux_accum
     in
-    let p = point_of_index g idx |> Option.get in
-    [W; NW; N; NE]
-    |> List.map(fun d -> aux p d [])
-    |> List.flatten
+    let point  = point_of_index g idx |> Option.get in
+    let result = [W; NW; N; NE]
+        |> List.map(fun d -> aux point d [])
+        |> List.flatten
+    in
+    (idx, point) :: result
 
 let pattern_kind_infos_recalc
         (g:   game)

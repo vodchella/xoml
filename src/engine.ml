@@ -109,9 +109,10 @@ let check_for_score
             g.board.(m) <- Some pl;
             let new_ptk_infos = pattern_kind_infos_recalc g m pl ptk_infos in
             let my_score, _   = score_board g pl new_ptk_infos in
-            (* if pl = X then ( *)
+            (* if pl = O then ( *)
             (*     let move_str = move_str_of_index g m in *)
-            (*     if move_str = "G4" || move_str = "C8" then ( *)
+            (*     if  move_str = "A5" then ( *)
+            (*         Logger.write g (string_of_pattern_kind_infos new_ptk_infos.(m)); *)
             (*         Logger.write g (move_str ^ " score: " ^ (string_of_int my_score)); *)
             (*     ) *)
             (* ); *)
