@@ -131,9 +131,7 @@ let check_for_win_with_score (g: game) (moves: int list) (pl: player) (score: in
     | _ -> None
 
 let find_best_move (g: game) (pl: player) : int option =
-    let max_depth      = 6 in
-    let break_on_index = ref None in
-
+    let max_depth = 6 in
     let rec minimax (g: game) (depth: int) (alpha: int) (beta: int) (cur_pl: player) : int =
         if depth <= 0 then
             eval_position g pl
@@ -157,7 +155,7 @@ let find_best_move (g: game) (pl: player) : int option =
                         if score > !best then best := score;
                         if score > !a    then a    := score;
 
-                        if abs(score) >= score_inevitable_win || Option.is_some !break_on_index then score
+                        if abs(score) >= score_inevitable_win then score
                         else if !a >= beta then !best  (* beta-cutoff *)
                         else loop rest
                 in
@@ -191,9 +189,10 @@ let find_best_move (g: game) (pl: player) : int option =
     match moves with
     | [] -> None
     | _  ->
-        let best_move    = ref None    in
-        let best_score   = ref min_int in
-        let alpha        = ref min_int in
+        let best_move      = ref None    in
+        let break_on_index = ref None    in
+        let best_score     = ref min_int in
+        let alpha          = ref min_int in
 
         (* Check for insta win *)
         break_on_index := check_for_score g moves pl score_insta_win;
@@ -208,12 +207,11 @@ let find_best_move (g: game) (pl: player) : int option =
             break_on_index := check_for_win_with_score g moves pl score_inevitable_win;
         );
 
-        moves
-        |> List.iter (fun m ->
-            match !break_on_index with
-            | Some i ->
-                best_move := Some i;
-            | _ -> (
+        if Option.is_some !break_on_index then (
+            best_move := !break_on_index
+        ) else (
+            moves
+            |> List.iter (fun m ->
                 let old_cell = g.board.(m) in
                 g.board.(m) <- Some pl;
 
@@ -226,7 +224,7 @@ let find_best_move (g: game) (pl: player) : int option =
                 end;
 
                 if score > !alpha then alpha := score;
-            )
+            );
         );
 
         !best_move
