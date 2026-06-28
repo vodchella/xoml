@@ -227,6 +227,11 @@ let find_best_move (g: game) (pl: player) : int option =
         (* Check for insta win *)
         break_on_index := check_for_score g moves pl score_insta_win ptk_infos;
 
+        (* Check for insta defeat *)
+        if Option.is_none !break_on_index then (
+            break_on_index := check_for_score g moves (opponent_of pl) score_insta_win ptk_infos;
+        );
+
         (* Check for fast inevitable win *)
         if Option.is_none !break_on_index then (
             break_on_index := check_for_win_with_score g moves pl score_fast_inev_win ptk_infos;
