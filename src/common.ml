@@ -64,6 +64,7 @@ let color_red            = "\027[31m"
 let color_reset          = "\027[0m"
 let initial_tip          = "Type your move (e.g. 'E4') or 'Q' to exit"
 let empty_row            = String.make (5 + (String.length initial_tip)) ' '
+let engine_version       = "0.3.2"
 let initial_game         =
     { board_width     = default_board_width
     ; board_height    = default_board_height

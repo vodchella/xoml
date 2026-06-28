@@ -27,9 +27,14 @@ let parse_args : run_args =
 
       ("-GTP", Arg.Set gtp_mode,
        "Launch in GTP-mode");
+
+      ("--version", Arg.Unit (fun () ->
+           print_endline ("XOml " ^ engine_version);
+           exit 0),
+       "Show version information");
     ] in
 
-    let usage_msg = "Usage: program_name [-s X] [-d X] [-O] [-GTP]" in
+    let usage_msg = "Usage: program_name [-s X] [-d X] [-O] [-GTP] [--version]" in
     Arg.parse speclist print_endline usage_msg;
 
     let board_side = Option.value !size ~default:default_board_width in
