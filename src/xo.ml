@@ -102,10 +102,11 @@ let rec main_gtp_loop (g: game) =
         (main_gtp_loop[@tailcall]) g
     )
     | CleanBoard -> (
-        let g = init_board_with_side g g.board_width in
-        let g = Logger.reset g in
+        let g' = init_board_with_side g g.board_width  in
+        let g' = { g' with difficulty = g.difficulty } in
+        let g' = Logger.reset g' in
         print_endline "= CLEAN_BOARD\n";
-        (main_gtp_loop[@tailcall]) g
+        (main_gtp_loop[@tailcall]) g'
     )
     | ShowBoard -> (
         print_endline "= SHOW_BOARD";
