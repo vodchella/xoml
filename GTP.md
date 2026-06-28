@@ -41,6 +41,12 @@ Supported commands:
     * `= <P>\n\n` if the game has finished. `<P>` can be either `X` or `O` and denotes the winning player.
     * `= draw\n\n` if the game ended in a draw.
 
+* **DIFFICULTY**
+    - Sets game difficulty.
+    - Example request: `DIFFICULTY <D>\n`, where `<D>` denotes the difficulty. May be `easy` or `normal`.
+    - Example success response: `= DIFFICULTY\n\n`
+    - Example error response: `? unknown difficulty: BLA-BLA\n\n`
+
 * **PLAY**
     - Plays a move by placing a piece on the board.
     - Example request: `PLAY <P> <CELL>\n`, where `<P>` denotes the player (`X` or `O`) and `<CELL>` denotes a board cell (`D5`, `C3`, etc.).

@@ -12,6 +12,7 @@ type gtp_input_result =
     | Name
     | Version
     | ProtocolVersion
+    | GameDifficulty of game_difficulty
     | Play of player * string
     | GenMove of player
     | Winner
@@ -70,6 +71,16 @@ let of_gtp_string (g: game) (s: string) : gtp_input_result =
             let arg_len = List.length parts - 1 in
             let cmd_str = List.nth parts 0 in
             match cmd_str with
+            | "DIFFICULTY" -> (
+                if arg_len == 1 then (
+                    let difficulty_str = List.nth parts 1 in
+                    match difficulty_str with
+                    | "EASY"   -> GameDifficulty Easy
+                    | "NORMAL" -> GameDifficulty Normal
+                    | _ -> Unknown ("unknown difficulty: " ^ difficulty_str)
+                )
+                else Unknown ("invalid arguments count: " ^ cmd_str)
+            )
             | "PLAY" -> (
                 if arg_len == 2 then (
                     let player_str = List.nth parts 1 in

@@ -5,7 +5,7 @@ open Xoml_test_support
 (* Score board *)
 
 let test_check_winner () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
     let g = apply_move g X "B8" in
     let g = apply_move g X "C7" in
     let g = apply_move g X "D6" in
@@ -15,47 +15,47 @@ let test_check_winner () =
     Alcotest.(check (option player_testable)) "winner must be X" (Some X) winner
 
 let test_check_insta_win_1 () =
-    let g = init_test_board () in
-    let g = Engine.apply_move g X "E5" in
-    let g = Engine.apply_move g O "F4" in
-    let g = Engine.apply_move g X "D4" in
-    let g = Engine.apply_move g O "F6" in
-    let g = Engine.apply_move g X "F3" in
-    let g = Engine.apply_move g O "E6" in
-    let g = Engine.apply_move g X "C6" in
-    let g = Engine.apply_move g O "G6" in
-    let g = Engine.apply_move g X "D6" in
-    let g = Engine.apply_move g O "H6" in
-    let g = Engine.apply_move g X "I6" in
-    let g = Engine.apply_move g O "G5" in
-    let g = Engine.apply_move g X "E3" in
-    let g = Engine.apply_move g O "I7" in
-    let g = Engine.apply_move g X "J8" in
-    let g = Engine.apply_move g O "H4" in
-    let g = Engine.apply_move g X "I3" in
-    let g = Engine.apply_move g O "G4" in
-    let g = Engine.apply_move g X "G3" in
-    let g = Engine.apply_move g O "H3" in
-    let g = Engine.apply_move g X "H5" in
-    let g = Engine.apply_move g O "I4" in
-    let g = Engine.apply_move g X "E4" in
+    let g = init_test_board ()  in
+    let g = apply_move g X "E5" in
+    let g = apply_move g O "F4" in
+    let g = apply_move g X "D4" in
+    let g = apply_move g O "F6" in
+    let g = apply_move g X "F3" in
+    let g = apply_move g O "E6" in
+    let g = apply_move g X "C6" in
+    let g = apply_move g O "G6" in
+    let g = apply_move g X "D6" in
+    let g = apply_move g O "H6" in
+    let g = apply_move g X "I6" in
+    let g = apply_move g O "G5" in
+    let g = apply_move g X "E3" in
+    let g = apply_move g O "I7" in
+    let g = apply_move g X "J8" in
+    let g = apply_move g O "H4" in
+    let g = apply_move g X "I3" in
+    let g = apply_move g O "G4" in
+    let g = apply_move g X "G3" in
+    let g = apply_move g O "H3" in
+    let g = apply_move g X "H5" in
+    let g = apply_move g O "I4" in
+    let g = apply_move g X "E4" in
     check_best_move g O "J4"
 
 let test_check_insta_win_2 () =
-    let g = init_test_board () in
-    let g = Engine.apply_move g X "D4" in
-    let g = Engine.apply_move g O "C5" in
-    let g = Engine.apply_move g X "E2" in
-    let g = Engine.apply_move g O "D5" in
-    let g = Engine.apply_move g X "B3" in
-    let g = Engine.apply_move g O "B5" in
-    let g = Engine.apply_move g X "G3" in
-    let g = Engine.apply_move g O "E5" in
-    let g = Engine.apply_move g X "F5" in
+    let g = init_test_board ()  in
+    let g = apply_move g X "D4" in
+    let g = apply_move g O "C5" in
+    let g = apply_move g X "E2" in
+    let g = apply_move g O "D5" in
+    let g = apply_move g X "B3" in
+    let g = apply_move g O "B5" in
+    let g = apply_move g X "G3" in
+    let g = apply_move g O "E5" in
+    let g = apply_move g X "F5" in
     check_best_move g O "A5"
 
 let test_check_inevitable_win () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
     let g = apply_move g X "E5" in
     let g = apply_move g O "F4" in
     let g = apply_move g X "C6" in
@@ -66,7 +66,7 @@ let test_check_inevitable_win () =
     check_best_move g O "H6"
 
 let test_check_losing_position_1 () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
     let g = apply_move g X "D4" in
     let g = apply_move g O "C5" in
     let g = apply_move g X "F6" in
@@ -94,7 +94,7 @@ let test_check_losing_position_1 () =
 
 (* TODO: This test is failing, so it's temporarily disabled. It needs to be investigated *)
 let test_check_losing_position_2 () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
     let g = apply_move g X "E4" in
     let g = apply_move g O "E5" in
     let g = apply_move g X "D3" in
@@ -120,7 +120,7 @@ let test_check_losing_position_2 () =
 
 
 let test_prevent_fork_1 () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
     let g = apply_move g X "D4" in
     let g = apply_move g O "C5" in
     let g = apply_move g X "E5" in
@@ -145,7 +145,8 @@ let test_prevent_fork_1 () =
     check_best_move g O "G4"
 
 let test_prevent_fork_2 () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
+    let g = { g with difficulty = Normal } in
     let g = apply_move g X "D4" in
     let g = apply_move g O "D5" in
     let g = apply_move g X "E3" in
@@ -176,7 +177,7 @@ let test_prevent_fork_2 () =
     check_best_move g O "G5"
 
 let test_prevent_fork_3 () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
     let g = apply_move g X "D4" in
     let g = apply_move g O "D5" in
     let g = apply_move g X "E3" in
@@ -215,7 +216,7 @@ let test_prevent_fork_3 () =
     check_best_move g O "E5"
 
 let test_score_board_with_41H_33_fork () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
     let g = apply_move g X "B5" in
     let g = apply_move g X "B4" in
     let g = apply_move g X "B3" in
@@ -227,7 +228,7 @@ let test_score_board_with_41H_33_fork () =
     Alcotest.(check int) "score must be 10292" 10292 score
 
 let recognize_next_move_loss () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
     let g = apply_move g X "D7" in
     let g = apply_move g O "E7" in
     let g = apply_move g X "E6" in
@@ -258,7 +259,7 @@ let recognize_next_move_loss () =
     check_best_move g O "C8"
 
 let check_for_not_useless_move () =
-    let g = init_test_board () in
+    let g = init_test_board ()  in
     let g = apply_move g O "F6" in
     let g = apply_move g O "G6" in
     let g = apply_move g X "H6" in

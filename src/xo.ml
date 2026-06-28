@@ -63,6 +63,11 @@ let rec main_gtp_loop (g: game) =
         print_endline "= 1\n";
         (main_gtp_loop[@tailcall]) g
     )
+    | GameDifficulty gd -> (
+        let g' = { g with difficulty = gd } in
+        print_endline "= DIFFICULTY\n";
+        (main_gtp_loop[@tailcall]) g'
+    )
     | Play (pl, move_str) -> (
         let g' = Engine.apply_move g pl move_str in
         if g'.last_move_ok then (
@@ -121,9 +126,10 @@ let rec main_gtp_loop (g: game) =
 
 
 let main () =
-    let { board_side; playerO_starts; gtp_mode } = Args.parse_args in
+    let { board_side; playerO_starts; gtp_mode; difficulty } = Args.parse_args in
     let g = initial_game in
-    let g = init_board_with_side g board_side in
+    let g = { g with difficulty = difficulty } in
+    let g = init_board_with_side g board_side  in
     assert (g.board_width  >= 5);
     assert (g.board_width  <= 10);
     assert (g.board_height >= 5);

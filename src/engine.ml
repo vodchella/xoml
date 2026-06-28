@@ -157,7 +157,7 @@ let check_for_win_with_score
     | _ -> None
 
 let find_best_move (g: game) (pl: player) : int option =
-    let max_depth = 6 in
+    let max_depth = if g.difficulty = Easy then 4 else 6 in
     let rec minimax
             (g:             game)
             (depth:         int)

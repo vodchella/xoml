@@ -4,9 +4,10 @@ let printf = Printf.printf
 let chrc   = Char.code
 
 
-type direction  = N | E | S | W | NE | SE | SW | NW
-type player     = X | O
-type game_state = Waiting | Thinking
+type direction       = N | E | S | W | NE | SE | SW | NW
+type player          = X | O
+type game_state      = Waiting | Thinking
+type game_difficulty = Easy | Normal
 
 (* INFO: point is one-based !!! *)
 type point = { x : int
@@ -28,11 +29,13 @@ type game =
     ; state           : game_state
     ; log_file        : out_channel option
     ; log_moves       : bool
+    ; difficulty      : game_difficulty
     }
 type run_args =
     { board_side      : int
     ; playerO_starts  : bool
     ; gtp_mode        : bool
+    ; difficulty      : game_difficulty
     }
 
 
@@ -77,6 +80,7 @@ let initial_game         =
     ; state           = Waiting
     ; log_file        = None
     ; log_moves       = true
+    ; difficulty      = Easy
     }
 
 
