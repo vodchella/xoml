@@ -103,16 +103,16 @@ let string_of_pattern_values (kind: pattern_kind) (dir: direction) : string =
     let kind = string_of_pattern_kind kind in
     kind ^ "_" ^ dir
 
-let string_of_pattern_kind_with_indices (p: pattern_kind * int list) : string =
-    (fst p |> string_of_pattern_kind) ^ " [" ^
-    (snd p |> List.map string_of_int |> String.concat ", ") ^ "]"
+let string_of_pattern_kind_info (info: pattern_kind_info) : string =
+    (fst       info |> string_of_pattern_kind) ^ " [" ^
+    (fst (snd info) |> List.map string_of_int |> String.concat ", ") ^ "]"
 
-let string_of_pattern_kinds_with_indices (kinds: (pattern_kind * int list) list) : string =
-    let kinds_str =
-        kinds
-        |> List.map (fun p -> string_of_pattern_kind_with_indices p)
+let string_of_pattern_kind_infos (infos: pattern_kind_info list) : string =
+    let infos_str =
+        infos
+        |> List.map (fun p -> string_of_pattern_kind_info p)
     in
-    String.concat "; " kinds_str
+    String.concat "; " infos_str
 
 let pattern_required_points_count (ptrn: pattern) : int =
     Array.fold_left
@@ -240,8 +240,8 @@ let pattern_kind_infos_init (g: game) (pl: player) : pattern_kind_info list arra
     let arr = Array.make g.board_size [] in
     let rec aux idx =
         match idx with
-        | 0 -> ()
-        | i -> (
+        | -1 -> ()
+        | i  -> (
             let pnt = point_of_index g i |> Option.get in
             let lst = pattern_kind_infos_at_point g working_dirs pnt pl in
             arr.(i) <- lst;
