@@ -270,7 +270,7 @@ let find_best_move (g: game) (pl: player) : int option =
 
                 let score = minimax g (max_depth - 1) !alpha max_int op new_op_ptk_infos new_pl_ptk_infos in
                 (* let move_str = move_str_of_index g m in *)
-                (* if  move_str = "E2" || move_str = "F4" then ( *)
+                (* if  move_str = "E1" || move_str = "B7" then ( *)
                 (*     Logger.write g (string_of_pattern_kind_infos new_pl_ptk_infos.(m)); *)
                 (*     Logger.write g (move_str ^ " score: " ^ (string_of_int score)); *)
                 (* ); *)

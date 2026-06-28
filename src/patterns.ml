@@ -7,8 +7,8 @@ type pattern_kind =
     | PAT42
     | PAT33L
     | PAT33R
-    (* | PAT33H1 *)
-    (* | PAT33H2 *)
+    | PAT33H1
+    | PAT33H2
     | PAT32
     | PAT41L
     | PAT41R
@@ -37,8 +37,8 @@ let pattern_kinds =
     ; PAT50H
     ; PAT33L
     ; PAT33R
-    (* ; PAT33H1 *)
-    (* ; PAT33H2 *)
+    ; PAT33H1
+    ; PAT33H2
     ; PAT32
     ; PAT41L
     ; PAT41R
@@ -60,8 +60,8 @@ let string_of_pattern_kind = function
     | PAT42   -> "PAT42"
     | PAT33L  -> "PAT33L"
     | PAT33R  -> "PAT33R"
-    (* | PAT33H1 -> "PAT33H1" *)
-    (* | PAT33H2 -> "PAT33H2" *)
+    | PAT33H1 -> "PAT33H1"
+    | PAT33H2 -> "PAT33H2"
     | PAT32   -> "PAT32"
     | PAT41L  -> "PAT41L"
     | PAT41R  -> "PAT41R"
@@ -82,8 +82,8 @@ let pattern_string_of_pattern_kind = function
     | PAT42   -> ".****."
     | PAT33L  -> "..***."
     | PAT33R  -> ".***.."
-    (* | PAT33H1 -> ".*.**." *)
-    (* | PAT33H2 -> ".**.*." *)
+    | PAT33H1 -> ".*.**."
+    | PAT33H2 -> ".**.*."
     | PAT32   -> ".***."
     | PAT41L  -> ".****"
     | PAT41R  -> "****."

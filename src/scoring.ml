@@ -8,8 +8,8 @@ let score_of_pattern_kind = function
     | PAT50H  -> score_inevitable_win
     | PAT33L  -> score_3_2
     | PAT33R  -> score_3_2
-    (* | PAT33H1 -> score_3_2 *)
-    (* | PAT33H2 -> score_3_2 *)
+    | PAT33H1 -> score_3_2
+    | PAT33H2 -> score_3_2
     | PAT32   -> score_3_2
     | PAT41L  -> score_4_1
     | PAT41R  -> score_4_1
@@ -35,8 +35,8 @@ let simple_four_kinds =
 let open_three_kinds =
     [ PAT33L
     ; PAT33R
-    (* ; PAT33H1 *)
-    (* ; PAT33H2 *)
+    ; PAT33H1
+    ; PAT33H2
     ]
 
 (* simple_four + simple_four *)
