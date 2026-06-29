@@ -56,21 +56,19 @@ jobs:
 
       - name: Set up OCaml on Windows
         if: runner.os == 'Windows'
-        shell: pwsh
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: 5
 
-      # - name: Run tests on Windows
-      #   if: runner.os == 'Windows'
-      #   shell: pwsh
-      #   run: |
-      #     opam install . --deps-only --with-test -y
-      #     opam exec -- dune runtest
+      - name: Run tests on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          opam install . --deps-only --with-test -y
+          opam exec -- dune runtest
 
       - name: Set up MSVC on Windows
         if: runner.os == 'Windows'
-        shell: pwsh
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Build on Windows
