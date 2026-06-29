@@ -26,22 +26,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Nix
-        if: runner.os != 'Windows'
+        if: runner.os == 'Linux'
         uses: cachix/install-nix-action@v27
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
       - name: Run tests (nix dev shell)
-        if: runner.os != 'Windows'
+        if: runner.os == 'Linux'
         run: nix develop -c make test
 
       - name: Build with Nix
-        if: runner.os != 'Windows'
+        if: runner.os == 'Linux'
         run: nix build .#static
 
       - name: Create tarball
-        if: runner.os != 'Windows'
+        if: runner.os == 'Linux'
         run: |
           mkdir -p dist
           BIN="result/bin/xoml"
@@ -66,20 +66,27 @@ jobs:
           opam install . --deps-only --with-test -y
           opam exec -- dune runtest
 
+      - name: Set up MSVC on Windows
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Build on Windows
         if: runner.os == 'Windows'
         run: |
           opam exec -- dune build --profile release
+          cp _build/default/src/xo.exe _build/default/src/xoml.exe
+          editbin /SUBSYSTEM:WINDOWS _build/default/src/xoml.exe
 
       - name: Create Windows archive
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           mkdir dist
-          cp _build/default/src/xo.exe dist/xoml.exe
+          cp _build/default/src/xo.exe dist/xoml-console.exe
+          cp _build/default/src/xoml.exe dist/xoml.exe
           $tag="${{ github.ref_name }}"
           $filename="xoml-$tag-${{ matrix.target }}.zip"
-          Compress-Archive -Path dist/xoml.exe -DestinationPath $filename
+          Compress-Archive -Path dist/* -DestinationPath $filename
 
       - name: Upload assets to GitHub release
         uses: softprops/action-gh-release@v2
