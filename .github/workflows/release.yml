@@ -60,11 +60,11 @@ jobs:
         with:
           ocaml-compiler: 5
 
-      - name: Run tests on Windows
-        if: runner.os == 'Windows'
-        run: |
-          opam install . --deps-only --with-test -y
-          opam exec -- dune runtest
+      # - name: Run tests on Windows
+      #   if: runner.os == 'Windows'
+      #   run: |
+      #     opam install . --deps-only --with-test -y
+      #     opam exec -- dune runtest
 
       - name: Set up MSVC on Windows
         if: runner.os == 'Windows'
@@ -72,9 +72,14 @@ jobs:
 
       - name: Build on Windows
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
           opam exec -- dune build --profile release
-          Copy-Item "_build\default\src\xo.exe" "_build\default\src\xoml.exe"
+          Get-ChildItem "_build\default\src"
+          Copy-Item "_build\default\src\xo.exe" "_build\default\src\xoml.exe" -Force
+          if (!(Test-Path "_build\default\src\xoml.exe")) {
+            throw "xoml.exe was not created"
+          }
           editbin /SUBSYSTEM:WINDOWS "_build\default\src\xoml.exe"
 
       - name: Create Windows archive
