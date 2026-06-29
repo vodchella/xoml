@@ -74,16 +74,16 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           opam exec -- dune build --profile release
-          cp _build/default/src/xo.exe _build/default/src/xoml.exe
-          editbin /SUBSYSTEM:WINDOWS _build/default/src/xoml.exe
+          Copy-Item "_build\default\src\xo.exe" "_build\default\src\xoml.exe"
+          editbin /SUBSYSTEM:WINDOWS "_build\default\src\xoml.exe"
 
       - name: Create Windows archive
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           mkdir dist
-          cp _build/default/src/xo.exe dist/xoml-console.exe
-          cp _build/default/src/xoml.exe dist/xoml.exe
+          Copy-Item "_build\default\src\xo.exe"   "dist\xoml-console.exe"
+          Copy-Item "_build\default\src\xoml.exe" "dist\xoml.exe"
           $tag="${{ github.ref_name }}"
           $filename="xoml-$tag-${{ matrix.target }}.zip"
           Compress-Archive -Path dist/* -DestinationPath $filename
