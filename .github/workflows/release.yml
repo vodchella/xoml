@@ -81,6 +81,7 @@ jobs:
           if (!(Test-Path "_build\default\src\xoml.exe")) {
             throw "xoml.exe was not created"
           }
+          (Get-Item "_build\default\src\xoml.exe").IsReadOnly = $false
           editbin /SUBSYSTEM:WINDOWS "_build\default\src\xoml.exe"
 
       - name: Create Windows archive
