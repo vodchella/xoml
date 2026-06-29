@@ -251,8 +251,18 @@ let pattern_kind_infos_init (g: game) (pl: player) : pattern_kind_info list arra
     aux (g.board_size - 1);
     arr
 
-let points_to_recalc_pattern_kinds (g: game) (idx: int) (pl: player) : (int * point) list =
-    let rec aux (pnt: point) (dir: direction) (aux_accum: (int * point) list) : (int * point) list =
+let points_to_recalc_pattern_kinds
+        (g:   game)
+        (idx: int)
+        (pl:  player)
+    : (int * point * direction list) list
+    =
+    let rec aux
+            (pnt:       point)
+            (dir:       direction)
+            (aux_accum: (int * point * direction list) list)
+        : (int * point * direction list) list
+        =
         let step         = relative_point_of_direction dir            in
         let tpnt         = { x = pnt.x + step.x; y = pnt.y + step.y } in
         let tpnt_idx_opt = index_of_point g tpnt                      in
@@ -260,7 +270,7 @@ let points_to_recalc_pattern_kinds (g: game) (idx: int) (pl: player) : (int * po
         | Some tpnt_idx -> (
             match g.board.(tpnt_idx) with
             | Some pl' when pl' != pl -> aux_accum
-            | _ -> aux tpnt dir ((tpnt_idx, tpnt) :: aux_accum)
+            | _ -> aux tpnt dir ((tpnt_idx, tpnt, [opposite_direction_of dir]) :: aux_accum)
         )
         | None -> aux_accum
     in
@@ -269,7 +279,7 @@ let points_to_recalc_pattern_kinds (g: game) (idx: int) (pl: player) : (int * po
         |> List.map(fun d -> aux point d [])
         |> List.flatten
     in
-    (idx, point) :: result
+    (idx, point, working_dirs) :: result
 
 let pattern_kind_infos_recalc
         (g:   game)
@@ -280,8 +290,8 @@ let pattern_kind_infos_recalc
     =
     let new_arr = Array.copy arr in
     points_to_recalc_pattern_kinds g idx pl
-    |> List.iter (fun (i, p) -> (
-        let infos = pattern_kind_infos_at_point g working_dirs p pl in
+    |> List.iter (fun (i, p, dirs) -> (
+        let infos = pattern_kind_infos_at_point g dirs p pl in
         new_arr.(i) <- infos
     ));
     new_arr

@@ -98,6 +98,16 @@ let player_of_string = function
     | "O" -> Some O
     | _     -> None
 
+let opposite_direction_of = function
+    | N  ->  S
+    | E  ->  W
+    | S  ->  N
+    | W  ->  E
+    | NE ->  SW
+    | SE ->  NW
+    | SW ->  NE
+    | NW ->  SE
+
 let point_is_valid (g: game) (pnt: point) : bool =
     match pnt with
     | { x; _ } when x < 1 -> false
