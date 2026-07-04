@@ -65,6 +65,24 @@ let test_check_inevitable_win () =
     let g = apply_move g X "C3" in
     check_best_move g O "H6"
 
+let test_prevent_inevitable_win () =
+    let g = init_test_board ()  in
+    let g = { g with difficulty = Normal } in
+    let g = apply_move g X "D5" in
+    let g = apply_move g O "E4" in
+    let g = apply_move g X "E6" in
+    let g = apply_move g O "F7" in
+    let g = apply_move g X "D6" in
+    let g = apply_move g O "F6" in
+    let g = apply_move g X "F5" in
+    let g = apply_move g O "D4" in
+    let g = apply_move g X "E5" in
+    let g = apply_move g O "G5" in
+    let g = apply_move g X "C6" in
+    let g = apply_move g O "C5" in
+    let g = apply_move g X "D7" in
+    check_best_move g O "G4"
+
 let test_check_losing_position_1 () =
     let g = init_test_board ()  in
     let g = apply_move g X "D4" in
@@ -283,6 +301,7 @@ let suite : string * unit Alcotest.test_case list =
         Alcotest.test_case "Check insta win 1"                   `Quick test_check_insta_win_1;
         Alcotest.test_case "Check insta win 2"                   `Quick test_check_insta_win_2;
         Alcotest.test_case "Check inevitable win"                `Quick test_check_inevitable_win;
+        Alcotest.test_case "Prevent inevitable win"              `Quick test_prevent_inevitable_win;
         Alcotest.test_case "Check losing position 1"             `Quick test_check_losing_position_1;
         (* Alcotest.test_case "Check losing position 2"             `Quick test_check_losing_position_2; *)
         Alcotest.test_case "Prevent fork 1"                      `Quick test_prevent_fork_1;
