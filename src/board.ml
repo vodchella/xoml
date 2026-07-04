@@ -108,6 +108,18 @@ let print_all_figures (g: game) =
     in
     print_figure 0
 
+let print_highlighted_cells (g: game) (cells: int list) =
+    let rec loop lst =
+        match lst with
+        | [] -> ()
+        | cell :: rest -> (
+            let point  = point_of_index g cell |> Option.get in
+            print_symbol_at_point (Some color_yellow) sym_none point;
+            loop rest
+        )
+    in
+    loop cells
+
 let clear_space_for_prompt (g: game) =
     print_at empty_row (g.input_vmargin - 1) 1;
     print_at empty_row g.input_vmargin 1;

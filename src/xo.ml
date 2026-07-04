@@ -2,8 +2,13 @@ open Common
 
 
 let rec main_loop (g: game) =
-    (* Board.print_last_figure g; *)
     Board.print_all_figures g;
+    if g.highlight_possible_moves then (
+        let moves = Engine.get_possible_moves g in
+        if List.length moves > 1 then (
+            Board.print_highlighted_cells g moves;
+        );
+    );
     match Engine.find_winner g with
     | Some winner ->
         Board.print_congratulations g winner;

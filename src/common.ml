@@ -14,22 +14,23 @@ type point = { x : int
              ; y : int
              }
 type game =
-    { board_width     : int
-    ; board_height    : int
-    ; board_size      : int
-    ; board           : player option array
-    ; win_length      : int
-    ; input_vmargin   : int
-    ; last_tip        : string
-    ; last_move_str   : string option
-    ; last_move_point : point option
-    ; last_move_index : int option
-    ; last_move_ok    : bool
-    ; last_player     : player option
-    ; state           : game_state
-    ; log_file        : out_channel option
-    ; log_moves       : bool
-    ; difficulty      : game_difficulty
+    { board_width:              int
+    ; board_height:             int
+    ; board_size:               int
+    ; board:                    player option array
+    ; win_length:               int
+    ; input_vmargin:            int
+    ; last_tip:                 string
+    ; last_move_str:            string option
+    ; last_move_point:          point option
+    ; last_move_index:          int option
+    ; last_move_ok:             bool
+    ; last_player:              player option
+    ; state:                    game_state
+    ; log_file:                 out_channel option
+    ; log_moves:                bool
+    ; difficulty:               game_difficulty
+    ; highlight_possible_moves: bool
     }
 type run_args =
     { board_side      : int
@@ -59,29 +60,31 @@ let ascii_esc            = "\x1b"
 let sym_x                = "X"
 let sym_o                = "O"
 let sym_none             = "."
-let color_green          = "\027[32m"
 let color_red            = "\027[31m"
+let color_green          = "\027[32m"
+let color_yellow         = "\027[33m"
 let color_reset          = "\027[0m"
 let initial_tip          = "Type your move (e.g. 'E4') or 'Q' to exit"
 let empty_row            = String.make (5 + (String.length initial_tip)) ' '
 let engine_version       = "0.3.2"
 let initial_game         =
-    { board_width     = default_board_width
-    ; board_height    = default_board_height
-    ; board_size      = default_board_width * default_board_height  (* Will be set up on startup *)
-    ; board           = Array.make (default_board_width * default_board_height) None
-    ; win_length      = default_win_length
-    ; input_vmargin   = default_board_height + 5                    (* Will be set up on startup *)
-    ; last_tip        = initial_tip
-    ; last_move_str   = None
-    ; last_move_point = None
-    ; last_move_index = None
-    ; last_move_ok    = false
-    ; last_player     = None
-    ; state           = Waiting
-    ; log_file        = None
-    ; log_moves       = true
-    ; difficulty      = Easy
+    { board_width              = default_board_width
+    ; board_height             = default_board_height
+    ; board_size               = default_board_width * default_board_height  (* Will be set up on startup *)
+    ; board                    = Array.make (default_board_width * default_board_height) None
+    ; win_length               = default_win_length
+    ; input_vmargin            = default_board_height + 5                    (* Will be set up on startup *)
+    ; last_tip                 = initial_tip
+    ; last_move_str            = None
+    ; last_move_point          = None
+    ; last_move_index          = None
+    ; last_move_ok             = false
+    ; last_player              = None
+    ; state                    = Waiting
+    ; log_file                 = None
+    ; log_moves                = true
+    ; difficulty               = Easy
+    ; highlight_possible_moves = true
     }
 
 
