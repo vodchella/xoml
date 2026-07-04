@@ -239,13 +239,12 @@ let indices_of_rects (g: game) (rects : (point * point) list) : int list =
             else
                 let rec loop_x x acc =
                     if x > x_max then acc
-                    else loop_x (x + 1) (IntSet.add (index_of_point g { x; y } |> Option.get) acc)
+                    else loop_x (x + 1) ((index_of_point g { x; y } |> Option.get) :: acc)
                 in
                 loop_y (y + 1) (loop_x x_min acc)
         in
         loop_y y_min acc
     in
-    rects
-    |> List.fold_left add_rect IntSet.empty
-    |> IntSet.elements
+    List.fold_left add_rect [] rects
 
+let indices_of_rects_old (g: game) (rects : (point * point) list) : int list = let add_rect acc (p1, p2) = let x_min = min p1.x p2.x in let x_max = max p1.x p2.x in let y_min = min p1.y p2.y in let y_max = max p1.y p2.y in let rec loop_y y acc = if y > y_max then acc else let rec loop_x x acc = if x > x_max then acc else loop_x (x + 1) (IntSet.add (index_of_point g { x; y } |> Option.get) acc) in loop_y (y + 1) (loop_x x_min acc) in loop_y y_min acc in rects |> List.fold_left add_rect IntSet.empty |> IntSet.elements

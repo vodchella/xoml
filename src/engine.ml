@@ -72,6 +72,27 @@ let expand_bounds (g: game) (p1: point) (p2: point) (factor: int) : (point * poi
     let ny2 = if ny2 > g.board_height then g.board_height else ny2 in
     ( {x = nx1; y = ny1}, {x = nx2; y = ny2} )
 
+let unique_moves (g: game) (moves: int list) : int list =
+    let seen = Array.make g.board_size false in
+    let rec loop acc = function
+        | [] -> acc
+        | x :: xs ->
+            if seen.(x) then
+                loop acc xs
+            else begin
+                seen.(x) <- true;
+                loop (x :: acc) xs
+            end
+    in
+    loop [] moves
+
+let get_possible_moves_around_index (g: game) (idx: int) : int list =
+    let point    = point_of_index g idx |> Option.get in
+    let rect     = expand_bounds g point point 1      in
+    let indices  = indices_of_rects g [rect]          in
+    let filtered = indices |> List.filter (fun i -> i != idx && Option.is_none g.board.(i)) in
+    filtered
+
 let get_possible_moves (g: game) : int list =
     (* TODO: If the player places a piece near the wall, the computer should take the center *)
     (* Now computer makes its first move next to the piece placed by the player *)
@@ -79,11 +100,20 @@ let get_possible_moves (g: game) : int list =
     if List.length occ_indices = 0 then
         [random_index_near_center g]
     else
-        let occ_points  = occ_indices |> List.map    (fun i -> (point_of_index g i) |> Option.get) in
-        let points      = occ_points  |> List.map    (fun p -> expand_bounds g p p 1)              in
-        let indices     = indices_of_rects g points                                                in
-        let filtered    = indices     |> List.filter (fun i -> Option.is_none g.board.(i))         in
-        filtered
+        occ_indices
+        |> List.map (fun i -> get_possible_moves_around_index g i)
+        |> List.flatten
+        |> unique_moves g
+        (* |> List.sort (fun a b -> compare b a) *)
+
+        (* let occ_points  = occ_indices |> List.map    (fun i -> (point_of_index g i) |> Option.get) in *)
+        (* let points      = occ_points  |> List.map    (fun p -> expand_bounds g p p 1)              in *)
+        (* let indices     = indices_of_rects_old g points                                            in *)
+        (* let filtered    = indices     |> List.filter (fun i -> Option.is_none g.board.(i))         in *)
+        (* filtered *)
+
+let update_possible_moves_at_index (moves: int list) (idx: int) (new_moves: int list) : int list =
+    new_moves @ List.filter ((<>) idx) moves
 
 let eval_position
         (g : game)
@@ -96,6 +126,30 @@ let eval_position
     let opp_score, _ = score_board g (opponent_of pl) opp_ptk_infos in
     let score        = my_score - opp_score                         in
     score
+
+let create_importance_array
+        (g:              game)
+        (pl:             player)
+        (possible_moves: int list)
+        (cur_ptk_infos:  pattern_kind_info list array)
+        (opp_ptk_infos:  pattern_kind_info list array)
+    : int array
+    =
+    let opp = opponent_of pl in
+    let result = Array.make g.board_size 0 in
+    possible_moves
+    |> List.iter (fun m ->
+        g.board.(m) <- Some pl;
+        let new_cur_ptk_infos = pattern_kind_infos_recalc g m pl cur_ptk_infos in
+        let my_score, _       = score_board g pl new_cur_ptk_infos             in
+        g.board.(m) <- Some opp;
+        let new_opp_ptk_infos = pattern_kind_infos_recalc g m pl opp_ptk_infos in
+        let opp_score, _      = score_board g pl new_opp_ptk_infos             in
+        g.board.(m) <- None;
+        result.(m)  <- (abs my_score) + (abs opp_score);
+        ()
+    );
+    result
 
 let check_for_score
         (g:         game)
@@ -160,6 +214,7 @@ let find_best_move (g: game) (pl: player) : int option =
     let max_depth = if g.difficulty = Easy then 4 else 6 in
     let rec minimax
             (g:             game)
+            (moves:         int list)
             (depth:         int)
             (alpha:         int)
             (beta:          int)
@@ -171,7 +226,6 @@ let find_best_move (g: game) (pl: player) : int option =
         if depth <= 0 then
             eval_position g pl cur_ptk_infos opp_ptk_infos
         else
-            let moves = get_possible_moves g in
             if moves = [] then
                 eval_position g pl cur_ptk_infos opp_ptk_infos
             else if cur_pl = pl then
@@ -188,13 +242,17 @@ let find_best_move (g: game) (pl: player) : int option =
                         let new_cur_ptk_infos = pattern_kind_infos_recalc g m cur_pl cur_ptk_infos in
                         let new_opp_ptk_infos = pattern_kind_infos_recalc g m opp_pl opp_ptk_infos in
 
-                        let score = minimax g (depth - 1) !a beta opp_pl new_opp_ptk_infos new_cur_ptk_infos in
+                        let new_moves = get_possible_moves_around_index g m in
+                        let new_possible_moves = update_possible_moves_at_index moves m new_moves in
+                        (* let new_possible_moves = get_possible_moves g in *)
+
+                        let score = minimax g new_possible_moves (depth - 1) !a beta opp_pl new_opp_ptk_infos new_cur_ptk_infos in
                         g.board.(m) <- old_cell;
 
                         if score > !best then best := score;
                         if score > !a    then a    := score;
 
-                        if abs(score) >= score_inevitable_win then score
+                        if abs score >= score_inevitable_win then score
                         else if !a >= beta then !best  (* beta-cutoff *)
                         else loop rest
                 in
@@ -213,13 +271,17 @@ let find_best_move (g: game) (pl: player) : int option =
                         let new_cur_ptk_infos = pattern_kind_infos_recalc g m cur_pl cur_ptk_infos in
                         let new_opp_ptk_infos = pattern_kind_infos_recalc g m opp_pl opp_ptk_infos in
 
-                        let score = minimax g (depth - 1) alpha !b opp_pl new_opp_ptk_infos new_cur_ptk_infos in
+                        let new_moves = get_possible_moves_around_index g m in
+                        let new_possible_moves = update_possible_moves_at_index moves m new_moves in
+                        (* let new_possible_moves = get_possible_moves g in *)
+
+                        let score = minimax g new_possible_moves (depth - 1) alpha !b opp_pl new_opp_ptk_infos new_cur_ptk_infos in
                         g.board.(m) <- old_cell;
 
                         if score < !best then best := score;
                         if score < !b    then b    := score;
 
-                        if score >= score_insta_win then score
+                        if score >= score_inevitable_win then score
                         else if alpha >= !b then !best  (* alpha-cutoff *)
                         else loop rest
                 in
@@ -261,6 +323,9 @@ let find_best_move (g: game) (pl: player) : int option =
         if Option.is_some !break_on_index then (
             best_move := !break_on_index
         ) else (
+            (* Sort moves by their importance for better alpha/beta cutoff *)
+            (* let importance = create_importance_array g pl moves pl_ptk_infos op_ptk_infos     in *)
+            (* let moves = moves |> List.sort (fun a b -> compare importance.(b) importance.(a)) in *)
             moves
             |> List.iter (fun m ->
                 let old_cell = g.board.(m) in
@@ -268,12 +333,17 @@ let find_best_move (g: game) (pl: player) : int option =
                 let new_pl_ptk_infos = pattern_kind_infos_recalc g m pl pl_ptk_infos in
                 let new_op_ptk_infos = pattern_kind_infos_recalc g m op op_ptk_infos in
 
-                let score = minimax g (max_depth - 1) !alpha max_int op new_op_ptk_infos new_pl_ptk_infos in
-                (* let move_str = move_str_of_index g m in *)
-                (* if  move_str = "E1" || move_str = "B7" then ( *)
-                (*     Logger.write g (string_of_pattern_kind_infos new_pl_ptk_infos.(m)); *)
-                (*     Logger.write g (move_str ^ " score: " ^ (string_of_int score)); *)
-                (* ); *)
+                let new_moves = get_possible_moves_around_index g m in
+                let new_possible_moves = update_possible_moves_at_index moves m new_moves in
+                (* let new_possible_moves = get_possible_moves g in *)
+
+                let score = minimax g new_possible_moves (max_depth - 1) !alpha max_int op new_op_ptk_infos new_pl_ptk_infos in
+                let move_str = move_str_of_index g m in
+                (* if  move_str = "A6" || move_str = "G4" then ( *)
+                if  move_str = "C3" || move_str = "G7" || move_str = "E2" then (
+                    (* Logger.write g (string_of_pattern_kind_infos new_pl_ptk_infos.(m)); *)
+                    Logger.write g (move_str ^ " score: " ^ (string_of_int score));
+                );
                 g.board.(m) <- old_cell;
 
                 if score > !best_score then begin

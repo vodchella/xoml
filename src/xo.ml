@@ -147,6 +147,40 @@ let main () =
     Printexc.record_backtrace true;
     Random.self_init ();
 
+let g = Engine.apply_move g X "D4" in
+let g = Engine.apply_move g O "E3" in
+let g = Engine.apply_move g X "E5" in
+let g = Engine.apply_move g O "D2" in
+let g = Engine.apply_move g X "D5" in
+let g = Engine.apply_move g O "E4" in
+let g = Engine.apply_move g X "F6" in
+let g = { g with difficulty = Normal } in
+(* let g = Engine.apply_move g O "E2" in *)
+
+(*     let g = Engine.apply_move g X "D4" in *)
+(*     let g = Engine.apply_move g O "C5" in *)
+(*     let g = Engine.apply_move g X "E5" in *)
+(*     let g = Engine.apply_move g O "C3" in *)
+(*     let g = Engine.apply_move g X "E4" in *)
+(*     let g = Engine.apply_move g O "C4" in *)
+(*     let g = Engine.apply_move g X "C2" in *)
+(*     let g = Engine.apply_move g O "C6" in *)
+(*     let g = Engine.apply_move g X "C7" in *)
+(*     let g = Engine.apply_move g O "D3" in *)
+(*     let g = Engine.apply_move g X "D7" in *)
+(*     let g = Engine.apply_move g O "E3" in *)
+(*     let g = Engine.apply_move g X "F3" in *)
+(*     let g = Engine.apply_move g O "B5" in *)
+(*     let g = Engine.apply_move g X "E2" in *)
+(*     let g = Engine.apply_move g O "B3" in *)
+(*     let g = Engine.apply_move g X "A3" in *)
+(*     let g = Engine.apply_move g O "D5" in *)
+(*     let g = Engine.apply_move g X "E6" in *)
+(*     let g = Engine.apply_move g O "E7" in *)
+(*     let g = Engine.apply_move g X "F5" in *)
+(* let g = { g with difficulty = Normal } in *)
+(* let g = Engine.apply_move g O "B4" in *)
+
     if gtp_mode then
         (main_gtp_loop[@tailcall]) g
     else (
