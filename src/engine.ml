@@ -124,8 +124,7 @@ let eval_position
     =
     let my_score,  _ = score_board g pl cur_ptk_infos               in
     let opp_score, _ = score_board g (opponent_of pl) opp_ptk_infos in
-    let score        = my_score - opp_score                         in
-    score
+    my_score - opp_score
 
 let create_importance_array
         (g:              game)
@@ -143,11 +142,10 @@ let create_importance_array
         let new_cur_ptk_infos = pattern_kind_infos_recalc g m pl cur_ptk_infos in
         let my_score, _       = score_board g pl new_cur_ptk_infos             in
         g.board.(m) <- Some opp;
-        let new_opp_ptk_infos = pattern_kind_infos_recalc g m pl opp_ptk_infos in
-        let opp_score, _      = score_board g pl new_opp_ptk_infos             in
+        let new_opp_ptk_infos = pattern_kind_infos_recalc g m opp opp_ptk_infos in
+        let opp_score, _      = score_board g opp new_opp_ptk_infos             in
         g.board.(m) <- None;
-        result.(m)  <- (abs my_score) + (abs opp_score);
-        ()
+        result.(m)  <- (abs my_score) + (abs opp_score)
     );
     result
 
@@ -211,7 +209,7 @@ let check_for_win_with_score
     | _ -> None
 
 let find_best_move (g: game) (pl: player) : int option =
-    let max_depth = if g.difficulty = Easy then 4 else 6 in
+    let max_depth = if g.difficulty = Easy then 4 else 4 in
     let rec minimax
             (g:             game)
             (moves:         int list)
@@ -224,10 +222,10 @@ let find_best_move (g: game) (pl: player) : int option =
         : int
         =
         if depth <= 0 then
-            eval_position g pl cur_ptk_infos opp_ptk_infos
+            eval_position g cur_pl cur_ptk_infos opp_ptk_infos
         else
             if moves = [] then
-                eval_position g pl cur_ptk_infos opp_ptk_infos
+                eval_position g cur_pl cur_ptk_infos opp_ptk_infos
             else if cur_pl = pl then
                 (* The "maximizing" player is making a move *)
                 let best = ref min_int in
@@ -252,7 +250,7 @@ let find_best_move (g: game) (pl: player) : int option =
                         if score > !best then best := score;
                         if score > !a    then a    := score;
 
-                        if abs score >= score_inevitable_win then score
+                        if score >= score_inevitable_win then score
                         else if !a >= beta then !best  (* beta-cutoff *)
                         else loop rest
                 in
@@ -340,10 +338,10 @@ let find_best_move (g: game) (pl: player) : int option =
                 let score = minimax g new_possible_moves (max_depth - 1) !alpha max_int op new_op_ptk_infos new_pl_ptk_infos in
                 let move_str = move_str_of_index g m in
                 (* if  move_str = "A6" || move_str = "G4" then ( *)
-                if  move_str = "C3" || move_str = "G7" || move_str = "E2" then (
+                (* if  move_str = "C3" || move_str = "G7" || move_str = "E2" then ( *)
                     (* Logger.write g (string_of_pattern_kind_infos new_pl_ptk_infos.(m)); *)
                     Logger.write g (move_str ^ " score: " ^ (string_of_int score));
-                );
+                (* ); *)
                 g.board.(m) <- old_cell;
 
                 if score > !best_score then begin
